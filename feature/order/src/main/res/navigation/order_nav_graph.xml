@@ -5,8 +5,6 @@
     android:id="@+id/order_nav_graph"
     app:startDestination="@id/orderFragment">
 
-    <deepLink app:uri="android-app://ru.shawarma.clientapp/order"/>
-
     <fragment
         android:id="@+id/orderFragment"
         android:label="@string/order"

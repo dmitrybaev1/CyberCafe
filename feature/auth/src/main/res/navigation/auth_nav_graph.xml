@@ -5,8 +5,6 @@
     android:id="@+id/auth_nav_graph"
     app:startDestination="@id/authFragment">
 
-    <deepLink app:uri="android-app://ru.shawarma.clientapp/auth"/>
-
     <fragment
         android:id="@+id/authFragment"
         android:label="@string/auth"
