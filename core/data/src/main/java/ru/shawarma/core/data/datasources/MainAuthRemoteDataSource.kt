@@ -1,11 +1,9 @@
 package ru.shawarma.core.data.datasources
 
 import kotlinx.coroutines.CoroutineDispatcher
+import okhttp3.ResponseBody
 import ru.shawarma.core.data.Result
-import ru.shawarma.core.data.entities.AuthData
-import ru.shawarma.core.data.entities.TokensRequest
-import ru.shawarma.core.data.entities.UserLoginRequest
-import ru.shawarma.core.data.entities.UserRegisterRequest
+import ru.shawarma.core.data.entities.*
 import ru.shawarma.core.data.safeServiceCall
 import ru.shawarma.core.data.services.AuthService
 
@@ -25,7 +23,7 @@ class MainAuthRemoteDataSource(
         }
 
 
-    override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<Unit> =
+    override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser> =
         safeServiceCall(dispatcher){
             authService.register(userRegisterRequest)
         }

@@ -1,25 +1,19 @@
-package ru.shawarma.core.data.repositories
+package ru.shawarma.core.data.testdoubles
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import ru.shawarma.core.data.Result
 import ru.shawarma.core.data.datasources.AuthRemoteDataSource
 import ru.shawarma.core.data.entities.*
 
-class MainAuthRepository(
-    private val authRemoteDataSource: AuthRemoteDataSource
-): AuthRepository {
+class FakeAuthRemoteDataSource: AuthRemoteDataSource  {
 
     override suspend fun login(userLoginRequest: UserLoginRequest): Result<AuthData> =
-        authRemoteDataSource.login(userLoginRequest)
-
+        Result.Success(AuthData("", "", "", 0))
 
     override suspend fun refreshToken(tokensRequest: TokensRequest): Result<AuthData> =
-        authRemoteDataSource.refreshToken(tokensRequest)
-
+        Result.Success(AuthData("", "", "", 0))
 
     override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser> =
-        authRemoteDataSource.register(userRegisterRequest)
+        Result.Failure("")
 
 }

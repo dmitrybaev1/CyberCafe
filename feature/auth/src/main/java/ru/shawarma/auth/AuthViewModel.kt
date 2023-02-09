@@ -26,13 +26,17 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<AuthUIState?>(null)
     val authState = _authState.asStateFlow()
 
-    private val _isError = MutableLiveData(false)
+    private val _isError = MutableLiveData<Boolean>(false)
     val isError: LiveData<Boolean> = _isError
 
     val email = MutableLiveData("")
     val password = MutableLiveData("")
 
-    private val authRepository: AuthRepository = MainAuthRepository(MainAuthRemoteDataSource(AppRetrofit.authService,Dispatchers.IO))
+    var authRepository: AuthRepository = MainAuthRepository(
+        MainAuthRemoteDataSource(
+            AppRetrofit.authService,
+            Dispatchers.IO)
+    )
 
     fun goToRegister(){
         _navCommand.value = NavigationCommand.ToRegister
@@ -50,7 +54,6 @@ class AuthViewModel : ViewModel() {
     }
 
     fun setEmptyInputError(){
-        Log.d("error","error")
         _isError.value = true
         _authState.value = AuthUIState.Error(Errors.emptyInputError)
     }

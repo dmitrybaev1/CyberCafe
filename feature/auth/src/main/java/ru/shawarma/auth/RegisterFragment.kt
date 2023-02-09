@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import ru.shawarma.auth.databinding.FragmentRegisterBinding
+import ru.shawarma.core.data.Errors
 
 class RegisterFragment : Fragment() {
 
@@ -33,15 +34,6 @@ class RegisterFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.navCommand.observe(viewLifecycleOwner){
-            AlertDialog.Builder(requireContext())
-                .setTitle(R.string.confirm_email_title)
-                .setMessage(R.string.confirm_email_text)
-                .setPositiveButton(R.string.ok){ dialog, _ ->
-                    dialog.dismiss()
-                    findNavController().popBackStack()
-                }.create().show()
-        }
         viewModel.registerState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
             .filterNotNull()
             .onEach { state -> handleRegisterState(state) }
@@ -50,10 +42,21 @@ class RegisterFragment : Fragment() {
 
     private fun handleRegisterState(state: RegisterUIState){
         when(state){
-            is RegisterUIState.Success -> {}
+            is RegisterUIState.Success -> {
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.confirm_email_title)
+                    .setMessage(R.string.confirm_email_text)
+                    .setPositiveButton(R.string.ok){ dialog, _ ->
+                        dialog.dismiss()
+                        findNavController().popBackStack()
+                    }.create().show()
+            }
             is RegisterUIState.Error -> {
-                if(state.message == "empty input error")
-                    binding!!.registerErrorTextView.text = resources.getString(R.string.empty_input_error)
+                when(val message = state.message){
+                    Errors.emptyInputError -> binding!!.registerErrorTextView.text = resources.getString(R.string.empty_input_error)
+                    Errors.networkError -> binding!!.registerErrorTextView.text = resources.getString(R.string.unknown_error)
+                    else -> binding!!.registerErrorTextView.text = message
+                }
             }
         }
     }
