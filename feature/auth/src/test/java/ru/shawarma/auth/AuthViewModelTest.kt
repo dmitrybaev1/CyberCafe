@@ -14,12 +14,15 @@ import ru.shawarma.auth.navigation.NavigationCommand
 import ru.shawarma.auth.viewmodels.AuthUIState
 import ru.shawarma.auth.viewmodels.AuthViewModel
 import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 
 class AuthViewModelTest {
 
     private lateinit var viewModel: AuthViewModel
+
+    private lateinit var authRepository: AuthRepository
 
     private lateinit var authData: AuthData
 
@@ -31,13 +34,14 @@ class AuthViewModelTest {
 
     @Before
     fun setup(){
-        viewModel = AuthViewModel(mock(),mock())
+        authRepository = mock()
+        viewModel = AuthViewModel(authRepository,mock())
         authData = AuthData("","","",0)
     }
 
     @Test
     fun `Successful auth`() = runTest {
-        whenever(viewModel.authRepository.login(any())).thenReturn(Result.Success(authData))
+        whenever(authRepository.login(any())).thenReturn(Result.Success(authData))
         viewModel.auth()
         assertTrue(viewModel.authState.value is AuthUIState.Success && !viewModel.isError.value!!)
     }
@@ -52,7 +56,7 @@ class AuthViewModelTest {
 
     @Test
     fun `Network error when trying auth`() = runTest {
-        whenever(viewModel.authRepository.login(any())).thenReturn(Result.NetworkFailure)
+        whenever(authRepository.login(any())).thenReturn(Result.NetworkFailure)
         viewModel.auth()
         val state = viewModel.authState.value as AuthUIState.Error
         assertEquals(Errors.NETWORK_ERROR, state.message)
@@ -61,7 +65,7 @@ class AuthViewModelTest {
 
     @Test
     fun `Api error when trying auth`() = runTest {
-        whenever(viewModel.authRepository.login(any())).thenReturn(Result.Failure(""))
+        whenever(authRepository.login(any())).thenReturn(Result.Failure(""))
         viewModel.auth()
         val state = viewModel.authState.value as AuthUIState.Error
         assertEquals("", state.message)
