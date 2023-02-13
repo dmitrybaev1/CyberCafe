@@ -1,8 +1,7 @@
 package ru.shawarma.core.data.datasources
 
-import okhttp3.ResponseBody
-import ru.shawarma.core.data.Result
 import ru.shawarma.core.data.entities.*
+import ru.shawarma.core.data.utils.Result
 
 interface AuthRemoteDataSource {
 

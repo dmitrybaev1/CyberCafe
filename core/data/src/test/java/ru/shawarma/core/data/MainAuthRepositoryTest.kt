@@ -10,6 +10,7 @@ import ru.shawarma.core.data.entities.UserLoginRequest
 import ru.shawarma.core.data.entities.UserRegisterRequest
 import ru.shawarma.core.data.repositories.MainAuthRepository
 import ru.shawarma.core.data.testdoubles.FakeAuthRemoteDataSource
+import ru.shawarma.core.data.utils.Result
 
 class MainAuthRepositoryTest {
     private lateinit var mainAuthRepository: MainAuthRepository

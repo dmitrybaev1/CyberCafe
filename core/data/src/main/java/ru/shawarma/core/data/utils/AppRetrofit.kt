@@ -1,4 +1,4 @@
-package ru.shawarma.core.data
+package ru.shawarma.core.data.utils
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

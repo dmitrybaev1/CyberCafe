@@ -9,4 +9,7 @@ data class AuthData(
     val refreshToken: String,
     val tokenType: String,
     val expiresIn: Long
-): Parcelable
+): Parcelable{
+    fun isEmpty(): Boolean =
+        this == AuthData("","","",0)
+}

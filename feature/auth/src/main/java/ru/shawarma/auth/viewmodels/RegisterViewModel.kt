@@ -1,25 +1,21 @@
-package ru.shawarma.auth
+package ru.shawarma.auth.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.shawarma.core.data.AppRetrofit
-import ru.shawarma.core.data.Errors
-import ru.shawarma.core.data.Result
-import ru.shawarma.core.data.datasources.MainAuthRemoteDataSource
-import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.RegisteredUser
 import ru.shawarma.core.data.entities.UserRegisterRequest
 import ru.shawarma.core.data.repositories.AuthRepository
-import ru.shawarma.core.data.repositories.MainAuthRepository
+import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.data.utils.Result
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(
+    val authRepository: AuthRepository
+) : ViewModel() {
 
     private val _registerState = MutableStateFlow<RegisterUIState?>(null)
     val registerState = _registerState.asStateFlow()
@@ -31,11 +27,11 @@ class RegisterViewModel : ViewModel() {
     private val _isError = MutableLiveData(false)
     val isError: LiveData<Boolean> = _isError
 
-    var authRepository: AuthRepository = MainAuthRepository(
+    /*var authRepository: AuthRepository = MainAuthRepository(
         MainAuthRemoteDataSource(
             AppRetrofit.authService,
             Dispatchers.IO)
-    )
+    )*/
 
     fun register(){
         val userRegisterRequest = UserRegisterRequest(name.value!!,email.value!!,password.value!!)
@@ -43,14 +39,14 @@ class RegisterViewModel : ViewModel() {
             when(val result = authRepository.register(userRegisterRequest)){
                 is Result.Success<RegisteredUser> -> { _registerState.value = RegisterUIState.Success(result.data); _isError.value = false }
                 is Result.Failure -> { _registerState.value = RegisterUIState.Error(result.message); _isError.value = true }
-                is Result.NetworkFailure -> { _registerState.value = RegisterUIState.Error(Errors.networkError); _isError.value = true }
+                is Result.NetworkFailure -> { _registerState.value = RegisterUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }
         }
     }
 
     fun setEmptyInputError(){
         _isError.value = true
-        _registerState.value = RegisterUIState.Error(Errors.emptyInputError)
+        _registerState.value = RegisterUIState.Error(Errors.EMPTY_INPUT_ERROR)
     }
 }
 

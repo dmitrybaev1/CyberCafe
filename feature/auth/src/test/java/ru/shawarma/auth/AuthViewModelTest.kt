@@ -5,16 +5,17 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import ru.shawarma.core.data.Errors
-import ru.shawarma.core.data.Result
+import ru.shawarma.auth.navigation.NavigationCommand
+import ru.shawarma.auth.viewmodels.AuthUIState
+import ru.shawarma.auth.viewmodels.AuthViewModel
 import ru.shawarma.core.data.entities.AuthData
-import ru.shawarma.core.data.repositories.MainAuthRepository
+import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.data.utils.Result
 
 class AuthViewModelTest {
 
@@ -30,8 +31,7 @@ class AuthViewModelTest {
 
     @Before
     fun setup(){
-        viewModel = AuthViewModel()
-        viewModel.authRepository = mock()
+        viewModel = AuthViewModel(mock(),mock())
         authData = AuthData("","","",0)
     }
 
@@ -46,7 +46,7 @@ class AuthViewModelTest {
     fun `Empty error when trying auth`() = runTest {
         viewModel.setEmptyInputError()
         val state = viewModel.authState.value as AuthUIState.Error
-        assertEquals(Errors.emptyInputError,state.message)
+        assertEquals(Errors.EMPTY_INPUT_ERROR,state.message)
         assertTrue(viewModel.isError.value!!)
     }
 
@@ -55,7 +55,7 @@ class AuthViewModelTest {
         whenever(viewModel.authRepository.login(any())).thenReturn(Result.NetworkFailure)
         viewModel.auth()
         val state = viewModel.authState.value as AuthUIState.Error
-        assertEquals(Errors.networkError, state.message)
+        assertEquals(Errors.NETWORK_ERROR, state.message)
         assertTrue(viewModel.isError.value!!)
     }
 
@@ -73,4 +73,6 @@ class AuthViewModelTest {
         viewModel.goToRegister()
         assertEquals(NavigationCommand.ToRegister,viewModel.navCommand.value)
     }
+
+
 }

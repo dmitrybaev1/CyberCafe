@@ -1,11 +1,8 @@
 package ru.shawarma.core.data.repositories
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
-import ru.shawarma.core.data.Result
 import ru.shawarma.core.data.datasources.AuthRemoteDataSource
 import ru.shawarma.core.data.entities.*
+import ru.shawarma.core.data.utils.Result
 
 class MainAuthRepository(
     private val authRemoteDataSource: AuthRemoteDataSource

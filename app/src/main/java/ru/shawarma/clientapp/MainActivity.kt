@@ -1,16 +1,16 @@
 package ru.shawarma.clientapp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import ru.shawarma.auth.AuthNavigation
-import ru.shawarma.menu.MenuNavigation
+import ru.shawarma.auth.navigation.AuthNavigation
 import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.menu.MenuNavigation
 
 class MainActivity : AppCompatActivity(), AuthNavigation, MenuNavigation {
 

@@ -1,4 +1,4 @@
-package ru.shawarma.auth
+package ru.shawarma.auth.navigation
 
 import ru.shawarma.core.data.entities.AuthData
 

@@ -1,9 +1,8 @@
 package ru.shawarma.core.data.testdoubles
 
-import okhttp3.ResponseBody
-import ru.shawarma.core.data.Result
 import ru.shawarma.core.data.datasources.AuthRemoteDataSource
 import ru.shawarma.core.data.entities.*
+import ru.shawarma.core.data.utils.Result
 
 class FakeAuthRemoteDataSource: AuthRemoteDataSource  {
 

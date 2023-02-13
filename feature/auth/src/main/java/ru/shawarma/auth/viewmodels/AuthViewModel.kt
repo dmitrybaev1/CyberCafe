@@ -1,24 +1,24 @@
-package ru.shawarma.auth
+package ru.shawarma.auth.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.shawarma.core.data.AppRetrofit
-import ru.shawarma.core.data.Errors
-import ru.shawarma.core.data.datasources.MainAuthRemoteDataSource
+import ru.shawarma.auth.navigation.NavigationCommand
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.UserLoginRequest
 import ru.shawarma.core.data.repositories.AuthRepository
-import ru.shawarma.core.data.repositories.MainAuthRepository
-import ru.shawarma.core.data.Result
+import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.data.utils.TokenManager
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(
+    val authRepository: AuthRepository,
+    val tokenManager: TokenManager
+) : ViewModel() {
 
     private val _navCommand = MutableLiveData<NavigationCommand>()
     val navCommand: LiveData<NavigationCommand> = _navCommand
@@ -26,17 +26,17 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<AuthUIState?>(null)
     val authState = _authState.asStateFlow()
 
-    private val _isError = MutableLiveData<Boolean>(false)
+    private val _isError = MutableLiveData(false)
     val isError: LiveData<Boolean> = _isError
 
     val email = MutableLiveData("")
     val password = MutableLiveData("")
 
-    var authRepository: AuthRepository = MainAuthRepository(
+    /*var authRepository: AuthRepository = MainAuthRepository(
         MainAuthRemoteDataSource(
             AppRetrofit.authService,
             Dispatchers.IO)
-    )
+    )*/
 
     fun goToRegister(){
         _navCommand.value = NavigationCommand.ToRegister
@@ -46,16 +46,26 @@ class AuthViewModel : ViewModel() {
         val userLoginRequest = UserLoginRequest(email.value!!,password.value!!)
         viewModelScope.launch {
             when(val result = authRepository.login(userLoginRequest)){
-                is Result.Success<AuthData> -> { _authState.value = AuthUIState.Success(result.data); _isError.value = false }
+                is Result.Success<AuthData> -> {
+                    val authData = result.data
+                    tokenManager.update(authData)
+                    _authState.value = AuthUIState.Success(authData)
+                    _isError.value = false
+                }
                 is Result.Failure -> { _authState.value = AuthUIState.Error(result.message); _isError.value = true }
-                is Result.NetworkFailure -> { _authState.value = AuthUIState.Error(Errors.networkError); _isError.value = true }
+                is Result.NetworkFailure -> { _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }
         }
     }
 
     fun setEmptyInputError(){
         _isError.value = true
-        _authState.value = AuthUIState.Error(Errors.emptyInputError)
+        _authState.value = AuthUIState.Error(Errors.EMPTY_INPUT_ERROR)
+    }
+
+    fun setRefreshTokenError(message: String){
+        _isError.value = true
+        _authState.value = AuthUIState.Error(message)
     }
 }
 

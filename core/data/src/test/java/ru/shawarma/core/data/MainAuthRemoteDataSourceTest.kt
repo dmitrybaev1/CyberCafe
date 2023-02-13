@@ -10,6 +10,7 @@ import ru.shawarma.core.data.entities.TokensRequest
 import ru.shawarma.core.data.entities.UserLoginRequest
 import ru.shawarma.core.data.entities.UserRegisterRequest
 import ru.shawarma.core.data.testdoubles.FakeAuthService
+import ru.shawarma.core.data.utils.Result
 
 class MainAuthRemoteDataSourceTest {
 

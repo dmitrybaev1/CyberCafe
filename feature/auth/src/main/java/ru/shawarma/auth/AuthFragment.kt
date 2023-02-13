@@ -1,29 +1,33 @@
 package ru.shawarma.auth
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import ru.shawarma.auth.databinding.FragmentAuthBinding
-import ru.shawarma.core.data.Errors
+import ru.shawarma.auth.navigation.AuthNavigation
+import ru.shawarma.auth.viewmodels.AuthUIState
+import ru.shawarma.auth.viewmodels.AuthViewModel
+import ru.shawarma.core.data.utils.Errors
 
 class AuthFragment : Fragment() {
 
     private var binding: FragmentAuthBinding? = null
     private val viewModel: AuthViewModel by viewModels()
 
-    /*Here we should implement observers like triggers in fragment lifecycle (not view!). Only LiveData
-     works with value caching and doesn't invoke duplicate value observe when we move back here from other fragments*/
+    /*Here we should implement observers like triggers or commands in fragment lifecycle (not view
+    because view will be recreated and reset consumers). Only LiveData works with value caching and
+    doesn't invoke duplicate value observing when we move back here from other fragments and switch
+    in STARTED state again*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.navCommand.observe(this){
@@ -40,14 +44,22 @@ class AuthFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         this.binding = binding
+        arguments?.let{bundle ->
+            viewModel.setRefreshTokenError(bundle.getString("error") ?: Errors.REFRESH_TOKEN_ERROR)
+        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.authState.flowWithLifecycle(viewLifecycleOwner.lifecycle)
-            .filterNotNull()
-            .onEach { state -> handleAuthState(state) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewLifecycleOwner.lifecycleScope.launch{
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.authState.filterNotNull().stateIn(this)
+                    .collect{state ->
+                        handleAuthState(state)
+                    }
+            }
+        }
+
     }
 
     private fun handleAuthState(state: AuthUIState){
@@ -57,8 +69,9 @@ class AuthFragment : Fragment() {
             }
             is AuthUIState.Error -> {
                 when(val message = state.message){
-                    Errors.emptyInputError -> binding!!.authErrorTextView.text = resources.getString(R.string.empty_input_error)
-                    Errors.networkError -> binding!!.authErrorTextView.text = resources.getString(R.string.unknown_error)
+                    Errors.EMPTY_INPUT_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.empty_input_error)
+                    Errors.NETWORK_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.unknown_error)
+                    Errors.REFRESH_TOKEN_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.refresh_token_error)
                     else -> binding!!.authErrorTextView.text = message
                 }
             }
