@@ -13,11 +13,14 @@ import org.mockito.kotlin.whenever
 import ru.shawarma.auth.viewmodels.RegisterUIState
 import ru.shawarma.auth.viewmodels.RegisterViewModel
 import ru.shawarma.core.data.entities.RegisteredUser
+import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 
 class RegisterViewModelTest {
     private lateinit var viewModel: RegisterViewModel
+
+    private lateinit var authRepository: AuthRepository
 
     private lateinit var registeredUser: RegisteredUser
 
@@ -29,13 +32,14 @@ class RegisterViewModelTest {
 
     @Before
     fun setup(){
-        viewModel = RegisterViewModel(mock())
+        authRepository = mock()
+        viewModel = RegisterViewModel(authRepository)
         registeredUser = RegisteredUser("","","")
     }
 
     @Test
     fun `Successful register`() = runTest {
-        whenever(viewModel.authRepository.register(any())).thenReturn(Result.Success(registeredUser))
+        whenever(authRepository.register(any())).thenReturn(Result.Success(registeredUser))
         viewModel.register()
         assertTrue(viewModel.registerState.value is RegisterUIState.Success && !viewModel.isError.value!!)
     }
@@ -50,7 +54,7 @@ class RegisterViewModelTest {
 
     @Test
     fun `Network error when trying register`() = runTest {
-        whenever(viewModel.authRepository.register(any())).thenReturn(Result.NetworkFailure)
+        whenever(authRepository.register(any())).thenReturn(Result.NetworkFailure)
         viewModel.register()
         val state = viewModel.registerState.value as RegisterUIState.Error
         assertEquals(Errors.NETWORK_ERROR, state.message)
@@ -59,7 +63,7 @@ class RegisterViewModelTest {
 
     @Test
     fun `Api error when trying auth`() = runTest {
-        whenever(viewModel.authRepository.register(any())).thenReturn(Result.Failure(""))
+        whenever(authRepository.register(any())).thenReturn(Result.Failure(""))
         viewModel.register()
         val state = viewModel.registerState.value as RegisterUIState.Error
         assertEquals("", state.message)

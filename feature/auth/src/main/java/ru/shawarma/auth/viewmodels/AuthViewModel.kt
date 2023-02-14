@@ -16,8 +16,8 @@ import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
 
 class AuthViewModel(
-    val authRepository: AuthRepository,
-    val tokenManager: TokenManager
+    private val authRepository: AuthRepository,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
 
     private val _navCommand = MutableLiveData<NavigationCommand>()
