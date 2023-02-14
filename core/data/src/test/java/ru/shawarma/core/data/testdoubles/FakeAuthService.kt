@@ -1,7 +1,5 @@
 package ru.shawarma.core.data.testdoubles
 
-import okhttp3.ResponseBody
-import org.mockito.kotlin.mock
 import ru.shawarma.core.data.entities.*
 import ru.shawarma.core.data.services.AuthService
 

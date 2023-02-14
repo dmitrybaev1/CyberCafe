@@ -14,7 +14,7 @@ import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 
 class RegisterViewModel(
-    val authRepository: AuthRepository
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _registerState = MutableStateFlow<RegisterUIState?>(null)
