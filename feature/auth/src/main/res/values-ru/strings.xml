@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="auth">Авторизация</string>
+    <string name="email">Почта</string>
+    <string name="name">Имя</string>
+    <string name="password">Пароль</string>
+    <string name="sign_in">Войти</string>
+    <string name="log_in">Вход</string>
+    <string name="register">Нет аккаунта?</string>
+    <string name="register_explicit">Зарегистрироваться</string>
+    <string name="join_us">Присоединяйтесь к нам</string>
+    <string name="confirm_email_title">Подтвердите почту</string>
+    <string name="confirm_email_text">Вы должны подтвердить ваш почтовый адрес. Мы выслали вам ссылку для подтверждения. Пожалуйста, проверьте сообщения и перейдите по ссылке.</string>
+    <string name="ok">Ок</string>
+    <string name="empty_input_error">Email и пароль не могут быть пустыми</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="refresh_token_error">Срок сессии истек, попробуйте авторизоваться снова</string>
 </resources>

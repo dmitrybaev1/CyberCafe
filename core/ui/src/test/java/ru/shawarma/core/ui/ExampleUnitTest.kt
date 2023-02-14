@@ -1,4 +1,4 @@
-package ru.shawarma.auth
+package ru.shawarma.core.ui
 
 import org.junit.Test
 

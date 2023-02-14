@@ -10,6 +10,15 @@
         android:label="@string/auth"
         android:name="ru.shawarma.auth.AuthFragment"
         tools:layout="@layout/fragment_auth">
+        <action android:id="@+id/actionAuthToRegister"
+            app:destination="@id/registerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:label="@string/auth"
+        android:name="ru.shawarma.auth.RegisterFragment"
+        tools:layout="@layout/fragment_register">
     </fragment>
 
 

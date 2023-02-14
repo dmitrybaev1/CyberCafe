@@ -1,15 +1,15 @@
 package ru.shawarma.clientapp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.os.bundleOf
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import ru.shawarma.auth.AuthNavigation
+import ru.shawarma.auth.navigation.AuthNavigation
+import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.menu.MenuNavigation
 
 class MainActivity : AppCompatActivity(), AuthNavigation, MenuNavigation {
@@ -28,8 +28,9 @@ class MainActivity : AppCompatActivity(), AuthNavigation, MenuNavigation {
         toolbar.setupWithNavController(navController,appBarConfig)
     }
 
-    override fun navigateToMenu() {
-        navController.navigate(ru.shawarma.menu.R.id.menu_nav_graph)
+    override fun navigateToMenu(authData: AuthData) {
+        val bundle = bundleOf("authData" to authData)
+        navController.navigate(ru.shawarma.menu.R.id.menu_nav_graph, bundle)
     }
 
     override fun navigateToSettings() {

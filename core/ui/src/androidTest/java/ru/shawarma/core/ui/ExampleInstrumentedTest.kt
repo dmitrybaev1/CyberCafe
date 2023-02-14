@@ -1,4 +1,4 @@
-package ru.shawarma.auth
+package ru.shawarma.core.ui
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("ru.shawarma.auth.test", appContext.packageName)
+        assertEquals("ru.shawarma.core.ui.test", appContext.packageName)
     }
 }
