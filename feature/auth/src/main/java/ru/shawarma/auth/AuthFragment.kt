@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -19,9 +20,12 @@ import ru.shawarma.auth.viewmodels.AuthUIState
 import ru.shawarma.auth.viewmodels.AuthViewModel
 import ru.shawarma.core.data.utils.Errors
 
+@AndroidEntryPoint
 class AuthFragment : Fragment() {
 
     private var binding: FragmentAuthBinding? = null
+
+
     private val viewModel: AuthViewModel by viewModels()
 
     /*Here we should implement observers like triggers or commands in fragment lifecycle (not view

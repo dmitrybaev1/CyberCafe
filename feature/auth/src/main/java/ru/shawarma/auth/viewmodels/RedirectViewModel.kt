@@ -2,6 +2,7 @@ package ru.shawarma.auth.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -12,8 +13,10 @@ import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.core.data.utils.checkExpires
+import javax.inject.Inject
 
-class RedirectViewModel(
+@HiltViewModel
+class RedirectViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
     isManualAuthorization: Boolean = false // especially for tests

@@ -5,8 +5,11 @@ import ru.shawarma.core.data.entities.*
 import ru.shawarma.core.data.services.AuthService
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.safeServiceCall
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MainAuthRemoteDataSource(
+@Singleton
+class MainAuthRemoteDataSource @Inject constructor(
     private val authService: AuthService,
     private val dispatcher: CoroutineDispatcher): AuthRemoteDataSource {
 

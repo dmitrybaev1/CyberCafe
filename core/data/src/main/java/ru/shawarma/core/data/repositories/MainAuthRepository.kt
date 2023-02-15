@@ -3,8 +3,11 @@ package ru.shawarma.core.data.repositories
 import ru.shawarma.core.data.datasources.AuthRemoteDataSource
 import ru.shawarma.core.data.entities.*
 import ru.shawarma.core.data.utils.Result
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MainAuthRepository(
+@Singleton
+class MainAuthRepository @Inject constructor(
     private val authRemoteDataSource: AuthRemoteDataSource
 ): AuthRepository {
 
