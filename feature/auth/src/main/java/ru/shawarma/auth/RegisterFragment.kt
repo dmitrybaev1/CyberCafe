@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -19,9 +20,11 @@ import ru.shawarma.auth.viewmodels.RegisterUIState
 import ru.shawarma.auth.viewmodels.RegisterViewModel
 import ru.shawarma.core.data.utils.Errors
 
+@AndroidEntryPoint
 class RegisterFragment : Fragment() {
 
     private var binding: FragmentRegisterBinding? = null
+
     private val viewModel: RegisterViewModel by viewModels()
 
     override fun onCreateView(

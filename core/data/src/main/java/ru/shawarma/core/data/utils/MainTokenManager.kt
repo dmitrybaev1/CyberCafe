@@ -4,14 +4,17 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.shawarma.core.data.entities.AuthData
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class MainTokenManager(
-    private val context: Context,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Main
+@Singleton
+class MainTokenManager @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val dispatcher: CoroutineDispatcher
 ): TokenManager {
 
     private val ACCESS_TOKEN = stringPreferencesKey("access_token")

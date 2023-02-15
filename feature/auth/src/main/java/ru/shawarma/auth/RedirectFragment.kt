@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ import ru.shawarma.auth.navigation.AuthNavigation
 import ru.shawarma.auth.viewmodels.RedirectState
 import ru.shawarma.auth.viewmodels.RedirectViewModel
 
+@AndroidEntryPoint
 class RedirectFragment : Fragment() {
 
     private val viewModel: RedirectViewModel by viewModels()
