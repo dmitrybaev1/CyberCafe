@@ -27,14 +27,20 @@ class RegisterViewModel @Inject constructor(
     val name = MutableLiveData("")
     val password = MutableLiveData("")
 
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     private val _isError = MutableLiveData(false)
     val isError: LiveData<Boolean> = _isError
 
 
     fun register(){
+        _isLoading.value = true
         val userRegisterRequest = UserRegisterRequest(name.value!!,email.value!!,password.value!!)
         viewModelScope.launch {
-            when(val result = authRepository.register(userRegisterRequest)){
+            val result = authRepository.register(userRegisterRequest)
+            _isLoading.value = false
+            when(result){
                 is Result.Success<RegisteredUser> -> { _registerState.value = RegisterUIState.Success(result.data); _isError.value = false }
                 is Result.Failure -> { _registerState.value = RegisterUIState.Error(result.message); _isError.value = true }
                 is Result.NetworkFailure -> { _registerState.value = RegisterUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }

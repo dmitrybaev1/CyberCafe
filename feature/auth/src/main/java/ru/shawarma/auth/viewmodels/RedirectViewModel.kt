@@ -1,5 +1,7 @@
 package ru.shawarma.auth.viewmodels
 
+import android.os.SystemClock
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,11 +18,16 @@ import ru.shawarma.core.data.utils.checkExpires
 import javax.inject.Inject
 
 @HiltViewModel
-class RedirectViewModel @Inject constructor(
+class RedirectViewModel(
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager,
-    isManualAuthorization: Boolean = false // especially for tests
+    isManualAuthorization: Boolean
 ) : ViewModel() {
+
+    @Inject constructor(
+        authRepository: AuthRepository,
+        tokenManager: TokenManager
+    ) : this(authRepository,tokenManager,false)
 
     private val _redirectState = MutableStateFlow<RedirectState?>(null)
     val redirectState = _redirectState.asStateFlow()
@@ -37,6 +44,7 @@ class RedirectViewModel @Inject constructor(
                 if(!checkExpires(authData.expiresIn))
                     _redirectState.value = RedirectState.TokenValid(authData)
                 else{
+                    Log.d("redirectVM","REFRESH TOKEN")
                     refreshToken(TokensRequest(authData.refreshToken, authData.accessToken))
                 }
             }

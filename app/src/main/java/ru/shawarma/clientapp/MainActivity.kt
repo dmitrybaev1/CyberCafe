@@ -5,15 +5,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
+import androidx.navigation.createGraph
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.fragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import ru.shawarma.auth.navigation.AuthNavigation
+import dagger.hilt.android.AndroidEntryPoint
+import ru.shawarma.auth.AuthFragment
 import ru.shawarma.core.data.entities.AuthData
-import ru.shawarma.menu.MenuNavigation
+import ru.shawarma.core.ui.AppNavigation
+import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.InternetConnectionStatus
 
-class MainActivity : AppCompatActivity(), AuthNavigation, MenuNavigation {
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity(), AppNavigation,
+    CommonComponentsController,InternetConnectionStatus {
 
+    private lateinit var toolbar: Toolbar
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +32,7 @@ class MainActivity : AppCompatActivity(), AuthNavigation, MenuNavigation {
         //AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         val appBarConfig = AppBarConfiguration(navController.graph)
         toolbar.setupWithNavController(navController,appBarConfig)
@@ -40,6 +50,12 @@ class MainActivity : AppCompatActivity(), AuthNavigation, MenuNavigation {
     override fun navigateToOrder() {
         navController.navigate(ru.shawarma.order.R.id.order_nav_graph)
     }
+
+    override fun setupToolbarForInsideNavigation(subGraph: NavGraph) {
+        toolbar.setupWithNavController(navController, AppBarConfiguration(subGraph))
+    }
+
+    override fun isOnline(): Boolean = true
 
 
 }

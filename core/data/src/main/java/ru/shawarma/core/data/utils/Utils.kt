@@ -1,6 +1,7 @@
 package ru.shawarma.core.data.utils
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -25,7 +26,7 @@ fun checkExpires(expiresIn: Long): Boolean =
 
 
 internal fun parseError(httpException: HttpException): ApiError {
-    val converter = AppRetrofit.instance.responseBodyConverter<ApiError>(
+    val converter = AppRetrofit.getInstance().responseBodyConverter<ApiError>(
         ApiError::class.java,
         arrayOf<Annotation>())
     val apiError: ApiError
@@ -33,6 +34,7 @@ internal fun parseError(httpException: HttpException): ApiError {
         apiError = httpException.response()?.errorBody()?.let { converter.convert(it) }!!
     }
     catch (e: Exception){
+        Log.d("parseError","${e.message}")
         return ApiError("Unknown error")
     }
     return apiError
@@ -45,6 +47,7 @@ internal suspend fun <T> safeServiceCall(dispatcher: CoroutineDispatcher, call: 
             Result.Success(result)
         }
         catch(e: Exception){
+            e.printStackTrace()
             when(e){
                 is HttpException -> {
                     when(e.code()){

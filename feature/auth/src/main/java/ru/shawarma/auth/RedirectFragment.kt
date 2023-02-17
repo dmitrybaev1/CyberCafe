@@ -1,6 +1,8 @@
 package ru.shawarma.auth
 
 import android.os.Bundle
+import android.os.SystemClock
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +12,19 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import ru.shawarma.auth.navigation.AuthNavigation
 import ru.shawarma.auth.viewmodels.RedirectState
 import ru.shawarma.auth.viewmodels.RedirectViewModel
+import ru.shawarma.core.ui.AppNavigation
 
 @AndroidEntryPoint
 class RedirectFragment : Fragment() {
@@ -36,11 +43,17 @@ class RedirectFragment : Fragment() {
                 viewModel.redirectState.filterNotNull().stateIn(viewLifecycleOwner.lifecycleScope)
                     .collect{state ->
                         when(state){
-                            RedirectState.NoToken -> findNavController().navigate(R.id.actionRedirectToAuth)
-                            is RedirectState.RefreshError -> findNavController().navigate(R.id.actionRedirectToAuth,
-                                bundleOf("error" to state.message)
-                            )
-                            is RedirectState.TokenValid -> (requireActivity() as AuthNavigation).navigateToMenu(state.authData)
+                            RedirectState.NoToken -> {
+                                findNavController().navigate(R.id.actionRedirectToAuth)
+                            }
+                            is RedirectState.RefreshError -> {
+                                findNavController().navigate(R.id.actionRedirectToAuth,
+                                bundleOf("error" to state.message))
+                            }
+                            is RedirectState.TokenValid -> {
+                                findNavController().popBackStack(R.id.redirectFragment,true)
+                                (requireActivity() as AppNavigation).navigateToMenu(state.authData)
+                            }
                         }
                     }
             }

@@ -60,7 +60,7 @@
             android:id="@+id/authErrorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ошибка вы пидор чмо ебаное блять"
+            android:text=""
             android:visibility="@{viewModel.isError() ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,12 +71,26 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/sign_in"
+            android:text='@{viewModel.isLoading() ? "" : @string/sign_in}'
+            android:clickable="@{!viewModel.isLoading()}"
             android:onClick="@{() -> (!viewModel.email.empty &amp;&amp; !viewModel.password.empty) ? viewModel.auth() : viewModel.setEmptyInputError()}"
             android:textAllCaps="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/authErrorTextView" />
+
+
+        <ProgressBar
+            android:id="@+id/authButtonProgressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:elevation="10dp"
+            android:visibility="@{viewModel.isLoading() ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/authSignInButton"
+            app:layout_constraintBottom_toBottomOf="@+id/authSignInButton"/>
 
         <Button
             android:id="@+id/authRegisterButton"

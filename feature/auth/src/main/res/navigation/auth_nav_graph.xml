@@ -11,7 +11,9 @@
         android:name="ru.shawarma.auth.RedirectFragment"
         tools:layout="@layout/fragment_redirect">
         <action android:id="@+id/actionRedirectToAuth"
-            app:destination="@id/authFragment"/>
+            app:destination="@id/authFragment"
+            app:popUpTo="@id/auth_nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment

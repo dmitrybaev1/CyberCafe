@@ -32,23 +32,23 @@ class AuthViewModel @Inject constructor(
     private val _isError = MutableLiveData(false)
     val isError: LiveData<Boolean> = _isError
 
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     val email = MutableLiveData("")
     val password = MutableLiveData("")
-
-    /*var authRepository: AuthRepository = MainAuthRepository(
-        MainAuthRemoteDataSource(
-            AppRetrofit.authService,
-            Dispatchers.IO)
-    )*/
 
     fun goToRegister(){
         _navCommand.value = NavigationCommand.ToRegister
     }
 
     fun auth(){
+        _isLoading.value = true
         val userLoginRequest = UserLoginRequest(email.value!!,password.value!!)
         viewModelScope.launch {
-            when(val result = authRepository.login(userLoginRequest)){
+            val result = authRepository.login(userLoginRequest)
+            _isLoading.value = false
+            when(result){
                 is Result.Success<AuthData> -> {
                     val authData = result.data
                     tokenManager.update(authData)

@@ -15,4 +15,5 @@
     <string name="empty_input_error">Email and password can\'t be empty</string>
     <string name="unknown_error">Unknown error</string>
     <string name="refresh_token_error">Session is invalid, try login again</string>
+    <string name="email_not_found_error">Incorrect email</string>
 </resources>
