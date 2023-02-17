@@ -64,6 +64,8 @@ class RegisterFragment : Fragment() {
             is RegisterUIState.Error -> {
                 when(val message = state.message){
                     Errors.EMPTY_INPUT_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.empty_input_error)
+                    Errors.EMAIL_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.email_error)
+                    Errors.PASSWORD_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.password_error)
                     Errors.NETWORK_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.unknown_error)
                     else -> binding!!.registerErrorTextView.text = message
                 }

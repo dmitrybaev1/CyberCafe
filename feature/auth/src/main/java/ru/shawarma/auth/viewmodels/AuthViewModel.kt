@@ -8,6 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.shawarma.auth.checkEmail
+import ru.shawarma.auth.checkPassword
 import ru.shawarma.auth.navigation.NavigationCommand
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.UserLoginRequest
@@ -43,6 +45,16 @@ class AuthViewModel @Inject constructor(
     }
 
     fun auth(){
+        if(!checkPassword(password.value!!)){
+            _isError.value = true
+            _authState.value = AuthUIState.Error(Errors.PASSWORD_ERROR)
+            return
+        }
+        if(!checkEmail(email.value!!)){
+            _isError.value = true
+            _authState.value = AuthUIState.Error(Errors.EMAIL_ERROR)
+            return
+        }
         _isLoading.value = true
         val userLoginRequest = UserLoginRequest(email.value!!,password.value!!)
         viewModelScope.launch {

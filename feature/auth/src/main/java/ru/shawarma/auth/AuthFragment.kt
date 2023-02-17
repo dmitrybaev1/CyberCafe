@@ -9,12 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavGraph
 import androidx.navigation.createGraph
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -82,7 +79,8 @@ class AuthFragment : Fragment() {
             is AuthUIState.Error -> {
                 when(val message = state.message){
                     Errors.EMPTY_INPUT_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.empty_input_error)
-                    Errors.NOT_FOUND_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.email_not_found_error)
+                    Errors.EMAIL_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.email_error)
+                    Errors.PASSWORD_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.password_error)
                     Errors.NETWORK_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.unknown_error)
                     Errors.REFRESH_TOKEN_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.refresh_token_error)
                     else -> binding!!.authErrorTextView.text = message

@@ -8,6 +8,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.shawarma.auth.checkEmail
+import ru.shawarma.auth.checkPassword
 import ru.shawarma.core.data.entities.RegisteredUser
 import ru.shawarma.core.data.entities.UserRegisterRequest
 import ru.shawarma.core.data.repositories.AuthRepository
@@ -35,6 +37,16 @@ class RegisterViewModel @Inject constructor(
 
 
     fun register(){
+        if(!checkPassword(password.value!!)){
+            _isError.value = true
+            _registerState.value = RegisterUIState.Error(Errors.PASSWORD_ERROR)
+            return
+        }
+        if(!checkEmail(email.value!!)){
+            _isError.value = true
+            _registerState.value = RegisterUIState.Error(Errors.EMAIL_ERROR)
+            return
+        }
         _isLoading.value = true
         val userRegisterRequest = UserRegisterRequest(name.value!!,email.value!!,password.value!!)
         viewModelScope.launch {
