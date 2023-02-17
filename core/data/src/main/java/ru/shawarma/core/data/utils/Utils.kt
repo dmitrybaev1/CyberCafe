@@ -14,6 +14,8 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "au
 
 object Errors {
     const val EMPTY_INPUT_ERROR = "EmptyInputError"
+    const val PASSWORD_ERROR = "PasswordError"
+    const val EMAIL_ERROR = "EmailError"
     const val NETWORK_ERROR = "NetworkError"
     const val REFRESH_TOKEN_ERROR = "RefreshTokenError"
     const val UNAUTHORIZED_ERROR = "401Error"
