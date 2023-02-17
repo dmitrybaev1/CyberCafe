@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="auth_hint">Авторизация</string>
+    <string name="auth">Авторизация</string>
     <string name="email_hint">Почта</string>
     <string name="name_hint">Имя (необязательно)</string>
-    <string name="password">Пароль</string>
+    <string name="password_hint">Пароль</string>
     <string name="sign_in">Войти</string>
     <string name="log_in">Вход</string>
     <string name="register">Нет аккаунта?</string>

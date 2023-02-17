@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/redirectFragment"
-        android:label="@string/auth_hint"
+        android:label="@string/auth"
         android:name="ru.shawarma.auth.RedirectFragment"
         tools:layout="@layout/fragment_redirect">
         <action android:id="@+id/actionRedirectToAuth"
@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/authFragment"
-        android:label="@string/auth_hint"
+        android:label="@string/auth"
         android:name="ru.shawarma.auth.AuthFragment"
         tools:layout="@layout/fragment_auth">
         <action android:id="@+id/actionAuthToRegister"
@@ -27,7 +27,7 @@
 
     <fragment
         android:id="@+id/registerFragment"
-        android:label="@string/auth_hint"
+        android:label="@string/auth"
         android:name="ru.shawarma.auth.RegisterFragment"
         tools:layout="@layout/fragment_register">
     </fragment>
