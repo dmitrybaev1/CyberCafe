@@ -1,11 +1,14 @@
 package ru.shawarma.core.data.utils
 
+import android.util.Log
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.shawarma.core.data.services.AuthService
 import ru.shawarma.core.data.services.MenuService
+import java.util.Locale
 
 enum class FeatureApi{
     AUTH,MENU
@@ -17,10 +20,18 @@ object AppRetrofit {
     private var menuInstance: Retrofit? = null
 
     fun getInstance(api: FeatureApi = FeatureApi.AUTH): Retrofit{
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
+        val loggingInterceptor = HttpLoggingInterceptor()
+        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
         val client = OkHttpClient.Builder()
-            .addInterceptor(interceptor).build()
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor{chain ->
+                val original: Request = chain.request()
+                val request: Request = original.newBuilder()
+                    .header("Accept-Language", Locale.getDefault().toLanguageTag())
+                    .method(original.method(), original.body())
+                    .build()
+                chain.proceed(request)
+            }.build()
         when (api) {
             FeatureApi.AUTH -> {
                 return authInstance ?: run {
