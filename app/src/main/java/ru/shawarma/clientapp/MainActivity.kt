@@ -51,8 +51,16 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         navController.navigate(ru.shawarma.order.R.id.order_nav_graph)
     }
 
-    override fun setupToolbarForInsideNavigation(subGraph: NavGraph) {
-        toolbar.setupWithNavController(navController, AppBarConfiguration(subGraph))
+    override fun setupToolbarForInsideNavigation(
+        navController: NavController?,
+        subGraph: NavGraph
+    ) {
+        navController?.let {
+            toolbar.setupWithNavController(it, AppBarConfiguration(subGraph))
+        } ?: run{
+            toolbar.setupWithNavController(this.navController, AppBarConfiguration(subGraph))
+        }
+
     }
 
     override fun isOnline(): Boolean = true
