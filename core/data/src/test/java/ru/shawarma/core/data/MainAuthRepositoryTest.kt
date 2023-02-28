@@ -13,7 +13,7 @@ import ru.shawarma.core.data.testdoubles.FakeAuthRemoteDataSource
 import ru.shawarma.core.data.utils.Result
 
 class MainAuthRepositoryTest {
-    private lateinit var mainAuthRepository: MainAuthRepository
+    private lateinit var authRepository: MainAuthRepository
 
     private lateinit var authRemoteDataSource: FakeAuthRemoteDataSource
 
@@ -26,7 +26,7 @@ class MainAuthRepositoryTest {
     @Before
     fun setup(){
         authRemoteDataSource = FakeAuthRemoteDataSource()
-        mainAuthRepository = MainAuthRepository(authRemoteDataSource)
+        authRepository = MainAuthRepository(authRemoteDataSource)
         userLoginRequest = UserLoginRequest("","")
         tokensRequest = TokensRequest("","")
         registerRequest = UserRegisterRequest("","","")
@@ -36,7 +36,7 @@ class MainAuthRepositoryTest {
     fun loginTest() = runTest {
         assertEquals(
             (authRemoteDataSource.login(userLoginRequest) as Result.Success<AuthData>).data,
-            (mainAuthRepository.login(userLoginRequest) as Result.Success<AuthData>).data
+            (authRepository.login(userLoginRequest) as Result.Success<AuthData>).data
         )
     }
 
@@ -44,7 +44,7 @@ class MainAuthRepositoryTest {
     fun refreshTokenTest() = runTest {
         assertEquals(
             (authRemoteDataSource.refreshToken(tokensRequest) as Result.Success<AuthData>).data,
-            (mainAuthRepository.refreshToken(tokensRequest) as Result.Success<AuthData>).data
+            (authRepository.refreshToken(tokensRequest) as Result.Success<AuthData>).data
         )
     }
 
@@ -52,7 +52,7 @@ class MainAuthRepositoryTest {
     fun registerTest() = runTest {
         assertEquals(
             (authRemoteDataSource.register(registerRequest) as Result.Failure).message,
-            (mainAuthRepository.register(registerRequest) as Result.Failure).message
+            (authRepository.register(registerRequest) as Result.Failure).message
         )
     }
 }

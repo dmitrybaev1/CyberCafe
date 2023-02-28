@@ -14,7 +14,7 @@ import ru.shawarma.core.data.utils.Result
 
 class MainAuthRemoteDataSourceTest {
 
-    private lateinit var mainAuthRemoteDataSource: MainAuthRemoteDataSource
+    private lateinit var authRemoteDataSource: MainAuthRemoteDataSource
 
     private lateinit var authService: FakeAuthService
 
@@ -35,28 +35,28 @@ class MainAuthRemoteDataSourceTest {
 
     @Test
     fun `login response correctly wrapped into result`() = runTest {
-        mainAuthRemoteDataSource = MainAuthRemoteDataSource(authService,
+        authRemoteDataSource = MainAuthRemoteDataSource(authService,
             StandardTestDispatcher(testScheduler))
         val expected = Result.Success(authService.login(userLoginRequest))
-        val actual = mainAuthRemoteDataSource.login(userLoginRequest)
+        val actual = authRemoteDataSource.login(userLoginRequest)
         assertTrue(expected.javaClass == actual.javaClass)
     }
 
     @Test
     fun `refresh token response correctly wrapped into result`() = runTest {
-        mainAuthRemoteDataSource = MainAuthRemoteDataSource(authService,
+        authRemoteDataSource = MainAuthRemoteDataSource(authService,
             StandardTestDispatcher(testScheduler))
         val expected = Result.Success(authService.refreshToken(tokensRequest))
-        val actual = mainAuthRemoteDataSource.refreshToken(tokensRequest)
+        val actual = authRemoteDataSource.refreshToken(tokensRequest)
         assertTrue(expected.javaClass == actual.javaClass)
     }
 
     @Test
     fun `register response correctly wrapped into result`() = runTest {
-        mainAuthRemoteDataSource = MainAuthRemoteDataSource(authService,
+        authRemoteDataSource = MainAuthRemoteDataSource(authService,
             StandardTestDispatcher(testScheduler))
         val expected = Result.Success(authService.register(registerRequest))
-        val actual = mainAuthRemoteDataSource.register(registerRequest)
+        val actual = authRemoteDataSource.register(registerRequest)
         assertTrue(expected.javaClass == actual.javaClass)
     }
 }

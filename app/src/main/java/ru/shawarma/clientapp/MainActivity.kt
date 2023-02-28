@@ -63,6 +63,15 @@ class MainActivity : AppCompatActivity(), AppNavigation,
 
     }
 
+    override fun inflateToolbarMenu(
+        menuRes: Int,
+        onMenuItemClickListener: Toolbar.OnMenuItemClickListener
+    ) {
+        toolbar.inflateMenu(menuRes)
+        toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
+    }
+
+
     override fun isOnline(): Boolean = true
 
 
