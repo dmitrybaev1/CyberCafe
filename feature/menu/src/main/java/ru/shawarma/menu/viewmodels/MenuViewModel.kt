@@ -17,6 +17,11 @@ import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.core.data.utils.checkExpiresAndTryRefresh
 import ru.shawarma.menu.*
+import ru.shawarma.menu.entities.CartMenuItem
+import ru.shawarma.menu.entities.MenuElement
+import ru.shawarma.menu.utlis.PlaceholderStringType
+import ru.shawarma.menu.utlis.STANDARD_REQUEST_OFFSET
+import ru.shawarma.menu.utlis.mapMenuItemResponseToMenuItem
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,7 +61,13 @@ class MenuViewModel @Inject constructor(
 
     val getPlaceholderString: LiveData<Map<PlaceholderStringType,Array<Any>>> = _getPlaceholderString
 
-    private val cartList = arrayListOf<MenuElement.MenuItem>()
+    private val _cartListLiveData = MutableLiveData<List<CartMenuItem>>()
+
+    val cartListLiveData: LiveData<List<CartMenuItem>> = _cartListLiveData
+
+    private val rawCartList = arrayListOf<MenuElement.MenuItem>()
+
+    private var cartList = arrayListOf<CartMenuItem>()
 
     init {
         getMenu()
@@ -110,7 +121,8 @@ class MenuViewModel @Inject constructor(
     }
 
     override fun addToCart(menuItem: MenuElement.MenuItem) {
-        cartList.add(menuItem)
+        rawCartList.add(menuItem)
+        _cartListLiveData.value = buildCartMenuItemList()
         val totalPrice = getTotalPrice()
         _getPlaceholderString.value = mapOf(
             PlaceholderStringType.ORDER_WITH_DETAILS to arrayOf(totalPrice),
@@ -119,7 +131,8 @@ class MenuViewModel @Inject constructor(
     }
 
     override fun removeFromCart(menuItem: MenuElement.MenuItem) {
-        cartList.remove(menuItem)
+        rawCartList.remove(menuItem)
+        _cartListLiveData.value = buildCartMenuItemList()
         val totalPrice = getTotalPrice()
         _getPlaceholderString.value = mapOf(
             PlaceholderStringType.ORDER_WITH_DETAILS to arrayOf(totalPrice),
@@ -147,12 +160,22 @@ class MenuViewModel @Inject constructor(
 
     private fun getTotalPrice(): Int {
         var totalPrice = 0
-        cartList.forEach { totalPrice += it.price }
+        rawCartList.forEach { totalPrice += it.price }
         return totalPrice
+    }
+
+    private fun buildCartMenuItemList(): List<CartMenuItem>{
+        cartList = arrayListOf()
+        val map = rawCartList.groupingBy { it }.eachCount()
+        for(key in map.keys){
+            val cartItem = CartMenuItem(key,map[key]!!)
+            cartList.add(cartItem)
+        }
+        return cartList
     }
 }
 sealed interface MenuUIState{
-    data class Success(val items: List<MenuElement>,val isFullyLoaded: Boolean = false): MenuUIState
+    data class Success(val items: List<MenuElement>, val isFullyLoaded: Boolean = false): MenuUIState
     data class Error(val items: List<MenuElement>): MenuUIState
     object TokenInvalidError: MenuUIState
 }

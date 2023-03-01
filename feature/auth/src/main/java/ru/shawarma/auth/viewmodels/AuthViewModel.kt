@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.shawarma.auth.checkEmail
 import ru.shawarma.auth.checkPassword
-import ru.shawarma.auth.navigation.NavigationCommand
+import ru.shawarma.auth.NavigationCommand
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.UserLoginRequest
 import ru.shawarma.core.data.repositories.AuthRepository

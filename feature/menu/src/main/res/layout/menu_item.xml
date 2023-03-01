@@ -6,10 +6,7 @@
     <data>
         <variable
             name="menuItem"
-            type="ru.shawarma.menu.MenuElement.MenuItem" />
-        <variable
-            name="pickedItem"
-            type="ru.shawarma.menu.MutableMenuPickedItem" />
+            type="ru.shawarma.menu.entities.MenuElement.MenuItem" />
         <import type="android.view.View" />
     </data>
 
@@ -29,7 +26,7 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/menuDishImageView"
+                android:id="@+id/menuItemImageView"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:background="#EFEFEF"
@@ -40,7 +37,7 @@
                 tools:srcCompat="@tools:sample/avatars" />
 
             <TextView
-                android:id="@+id/menuDishTitleTextView"
+                android:id="@+id/menuItemTitleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -51,10 +48,10 @@
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menuDishImageView" />
+                app:layout_constraintTop_toBottomOf="@+id/menuItemImageView" />
 
             <TextView
-                android:id="@+id/menuDishShortDescriptionTextView"
+                android:id="@+id/menuItemShortDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
@@ -62,7 +59,7 @@
                 android:text="Стандартная шаверма, но не менее вкусная!"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menuDishTitleTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/menuItemTitleTextView" />
 
             <View
                 android:id="@+id/menuItemDivider"
@@ -73,11 +70,11 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/menuDishPriceTextView" />
+                app:layout_constraintTop_toTopOf="@id/menuItemPriceTextView" />
 
 
             <TextView
-                android:id="@+id/menuDishPriceTextView"
+                android:id="@+id/menuItemPriceTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
@@ -98,17 +95,17 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:text="@string/add_to_cart"
-                android:visibility="@{pickedItem.isPicked ? View.GONE : View.VISIBLE}"
+                android:visibility="@{menuItem.isPicked ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/menuItemDivider" />
 
-            <ru.shawarma.menu.CartQuantityControlView
+            <ru.shawarma.menu.view.CartQuantityControlView
                 android:id="@+id/menuCartQuantityControlView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:visibility="@{pickedItem.isPicked ? View.VISIBLE : View.GONE}"
+                android:visibility="@{menuItem.isPicked ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/menuItemDivider" />

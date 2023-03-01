@@ -1,4 +1,4 @@
-package ru.shawarma.auth.navigation
+package ru.shawarma.auth
 
 sealed interface NavigationCommand{
     object ToRegister: NavigationCommand

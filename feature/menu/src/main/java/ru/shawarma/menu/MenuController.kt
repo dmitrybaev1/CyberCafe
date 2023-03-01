@@ -1,5 +1,7 @@
 package ru.shawarma.menu
 
+import ru.shawarma.menu.entities.MenuElement
+
 interface MenuController {
 
     fun reloadMenu()

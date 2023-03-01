@@ -1,6 +1,8 @@
-package ru.shawarma.menu
+package ru.shawarma.menu.utlis
 
 import ru.shawarma.core.data.entities.MenuItemResponse
+import ru.shawarma.menu.entities.CartMenuItem
+import ru.shawarma.menu.entities.MenuElement
 
 fun mapMenuItemResponseToMenuItem(menuItemsResponse: List<MenuItemResponse>): List<MenuElement.MenuItem>{
     val list = arrayListOf<MenuElement.MenuItem>()

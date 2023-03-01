@@ -1,12 +1,12 @@
-package ru.shawarma.menu
+package ru.shawarma.menu.view
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import ru.shawarma.menu.R
 
 class CartQuantityControlView(context: Context,attributeSet: AttributeSet): LinearLayout(context,attributeSet) {
     interface OnPlusClickListener{
@@ -20,22 +20,22 @@ class CartQuantityControlView(context: Context,attributeSet: AttributeSet): Line
     private var minusClickListener: OnMinusClickListener? = null
 
     var count = 1
-        private set
+
 
     init{
-        View.inflate(context,R.layout.cart_quantity_control_view,this)
+        View.inflate(context, R.layout.cart_quantity_control_view,this)
         val minusButton = findViewById<Button>(R.id.minusButton)
         val plusButton = findViewById<Button>(R.id.plusButton)
         val countTextView = findViewById<TextView>(R.id.countTextView)
         countTextView.text = count.toString()
         minusButton.setOnClickListener {
             if(count>1)
-                --count
-            minusClickListener?.onMinusClick(count)
+                minusClickListener?.onMinusClick(--count)
+            else
+                minusClickListener?.onMinusClick(0)
         }
         plusButton.setOnClickListener {
-            ++count
-            plusClickListener?.onPlusClick(count)
+            plusClickListener?.onPlusClick(++count)
         }
     }
 
@@ -44,7 +44,7 @@ class CartQuantityControlView(context: Context,attributeSet: AttributeSet): Line
     }
 
     fun setOnPlusClickListener(block: (Int) -> Unit){
-        plusClickListener = object : OnPlusClickListener{
+        plusClickListener = object : OnPlusClickListener {
             override fun onPlusClick(newNumber: Int) = block(newNumber)
         }
     }
@@ -54,7 +54,7 @@ class CartQuantityControlView(context: Context,attributeSet: AttributeSet): Line
     }
 
     fun setOnMinusClickListener(block: (Int) -> Unit){
-        minusClickListener = object : OnMinusClickListener{
+        minusClickListener = object : OnMinusClickListener {
             override fun onMinusClick(newNumber: Int) = block(newNumber)
         }
     }

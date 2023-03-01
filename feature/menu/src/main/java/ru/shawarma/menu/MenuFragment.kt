@@ -1,7 +1,6 @@
 package ru.shawarma.menu
 
 import android.os.Bundle
-import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.menu.adapters.MenuAdapter
 import ru.shawarma.menu.databinding.FragmentMenuBinding
+import ru.shawarma.menu.utlis.MENU_FULL_SPAN_SIZE
+import ru.shawarma.menu.utlis.MENU_ITEM_SPAN_SIZE
+import ru.shawarma.menu.utlis.PlaceholderStringType
 import ru.shawarma.menu.viewmodels.MenuUIState
 import ru.shawarma.menu.viewmodels.MenuViewModel
 
@@ -52,7 +55,8 @@ class MenuFragment : Fragment() {
             if(map.containsKey(PlaceholderStringType.ORDER_WITH_DETAILS)){
                 val intParam = map[PlaceholderStringType.ORDER_WITH_DETAILS]?.get(0) as Int
                 val text = requireContext().getString(R.string.order_with_details,intParam)
-                viewModel.setFormattedString(PlaceholderStringType.ORDER_WITH_DETAILS,
+                viewModel.setFormattedString(
+                    PlaceholderStringType.ORDER_WITH_DETAILS,
                     HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY))
             }
             if(map.containsKey(PlaceholderStringType.TOTAL_PRICE)){
