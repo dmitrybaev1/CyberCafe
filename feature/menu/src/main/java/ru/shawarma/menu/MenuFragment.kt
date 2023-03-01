@@ -1,9 +1,11 @@
 package ru.shawarma.menu
 
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -45,6 +47,19 @@ class MenuFragment : Fragment() {
         inflateMenu()
         viewModel.navCommand.observe(this){
             findNavController().navigate(R.id.actionMenuToCart)
+        }
+        viewModel.getPlaceholderString.observe(this){map ->
+            if(map.containsKey(PlaceholderStringType.ORDER_WITH_DETAILS)){
+                val intParam = map[PlaceholderStringType.ORDER_WITH_DETAILS]?.get(0) as Int
+                val text = requireContext().getString(R.string.order_with_details,intParam)
+                viewModel.setFormattedString(PlaceholderStringType.ORDER_WITH_DETAILS,
+                    HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY))
+            }
+            if(map.containsKey(PlaceholderStringType.TOTAL_PRICE)){
+                val intParam = map[PlaceholderStringType.TOTAL_PRICE]?.get(0) as Int
+                val text = requireContext().getString(R.string.total_price,intParam)
+                viewModel.setFormattedString(PlaceholderStringType.TOTAL_PRICE,text)
+            }
         }
     }
 

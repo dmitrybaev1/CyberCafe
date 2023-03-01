@@ -29,8 +29,9 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
-            android:text="@string/order_with_details"
+            android:text="@{viewModel.orderWithDetailsText}"
             android:textAllCaps="false"
+            android:onClick="@{() -> viewModel.goToCart()}"
             app:layout_constraintBottom_toBottomOf="@+id/menuRecyclerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

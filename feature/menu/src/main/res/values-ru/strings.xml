@@ -6,5 +6,7 @@
     <string name="retry">Повторить</string>
     <string name="add_to_cart">В корзину</string>
     <string name="settings">Настройки</string>
-    <string name="order_with_details">ОФОРМИТЬ ЗАКАЗ&lt;br>&lt;small>&lt;font color=\"#FFFF00\">На сумму: %1$s\u20BD&lt;/font>&lt;/small></string>
+    <string name="order_with_details">ОФОРМИТЬ ЗАКАЗ&lt;br>&lt;small>&lt;font color=\"#FFFF00\">На сумму: %d\u20BD&lt;/font>&lt;/small></string>
+    <string name="order">Оформить заказ</string>
+    <string name="total_price">Итого: %d</string>
 </resources>

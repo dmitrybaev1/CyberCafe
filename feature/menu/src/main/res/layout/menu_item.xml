@@ -8,8 +8,8 @@
             name="menuItem"
             type="ru.shawarma.menu.MenuElement.MenuItem" />
         <variable
-            name="isPicked"
-            type="androidx.databinding.ObservableBoolean" />
+            name="pickedItem"
+            type="ru.shawarma.menu.MutableMenuPickedItem" />
         <import type="android.view.View" />
     </data>
 
@@ -98,7 +98,7 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:text="@string/add_to_cart"
-                android:visibility="@{isPicked ? View.GONE : View.VISIBLE}"
+                android:visibility="@{pickedItem.isPicked ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/menuItemDivider" />
@@ -108,7 +108,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:visibility="@{isPicked ? View.VISIBLE : View.GONE}"
+                android:visibility="@{pickedItem.isPicked ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/menuItemDivider" />

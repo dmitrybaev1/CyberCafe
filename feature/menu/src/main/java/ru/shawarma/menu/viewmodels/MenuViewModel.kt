@@ -44,6 +44,18 @@ class MenuViewModel @Inject constructor(
 
     val navCommand: LiveData<NavigationCommand> = _navCommand
 
+    private val _orderWithDetailsText = MutableLiveData<CharSequence>()
+
+    val orderWithDetailsText: LiveData<CharSequence> = _orderWithDetailsText
+
+    private val _totalPriceText = MutableLiveData<CharSequence>()
+
+    val totalPriceText: LiveData<CharSequence> = _orderWithDetailsText
+
+    private val _getPlaceholderString = MutableLiveData<Map<PlaceholderStringType,Array<Any>>>()
+
+    val getPlaceholderString: LiveData<Map<PlaceholderStringType,Array<Any>>> = _getPlaceholderString
+
     private val cartList = arrayListOf<MenuElement.MenuItem>()
 
     init {
@@ -98,11 +110,28 @@ class MenuViewModel @Inject constructor(
     }
 
     override fun addToCart(menuItem: MenuElement.MenuItem) {
-        TODO("Not yet implemented")
+        cartList.add(menuItem)
+        val totalPrice = getTotalPrice()
+        _getPlaceholderString.value = mapOf(
+            PlaceholderStringType.ORDER_WITH_DETAILS to arrayOf(totalPrice),
+            PlaceholderStringType.TOTAL_PRICE to arrayOf(totalPrice)
+        )
     }
 
     override fun removeFromCart(menuItem: MenuElement.MenuItem) {
-        TODO("Not yet implemented")
+        cartList.remove(menuItem)
+        val totalPrice = getTotalPrice()
+        _getPlaceholderString.value = mapOf(
+            PlaceholderStringType.ORDER_WITH_DETAILS to arrayOf(totalPrice),
+            PlaceholderStringType.TOTAL_PRICE to arrayOf(totalPrice)
+        )
+    }
+
+    fun setFormattedString(type: PlaceholderStringType, formattedString: CharSequence){
+        when(type) {
+            PlaceholderStringType.ORDER_WITH_DETAILS -> _orderWithDetailsText.value = formattedString
+            PlaceholderStringType.TOTAL_PRICE -> _totalPriceText.value = formattedString
+        }
     }
 
     fun goToCart(){
@@ -116,6 +145,11 @@ class MenuViewModel @Inject constructor(
         }
         else false
 
+    private fun getTotalPrice(): Int {
+        var totalPrice = 0
+        cartList.forEach { totalPrice += it.price }
+        return totalPrice
+    }
 }
 sealed interface MenuUIState{
     data class Success(val items: List<MenuElement>,val isFullyLoaded: Boolean = false): MenuUIState
