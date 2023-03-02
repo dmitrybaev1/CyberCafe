@@ -15,7 +15,7 @@ import ru.shawarma.core.data.repositories.MenuRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
-import ru.shawarma.core.data.utils.checkExpiresAndTryRefresh
+import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
 import ru.shawarma.menu.*
 import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.entities.MenuElement
@@ -69,6 +69,8 @@ class MenuViewModel @Inject constructor(
 
     private var cartList = arrayListOf<CartMenuItem>()
 
+    var totalCurrentCartPrice = 0
+
     init {
         getMenu()
     }
@@ -79,7 +81,7 @@ class MenuViewModel @Inject constructor(
 
     fun getMenu(loadNext: Boolean = true){
         viewModelScope.launch {
-            if(!checkTokenExpires()){
+            if(!checkTokenValid()){
                 _menuState.value = MenuUIState.TokenInvalidError
                 return@launch
             }
@@ -124,6 +126,7 @@ class MenuViewModel @Inject constructor(
         rawCartList.add(menuItem)
         _cartListLiveData.value = buildCartMenuItemList()
         val totalPrice = getTotalPrice()
+        totalCurrentCartPrice = totalPrice
         _getPlaceholderString.value = mapOf(
             PlaceholderStringType.ORDER_WITH_DETAILS to arrayOf(totalPrice),
             PlaceholderStringType.TOTAL_PRICE to arrayOf(totalPrice)
@@ -134,6 +137,7 @@ class MenuViewModel @Inject constructor(
         rawCartList.remove(menuItem)
         _cartListLiveData.value = buildCartMenuItemList()
         val totalPrice = getTotalPrice()
+        totalCurrentCartPrice = totalPrice
         _getPlaceholderString.value = mapOf(
             PlaceholderStringType.ORDER_WITH_DETAILS to arrayOf(totalPrice),
             PlaceholderStringType.TOTAL_PRICE to arrayOf(totalPrice)
@@ -151,8 +155,8 @@ class MenuViewModel @Inject constructor(
         _navCommand.value = NavigationCommand.ToCart
     }
 
-    private suspend fun checkTokenExpires(): Boolean =
-        if(checkExpiresAndTryRefresh(authData!!,authRepository, tokenManager)){
+    private suspend fun checkTokenValid(): Boolean =
+        if(checkNotExpiresOrTryRefresh(authData!!,authRepository, tokenManager)){
             authData = tokenManager.getAuthData()
             true
         }

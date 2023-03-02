@@ -1,4 +1,4 @@
-package ru.shawarma.auth
+package ru.shawarma.menu
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.TestDispatcher

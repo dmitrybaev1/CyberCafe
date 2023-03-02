@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="@{cartItem.name}"
+            android:text="@{cartItem.menuItem.name}"
             android:textSize="20sp"
             app:layout_constraintStart_toEndOf="@+id/cartItemImageView"
             app:layout_constraintTop_toTopOf="@id/cartItemImageView" />
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:text="@{cartItem.price}"
+            android:text="@{cartItem.menuItem.price}"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/cartItemImageView"

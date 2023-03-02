@@ -28,12 +28,12 @@ object Errors {
 fun checkExpires(expiresIn: Long): Boolean =
     expiresIn <= (System.currentTimeMillis() / 1000L) - 60L //Sub one minute to guarantee correct timings and refresh
 
-suspend fun checkExpiresAndTryRefresh(
+suspend fun checkNotExpiresOrTryRefresh(
     authData: AuthData,
     authRepository: AuthRepository,
     tokenManager: TokenManager,
 ): Boolean =
-    if(checkExpires(authData.expiresIn))
+    if(!checkExpires(authData.expiresIn))
         true
     else{
         val tokensRequest = TokensRequest(authData.refreshToken,authData.accessToken)
