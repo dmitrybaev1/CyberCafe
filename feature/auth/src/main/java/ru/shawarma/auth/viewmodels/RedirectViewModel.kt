@@ -11,10 +11,7 @@ import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.TokensRequest
 import ru.shawarma.core.data.repositories.AuthRepository
-import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
-import ru.shawarma.core.data.utils.checkExpires
+import ru.shawarma.core.data.utils.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,26 +38,13 @@ class RedirectViewModel(
         viewModelScope.launch {
             val authData = tokenManager.getAuthData()
             if(!authData.isEmpty()){
-                if(!checkExpires(authData.expiresIn))
+                if(checkNotExpiresOrTryRefresh(authData, authRepository, tokenManager))
                     _redirectState.value = RedirectState.TokenValid(authData)
-                else{
-                    Log.d("redirectVM","REFRESH TOKEN")
-                    refreshToken(TokensRequest(authData.refreshToken, authData.accessToken))
-                }
+                else
+                    _redirectState.value = RedirectState.RefreshError(Errors.REFRESH_TOKEN_ERROR)
             }
             else
                 _redirectState.value = RedirectState.NoToken
-        }
-    }
-
-    private suspend fun refreshToken(tokensRequest: TokensRequest){
-        when(val result = authRepository.refreshToken(tokensRequest)){
-            is Result.Success<AuthData> -> {
-                val authData = result.data
-                tokenManager.update(authData)
-                _redirectState.value = RedirectState.TokenValid(authData)
-            }
-            else -> _redirectState.value = RedirectState.RefreshError(Errors.REFRESH_TOKEN_ERROR)
         }
     }
 }
