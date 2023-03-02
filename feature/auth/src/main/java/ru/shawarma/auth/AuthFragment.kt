@@ -93,7 +93,7 @@ class AuthFragment : Fragment() {
         val toolbarGraph = findNavController().createGraph(startDestination = R.id.authFragment){
             fragment<AuthFragment>(R.id.authFragment){}
         }
-        (requireActivity() as CommonComponentsController).setupToolbarForInsideNavigation(toolbarGraph)
+        (requireActivity() as CommonComponentsController).setupToolbarForInsideNavigation(subGraph = toolbarGraph)
     }
 
     override fun onDestroyView() {

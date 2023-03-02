@@ -10,7 +10,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import ru.shawarma.auth.navigation.NavigationCommand
 import ru.shawarma.auth.viewmodels.AuthUIState
 import ru.shawarma.auth.viewmodels.AuthViewModel
 import ru.shawarma.core.data.entities.AuthData

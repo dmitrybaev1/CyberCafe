@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="cartItem"
+            type="ru.shawarma.menu.entities.CartMenuItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/cartItemImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/cartItemTitleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@{cartItem.menuItem.name}"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@+id/cartItemImageView"
+            app:layout_constraintTop_toTopOf="@id/cartItemImageView" />
+
+        <ru.shawarma.menu.view.CartQuantityControlView
+            android:id="@+id/cartCartQuantityControlView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toEndOf="@+id/cartItemImageView"
+            app:layout_constraintTop_toBottomOf="@id/cartItemTitleTextView"
+            app:layout_constraintBottom_toBottomOf="@id/cartItemImageView">
+
+        </ru.shawarma.menu.view.CartQuantityControlView>
+
+        <TextView
+            android:id="@+id/cartItemPriceTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="@{cartItem.menuItem.price}"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/cartItemImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/cartItemImageView" />
+
+        <View
+            android:id="@+id/cartItemDivider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cartItemImageView" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

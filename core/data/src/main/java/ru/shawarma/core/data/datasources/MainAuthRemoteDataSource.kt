@@ -11,7 +11,8 @@ import javax.inject.Singleton
 @Singleton
 class MainAuthRemoteDataSource @Inject constructor(
     private val authService: AuthService,
-    private val dispatcher: CoroutineDispatcher): AuthRemoteDataSource {
+    private val dispatcher: CoroutineDispatcher
+): AuthRemoteDataSource {
 
     override suspend fun login(userLoginRequest: UserLoginRequest): Result<AuthData> =
         safeServiceCall(dispatcher){

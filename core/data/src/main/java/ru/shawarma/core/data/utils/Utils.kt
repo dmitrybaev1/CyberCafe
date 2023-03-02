@@ -5,10 +5,12 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import ru.shawarma.core.data.entities.ApiError
+import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.core.data.entities.TokensRequest
+import ru.shawarma.core.data.repositories.AuthRepository
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "authData")
 
@@ -26,6 +28,24 @@ object Errors {
 fun checkExpires(expiresIn: Long): Boolean =
     expiresIn <= (System.currentTimeMillis() / 1000L) - 60L //Sub one minute to guarantee correct timings and refresh
 
+suspend fun checkNotExpiresOrTryRefresh(
+    authData: AuthData,
+    authRepository: AuthRepository,
+    tokenManager: TokenManager,
+): Boolean =
+    if(!checkExpires(authData.expiresIn))
+        true
+    else{
+        val tokensRequest = TokensRequest(authData.refreshToken,authData.accessToken)
+        when(val result = authRepository.refreshToken(tokensRequest)){
+            is Result.Success<AuthData> -> {
+                val authData = result.data
+                tokenManager.update(authData)
+                true
+            }
+            else -> false
+        }
+    }
 
 internal fun parseError(httpException: HttpException): ApiError {
     val converter = AppRetrofit.getInstance().responseBodyConverter<ApiError>(

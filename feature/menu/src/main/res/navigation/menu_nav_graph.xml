@@ -9,6 +9,15 @@
         android:id="@+id/menuFragment"
         android:label="@string/menu"
         android:name="ru.shawarma.menu.MenuFragment"
-        tools:layout="@layout/fragment_menu"/>
+        tools:layout="@layout/fragment_menu">
+        <action android:id="@+id/actionMenuToCart"
+            app:destination="@id/cartFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/cartFragment"
+        android:label="@string/cart"
+        android:name="ru.shawarma.menu.CartFragment"
+        tools:layout="@layout/fragment_cart"/>
 
 </navigation>
