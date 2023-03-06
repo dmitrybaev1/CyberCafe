@@ -20,7 +20,12 @@
         android:id="@+id/menuItemFragment"
         android:label="@string/choose_product"
         android:name="ru.shawarma.menu.MenuItemFragment"
-        tools:layout="@layout/fragment_menu_item"/>
+        tools:layout="@layout/fragment_menu_item">
+        <action android:id="@+id/actionMenuItemToCart"
+            app:destination="@id/cartFragment"
+            app:popUpTo="@id/menuFragment"
+            app:popUpToInclusive="false"/>
+    </fragment>
 
     <fragment
         android:id="@+id/cartFragment"

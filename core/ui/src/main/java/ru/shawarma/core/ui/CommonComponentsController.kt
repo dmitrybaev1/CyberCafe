@@ -9,4 +9,6 @@ interface CommonComponentsController {
     fun setupToolbarForInsideNavigation(navController: NavController? = null,subGraph: NavGraph)
 
     fun inflateToolbarMenu(@MenuRes menuRes: Int,onMenuItemClickListener: OnMenuItemClickListener)
+
+    fun changeToolbarMenuItemClickListener(onMenuItemClickListener: OnMenuItemClickListener)
 }

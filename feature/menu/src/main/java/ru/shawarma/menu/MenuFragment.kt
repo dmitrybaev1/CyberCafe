@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.AuthData
@@ -46,7 +47,6 @@ class MenuFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("menuFragment","onCreate")
         viewModel.navCommand.observe(this){navCommand ->
             when(navCommand){
                 NavigationCommand.ToCartFragment -> findNavController().navigate(R.id.actionMenuToCart)
@@ -54,7 +54,6 @@ class MenuFragment : Fragment() {
             }
         }
         viewModel.getPlaceholderString.observeForever{map ->
-            Log.d("menuFragment","getPlaceholderString")
             if(map.containsKey(PlaceholderStringType.ORDER_WITH_DETAILS)){
                 val intParam = map[PlaceholderStringType.ORDER_WITH_DETAILS]?.get(0) as Int
                 val text = requireContext().getString(R.string.order_with_details,intParam)
@@ -106,7 +105,7 @@ class MenuFragment : Fragment() {
                             binding!!.menuRecyclerView.scrollToPosition(items.size-1)
                         }
                         is MenuUIState.TokenInvalidError -> {
-                            Log.d("menuFragment","token invalid")
+                            ProcessPhoenix.triggerRebirth(requireActivity().applicationContext)
                         }
                     }
                     isRequestInProgress = false

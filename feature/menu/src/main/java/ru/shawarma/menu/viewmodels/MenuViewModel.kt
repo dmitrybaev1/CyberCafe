@@ -88,8 +88,7 @@ class MenuViewModel @Inject constructor(
             if(loadNext)
                 menuOffset += STANDARD_REQUEST_OFFSET
             val token = "Bearer ${authData!!.accessToken}"
-            if(menuList.last() is MenuElement.Error || menuList.last() is MenuElement.Loading)
-                menuList.removeLast()
+            checkAndRemoveOldErrorAndLoading()
             when(val result = menuRepository.getMenu(token,menuOffset,menuCount)){
                 is Result.Success<List<MenuItemResponse>> -> {
                     val items = mapMenuItemResponseToMenuItem(result.data)
@@ -115,7 +114,7 @@ class MenuViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR)
                         _menuState.value = MenuUIState.TokenInvalidError
                     else {
-                        if(menuList.last() !is MenuElement.Error)
+                        if(menuList.lastOrNull() !is MenuElement.Error)
                             menuList.add(MenuElement.Error)
                         val newList = arrayListOf<MenuElement>()
                         newList.addAll(menuList)
@@ -123,7 +122,7 @@ class MenuViewModel @Inject constructor(
                     }
                 }
                 is Result.NetworkFailure -> {
-                    if(menuList.last() !is MenuElement.Error)
+                    if(menuList.lastOrNull() !is MenuElement.Error)
                         menuList.add(MenuElement.Error)
                     val newList = arrayListOf<MenuElement>()
                     newList.addAll(menuList)
@@ -132,7 +131,10 @@ class MenuViewModel @Inject constructor(
             }
         }
     }
-
+    private fun checkAndRemoveOldErrorAndLoading(){
+        if(menuList.lastOrNull() is MenuElement.Error || menuList.lastOrNull() is MenuElement.Loading)
+            menuList.removeLast()
+    }
     override fun reloadMenu() {
         if(menuList.last() is MenuElement.Error)
             menuList.removeLast()
@@ -174,7 +176,6 @@ class MenuViewModel @Inject constructor(
         rawCartList.filter { item -> item == menuItem }.size
 
     fun setFormattedString(type: PlaceholderStringType, formattedString: CharSequence){
-        Log.d("menuViewModel","setFormattedString")
         when(type) {
             PlaceholderStringType.ORDER_WITH_DETAILS -> _orderWithDetailsText.value = formattedString
             PlaceholderStringType.TOTAL_PRICE -> _totalPriceText.value = formattedString

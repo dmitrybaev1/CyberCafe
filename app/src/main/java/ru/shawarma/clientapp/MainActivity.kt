@@ -1,6 +1,7 @@
 package ru.shawarma.clientapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
         toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        //setSupportActionBar(toolbar)
         val appBarConfig = AppBarConfiguration(navController.graph)
         toolbar.setupWithNavController(navController,appBarConfig)
     }
@@ -67,10 +68,14 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         menuRes: Int,
         onMenuItemClickListener: Toolbar.OnMenuItemClickListener
     ) {
+        toolbar.menu.clear()
         toolbar.inflateMenu(menuRes)
         toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
     }
 
+    override fun changeToolbarMenuItemClickListener(onMenuItemClickListener: Toolbar.OnMenuItemClickListener) {
+        toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
+    }
 
     override fun isOnline(): Boolean = true
 

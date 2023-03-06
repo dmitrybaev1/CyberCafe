@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import ru.shawarma.core.ui.CommonComponentsController
 import ru.shawarma.menu.databinding.FragmentMenuItemBinding
 import ru.shawarma.menu.viewmodels.MenuViewModel
 
@@ -22,6 +24,7 @@ class MenuItemFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        changeToolbarMenuActions()
         val binding = FragmentMenuItemBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
@@ -44,6 +47,15 @@ class MenuItemFragment : Fragment() {
         binding.menuItemFragmentCartQuantityControlView.setOnPlusClickListener {
             viewModel.addToCart(viewModel.chosenMenuItem.value!!)
             binding.menuItemFragmentCartQuantityControlView.count = viewModel.getMenuItemCount(menuItem)
+        }
+    }
+
+    private fun changeToolbarMenuActions(){
+        (requireActivity() as CommonComponentsController).changeToolbarMenuItemClickListener{
+            if(it.itemId == R.id.action_cart) {
+                findNavController().navigate(R.id.actionMenuItemToCart)
+            }
+            true
         }
     }
 
