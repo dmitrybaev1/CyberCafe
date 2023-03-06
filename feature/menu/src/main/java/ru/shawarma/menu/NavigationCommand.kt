@@ -1,5 +1,6 @@
 package ru.shawarma.menu
 
 sealed interface NavigationCommand{
-    object ToCart: NavigationCommand
+    object ToCartFragment: NavigationCommand
+    object ToMenuItemFragment: NavigationCommand
 }

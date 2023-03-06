@@ -5,6 +5,7 @@
         <variable
             name="viewModel"
             type="ru.shawarma.menu.viewmodels.MenuViewModel" />
+        <import type="android.view.View"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,10 +16,11 @@
             android:id="@+id/menuRecyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:padding="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" >
+            app:layout_constraintTop_toTopOf="parent">
 
         </androidx.recyclerview.widget.RecyclerView>
 
@@ -31,6 +33,7 @@
             android:layout_marginBottom="20dp"
             android:text="@{viewModel.orderWithDetailsText}"
             android:textAllCaps="false"
+            android:visibility="@{viewModel.cartListLiveData.empty ? View.GONE : View.VISIBLE}"
             android:onClick="@{() -> viewModel.goToCart()}"
             app:layout_constraintBottom_toBottomOf="@+id/menuRecyclerView"
             app:layout_constraintEnd_toEndOf="parent"

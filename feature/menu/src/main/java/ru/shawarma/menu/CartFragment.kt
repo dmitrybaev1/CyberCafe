@@ -1,9 +1,11 @@
 package ru.shawarma.menu
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,12 +36,21 @@ class CartFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding!!.cartRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
-        viewModel.cartListLiveData.observe(viewLifecycleOwner){ list ->
-            cartAdapter?.notifyDataSetChanged() ?: run {
-                cartAdapter = CartAdapter(list,viewModel)
-                binding!!.cartRecyclerView.adapter = cartAdapter
+        val binding = binding!!
+        cartAdapter = CartAdapter(viewModel)
+        binding.cartRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireActivity())
+            adapter = cartAdapter
+        }
+        ArrayAdapter.createFromResource(
+            requireContext(),R.array.payment_type_array,android.R.layout.simple_spinner_item)
+            .also { adapter ->
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.cartPaymentSpinner.adapter = adapter
             }
+        viewModel.cartListLiveData.observe(viewLifecycleOwner){ list ->
+            cartAdapter?.setList(list)
+            cartAdapter?.notifyDataSetChanged()
         }
     }
 

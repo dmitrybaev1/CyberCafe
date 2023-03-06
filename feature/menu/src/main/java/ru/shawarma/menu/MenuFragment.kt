@@ -1,6 +1,7 @@
 package ru.shawarma.menu
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,14 +46,15 @@ class MenuFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val authData: AuthData? = arguments?.getParcelable("authData")
-        viewModel.setToken(authData!!)
-        setupToolbarUpButton()
-        inflateMenu()
-        viewModel.navCommand.observe(this){
-            findNavController().navigate(R.id.actionMenuToCart)
+        Log.d("menuFragment","onCreate")
+        viewModel.navCommand.observe(this){navCommand ->
+            when(navCommand){
+                NavigationCommand.ToCartFragment -> findNavController().navigate(R.id.actionMenuToCart)
+                NavigationCommand.ToMenuItemFragment -> findNavController().navigate(R.id.actionMenuToMenuItem)
+            }
         }
-        viewModel.getPlaceholderString.observe(this){map ->
+        viewModel.getPlaceholderString.observeForever{map ->
+            Log.d("menuFragment","getPlaceholderString")
             if(map.containsKey(PlaceholderStringType.ORDER_WITH_DETAILS)){
                 val intParam = map[PlaceholderStringType.ORDER_WITH_DETAILS]?.get(0) as Int
                 val text = requireContext().getString(R.string.order_with_details,intParam)
@@ -65,6 +68,9 @@ class MenuFragment : Fragment() {
                 viewModel.setFormattedString(PlaceholderStringType.TOTAL_PRICE,text)
             }
         }
+        val authData: AuthData? = arguments?.getParcelable("authData")
+        viewModel.setToken(authData!!)
+        viewModel.getMenu()
     }
 
     override fun onCreateView(
@@ -72,6 +78,8 @@ class MenuFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setupToolbarUpButton()
+        inflateMenu()
         val binding = FragmentMenuBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
@@ -86,18 +94,19 @@ class MenuFragment : Fragment() {
                 viewModel.menuState.collect{state ->
                     when(state){
                         is MenuUIState.Success -> {
-                            menuAdapter?.notifyDataSetChanged() ?: run {
-                                menuAdapter = MenuAdapter(state.items,viewModel)
-                                binding!!.menuRecyclerView.adapter = menuAdapter
-                            }
+                            menuAdapter?.setList(state.items)
+                            menuAdapter?.notifyDataSetChanged()
                             if(state.isFullyLoaded)
                                 isFullyLoaded = true
                         }
                         is MenuUIState.Error -> {
+                            val items = state.items
+                            menuAdapter?.setList(items)
                             menuAdapter?.notifyDataSetChanged()
+                            binding!!.menuRecyclerView.scrollToPosition(items.size-1)
                         }
                         is MenuUIState.TokenInvalidError -> {
-                            //выкинуть на авторизацию
+                            Log.d("menuFragment","token invalid")
                         }
                     }
                     isRequestInProgress = false
@@ -107,6 +116,7 @@ class MenuFragment : Fragment() {
     }
 
     private fun setupMenuRecyclerView(){
+        menuAdapter = MenuAdapter(viewModel)
         val gridLayoutManager = GridLayoutManager(requireActivity(),2)
         gridLayoutManager.spanSizeLookup = object: SpanSizeLookup(){
             override fun getSpanSize(position: Int): Int =
@@ -114,6 +124,7 @@ class MenuFragment : Fragment() {
                 else MENU_FULL_SPAN_SIZE
         }
         binding!!.menuRecyclerView.apply {
+            adapter = menuAdapter
             layoutManager = gridLayoutManager
             addOnScrollListener(object: OnScrollListener(){
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {

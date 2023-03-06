@@ -37,7 +37,6 @@ class AuthFragment : Fragment() {
     in STARTED state again*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupToolbarUpButton()
         viewModel.navCommand.observe(this){
             findNavController().navigate(R.id.actionAuthToRegister)
         }
@@ -48,6 +47,7 @@ class AuthFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setupToolbarUpButton()
         val binding = FragmentAuthBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel

@@ -74,7 +74,7 @@ class AuthViewModelTest {
     @Test
     fun `Navigation command to register was set`() = runTest {
         viewModel.goToRegister()
-        assertEquals(NavigationCommand.ToRegister,viewModel.navCommand.value)
+        assertEquals(NavigationCommand.ToRegisterFragment,viewModel.navCommand.value)
     }
 
 

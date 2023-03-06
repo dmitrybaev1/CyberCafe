@@ -1,5 +1,6 @@
 package ru.shawarma.menu.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -14,9 +15,14 @@ import ru.shawarma.menu.databinding.MenuItemBinding
 import ru.shawarma.menu.databinding.MenuLoadingBinding
 
 class MenuAdapter(
-    private val list: List<MenuElement>,
     private val menuController: MenuController
 ) : RecyclerView.Adapter<ViewHolder>() {
+
+    private var list: List<MenuElement>? = null
+
+    fun setList(list: List<MenuElement>){
+        this.list = list
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when(viewType){
@@ -51,24 +57,26 @@ class MenuAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when(holder){
             is MenuItemViewHolder -> {
-                val menuItem = list[position] as MenuElement.MenuItem
+                val menuItem = list?.get(position) as MenuElement.MenuItem
                 holder.bind(menuItem)
             }
             is MenuHeaderViewHolder -> {
-                val headerItem = list[position] as MenuElement.Header
+                val headerItem = list?.get(position) as MenuElement.Header
                 holder.bind(headerItem)
             }
         }
     }
 
-    override fun getItemCount(): Int = list.size
+    override fun getItemCount(): Int = list?.size ?: 0
+
 
     override fun getItemViewType(position: Int): Int {
-        return when(list[position]){
+        return when(list?.get(position)){
             is MenuElement.MenuItem -> R.layout.menu_item
             is MenuElement.Header -> R.layout.menu_header
             is MenuElement.Error -> R.layout.menu_error
             is MenuElement.Loading -> R.layout.menu_loading
+            else -> throw IllegalStateException()
         }
     }
 
@@ -78,20 +86,27 @@ class MenuAdapter(
     ) : ViewHolder(binding.root){
         fun bind(menuItem: MenuElement.MenuItem){
             binding.menuItem = menuItem
+            binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
             binding.menuAddToCartButton.setOnClickListener {
                 menuController.addToCart(menuItem)
-                if(!menuItem.isPicked.get())
-                    menuItem.isPicked.set(true)
+               /* if(!menuItem.isPicked.get())
+                    menuItem.isPicked.set(true)*/
+                binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
             }
             binding.menuCartQuantityControlView.setOnMinusClickListener { value ->
                 menuController.removeFromCart(menuItem)
-                if(value == 0)
-                    menuItem.isPicked.set(false)
+                /*if(value == 0)
+                    menuItem.isPicked.set(false)*/
+                binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
             }
             binding.menuCartQuantityControlView.setOnPlusClickListener {
                 menuController.addToCart(menuItem)
-                if(!menuItem.isPicked.get())
-                    menuItem.isPicked.set(true)
+               /* if(!menuItem.isPicked.get())
+                    menuItem.isPicked.set(true)*/
+                binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
+            }
+            binding.root.setOnClickListener {
+                menuController.goToMenuItemFragment(menuItem,binding.menuCartQuantityControlView.count)
             }
         }
     }

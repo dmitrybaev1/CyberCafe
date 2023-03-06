@@ -18,15 +18,22 @@ class CartQuantityControlView(context: Context,attributeSet: AttributeSet): Line
 
     private var plusClickListener: OnPlusClickListener? = null
     private var minusClickListener: OnMinusClickListener? = null
+    private val minusButton: Button
+    private val plusButton: Button
+    private val countTextView: TextView
 
     var count = 1
+        set(value){
+            field = value
+            countTextView.text = field.toString()
+        }
 
 
     init{
         View.inflate(context, R.layout.cart_quantity_control_view,this)
-        val minusButton = findViewById<Button>(R.id.minusButton)
-        val plusButton = findViewById<Button>(R.id.plusButton)
-        val countTextView = findViewById<TextView>(R.id.countTextView)
+        minusButton = findViewById<Button>(R.id.minusButton)
+        plusButton = findViewById<Button>(R.id.plusButton)
+        countTextView = findViewById<TextView>(R.id.countTextView)
         countTextView.text = count.toString()
         minusButton.setOnClickListener {
             if(count>1)

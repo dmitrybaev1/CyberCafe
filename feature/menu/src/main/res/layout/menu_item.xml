@@ -11,11 +11,10 @@
     </data>
 
     <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:id="@+id/menuItemCardView"
+        android:layout_width="190dp"
+        android:layout_height="320dp"
+        android:layout_margin="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -28,7 +27,7 @@
             <ImageView
                 android:id="@+id/menuItemImageView"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="150dp"
                 android:background="#EFEFEF"
                 android:scaleType="fitCenter"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -38,54 +37,20 @@
 
             <TextView
                 android:id="@+id/menuItemTitleTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"
                 android:gravity="start"
                 android:text="@{menuItem.name}"
                 android:textColor="@color/black"
-                android:textSize="24sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menuItemImageView" />
-
-            <TextView
-                android:id="@+id/menuItemShortDescriptionTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:gravity="start"
-                android:text="Стандартная шаверма, но не менее вкусная!"
-                android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/menuItemTitleTextView" />
-
-            <View
-                android:id="@+id/menuItemDivider"
-                android:layout_width="2dp"
-                android:layout_height="0dp"
-                android:layout_marginBottom="10dp"
-                android:background="@color/black"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/menuAddToCartButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/menuItemPriceTextView" />
-
-
-            <TextView
-                android:id="@+id/menuItemPriceTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
-                android:gravity="center"
-                android:text='@{menuItem.price + "\u20BD"}'
-                android:textColor="@color/black"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/menuItemDivider"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/menuItemImageView" />
 
             <Button
                 android:id="@+id/menuAddToCartButton"
@@ -94,11 +59,11 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
-                android:text="@string/add_to_cart"
+                android:text='@{menuItem.price + "\u20BD"}'
                 android:visibility="@{menuItem.isPicked ? View.GONE : View.VISIBLE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/menuItemDivider" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <ru.shawarma.menu.view.CartQuantityControlView
                 android:id="@+id/menuCartQuantityControlView"
@@ -108,7 +73,7 @@
                 android:visibility="@{menuItem.isPicked ? View.VISIBLE : View.GONE}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/menuItemDivider" />
+                app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

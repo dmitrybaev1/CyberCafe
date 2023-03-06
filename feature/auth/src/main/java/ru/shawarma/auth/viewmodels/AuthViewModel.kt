@@ -41,7 +41,7 @@ class AuthViewModel @Inject constructor(
     val password = MutableLiveData("")
 
     fun goToRegister(){
-        _navCommand.value = NavigationCommand.ToRegister
+        _navCommand.value = NavigationCommand.ToRegisterFragment
     }
 
     fun auth(){
