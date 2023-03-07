@@ -78,8 +78,11 @@ class AuthViewModel @Inject constructor(
         _authState.value = AuthUIState.Error(Errors.EMPTY_INPUT_ERROR)
     }
 
-    fun setRefreshTokenError(message: String){
+    fun setRefreshTokenErrorAndClearData(message: String){
         _isError.value = true
+        viewModelScope.launch {
+            tokenManager.update(AuthData.empty())
+        }
         _authState.value = AuthUIState.Error(message)
     }
 }

@@ -4,10 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph
-import androidx.navigation.createGraph
+import androidx.navigation.*
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
@@ -44,6 +43,13 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         navController.navigate(ru.shawarma.menu.R.id.menu_nav_graph, bundle)
     }
 
+    override fun navigateToAuth(errorMessage: String) {
+        val request = NavDeepLinkRequest.Builder
+            .fromUri("android-app://ru.shawarma.app/authFragment/$errorMessage".toUri())
+            .build()
+        navController.navigate(request)
+    }
+
     override fun navigateToSettings() {
         navController.navigate(ru.shawarma.settings.R.id.settings_nav_graph)
     }
@@ -71,6 +77,10 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         toolbar.menu.clear()
         toolbar.inflateMenu(menuRes)
         toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
+    }
+
+    override fun clearToolbarMenu() {
+        toolbar.menu.clear()
     }
 
     override fun changeToolbarMenuItemClickListener(onMenuItemClickListener: Toolbar.OnMenuItemClickListener) {

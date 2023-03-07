@@ -10,5 +10,7 @@ interface CommonComponentsController {
 
     fun inflateToolbarMenu(@MenuRes menuRes: Int,onMenuItemClickListener: OnMenuItemClickListener)
 
+    fun clearToolbarMenu()
+
     fun changeToolbarMenuItemClickListener(onMenuItemClickListener: OnMenuItemClickListener)
 }

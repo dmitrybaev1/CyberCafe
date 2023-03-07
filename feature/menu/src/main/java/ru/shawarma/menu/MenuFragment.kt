@@ -19,10 +19,11 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.jakewharton.processphoenix.ProcessPhoenix
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
 import ru.shawarma.menu.adapters.MenuAdapter
 import ru.shawarma.menu.databinding.FragmentMenuBinding
@@ -105,7 +106,8 @@ class MenuFragment : Fragment() {
                             binding!!.menuRecyclerView.scrollToPosition(items.size-1)
                         }
                         is MenuUIState.TokenInvalidError -> {
-                            ProcessPhoenix.triggerRebirth(requireActivity().applicationContext)
+                            findNavController().popBackStack(R.id.menuFragment,true)
+                            (requireActivity() as AppNavigation).navigateToAuth(Errors.REFRESH_TOKEN_ERROR)
                         }
                     }
                     isRequestInProgress = false

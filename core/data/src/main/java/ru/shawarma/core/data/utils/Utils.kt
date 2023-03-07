@@ -25,16 +25,18 @@ object Errors {
     const val NOT_FOUND_ERROR = "404Error"
 }
 
-fun checkExpires(expiresIn: Long): Boolean =
-    expiresIn <= (System.currentTimeMillis() / 1000L) - 60L //Sub one minute to guarantee correct timings and refresh
+fun checkExpires(expiresIn: Long): Boolean {
+    return expiresIn <= (System.currentTimeMillis() / 1000L) - 60L //Sub one minute to guarantee correct timings and refresh
+}
 
 suspend fun checkNotExpiresOrTryRefresh(
     authData: AuthData,
     authRepository: AuthRepository,
     tokenManager: TokenManager,
 ): Boolean =
-    if(!checkExpires(authData.expiresIn))
+    if(!checkExpires(authData.expiresIn)) {
         true
+    }
     else{
         val tokensRequest = TokensRequest(authData.refreshToken,authData.accessToken)
         when(val result = authRepository.refreshToken(tokensRequest)){
@@ -43,7 +45,8 @@ suspend fun checkNotExpiresOrTryRefresh(
                 tokenManager.update(authData)
                 true
             }
-            else -> false
+            else ->
+                false
         }
     }
 
