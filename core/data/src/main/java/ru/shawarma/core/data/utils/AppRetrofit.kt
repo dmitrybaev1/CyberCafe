@@ -1,6 +1,5 @@
 package ru.shawarma.core.data.utils
 
-import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
@@ -8,7 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.shawarma.core.data.services.AuthService
 import ru.shawarma.core.data.services.MenuService
-import java.util.Locale
+import java.util.*
 
 enum class FeatureApi{
     AUTH,MENU

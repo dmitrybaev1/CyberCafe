@@ -1,15 +1,13 @@
 package ru.shawarma.menu.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.R
 import ru.shawarma.menu.databinding.CartItemBinding
-import ru.shawarma.menu.entities.MenuElement
+import ru.shawarma.menu.entities.CartMenuItem
 
 class CartAdapter(
     private val menuController: MenuController

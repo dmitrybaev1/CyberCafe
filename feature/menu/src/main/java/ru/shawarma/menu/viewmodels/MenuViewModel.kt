@@ -1,6 +1,5 @@
 package ru.shawarma.menu.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +16,8 @@ import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
-import ru.shawarma.menu.*
+import ru.shawarma.menu.MenuController
+import ru.shawarma.menu.NavigationCommand
 import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.entities.MenuElement
 import ru.shawarma.menu.utlis.PlaceholderStringType
