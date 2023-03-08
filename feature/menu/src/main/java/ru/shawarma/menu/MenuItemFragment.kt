@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.shawarma.core.ui.CommonComponentsController
@@ -15,7 +15,7 @@ import ru.shawarma.menu.viewmodels.MenuViewModel
 @AndroidEntryPoint
 class MenuItemFragment : Fragment() {
 
-    private val viewModel: MenuViewModel by activityViewModels()
+    private val viewModel: MenuViewModel by hiltNavGraphViewModels(R.id.menu_nav_graph)
 
     private var binding: FragmentMenuItemBinding? = null
 
@@ -24,7 +24,7 @@ class MenuItemFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        changeToolbarMenuActions()
+        inflateMenu()
         val binding = FragmentMenuItemBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
@@ -40,7 +40,7 @@ class MenuItemFragment : Fragment() {
             viewModel.addToCart(menuItem)
             binding.menuItemFragmentCartQuantityControlView.count = viewModel.getMenuItemCount(menuItem)
         }
-        binding.menuItemFragmentCartQuantityControlView.setOnMinusClickListener { value ->
+        binding.menuItemFragmentCartQuantityControlView.setOnMinusClickListener {
             viewModel.removeFromCart(viewModel.chosenMenuItem.value!!)
             binding.menuItemFragmentCartQuantityControlView.count = viewModel.getMenuItemCount(menuItem)
         }
@@ -50,11 +50,10 @@ class MenuItemFragment : Fragment() {
         }
     }
 
-    private fun changeToolbarMenuActions(){
-        (requireActivity() as CommonComponentsController).changeToolbarMenuItemClickListener{
-            if(it.itemId == R.id.action_cart) {
+    private fun inflateMenu(){
+        (requireActivity() as CommonComponentsController).inflateToolbarMenu(R.menu.menu_item_menu) {
+            if(it.itemId == R.id.action_cart)
                 findNavController().navigate(R.id.actionMenuItemToCart)
-            }
             true
         }
     }

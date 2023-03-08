@@ -1,18 +1,17 @@
 package ru.shawarma.menu.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import ru.shawarma.menu.MenuController
-import ru.shawarma.menu.entities.MenuElement
 import ru.shawarma.menu.R
 import ru.shawarma.menu.databinding.MenuErrorBinding
 import ru.shawarma.menu.databinding.MenuHeaderBinding
 import ru.shawarma.menu.databinding.MenuItemBinding
 import ru.shawarma.menu.databinding.MenuLoadingBinding
+import ru.shawarma.menu.entities.MenuElement
 
 class MenuAdapter(
     private val menuController: MenuController
@@ -89,20 +88,14 @@ class MenuAdapter(
             binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
             binding.menuAddToCartButton.setOnClickListener {
                 menuController.addToCart(menuItem)
-               /* if(!menuItem.isPicked.get())
-                    menuItem.isPicked.set(true)*/
                 binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
             }
             binding.menuCartQuantityControlView.setOnMinusClickListener { value ->
                 menuController.removeFromCart(menuItem)
-                /*if(value == 0)
-                    menuItem.isPicked.set(false)*/
                 binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
             }
             binding.menuCartQuantityControlView.setOnPlusClickListener {
                 menuController.addToCart(menuItem)
-               /* if(!menuItem.isPicked.get())
-                    menuItem.isPicked.set(true)*/
                 binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
             }
             binding.root.setOnClickListener {

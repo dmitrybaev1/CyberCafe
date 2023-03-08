@@ -5,7 +5,8 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import ru.shawarma.core.data.entities.ApiError
 import ru.shawarma.core.data.entities.AuthData
@@ -25,9 +26,9 @@ object Errors {
     const val NOT_FOUND_ERROR = "404Error"
 }
 
-fun checkExpires(expiresIn: Long): Boolean {
-    return expiresIn <= (System.currentTimeMillis() / 1000L) - 60L //Sub one minute to guarantee correct timings and refresh
-}
+fun checkExpires(expiresIn: Long): Boolean =
+    System.currentTimeMillis() / 1000L + 60L >= expiresIn
+
 
 suspend fun checkNotExpiresOrTryRefresh(
     authData: AuthData,
@@ -65,7 +66,9 @@ internal fun parseError(httpException: HttpException): ApiError {
     return apiError
 }
 
-internal suspend fun <T> safeServiceCall(dispatcher: CoroutineDispatcher, call: suspend () -> T): Result<T> =
+internal suspend fun <T> safeServiceCall(
+    dispatcher: CoroutineDispatcher, call: suspend () -> T
+): Result<T> =
     withContext(dispatcher){
         try {
             val result = call.invoke()

@@ -1,13 +1,12 @@
 package ru.shawarma.menu
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -16,7 +15,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +34,7 @@ import ru.shawarma.menu.viewmodels.MenuViewModel
 @AndroidEntryPoint
 class MenuFragment : Fragment() {
 
-    private val viewModel: MenuViewModel by activityViewModels()
+    private val viewModel: MenuViewModel by hiltNavGraphViewModels(R.id.menu_nav_graph)
 
     private var binding: FragmentMenuBinding? = null
 
@@ -161,4 +159,5 @@ class MenuFragment : Fragment() {
         super.onDestroyView()
         binding = null
     }
+
 }
