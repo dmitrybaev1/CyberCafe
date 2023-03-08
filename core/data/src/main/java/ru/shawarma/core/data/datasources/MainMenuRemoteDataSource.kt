@@ -3,8 +3,8 @@ package ru.shawarma.core.data.datasources
 import kotlinx.coroutines.CoroutineDispatcher
 import ru.shawarma.core.data.entities.MenuItemResponse
 import ru.shawarma.core.data.services.MenuService
-import ru.shawarma.core.data.utils.safeServiceCall
 import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.data.utils.safeServiceCall
 import javax.inject.Inject
 
 class MainMenuRemoteDataSource @Inject constructor(

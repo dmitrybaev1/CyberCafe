@@ -1,7 +1,5 @@
 package ru.shawarma.auth.viewmodels
 
-import android.os.SystemClock
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,9 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.AuthData
-import ru.shawarma.core.data.entities.TokensRequest
 import ru.shawarma.core.data.repositories.AuthRepository
-import ru.shawarma.core.data.utils.*
+import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.data.utils.TokenManager
+import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
 import javax.inject.Inject
 
 @HiltViewModel

@@ -17,13 +17,12 @@ import ru.shawarma.core.data.entities.MenuItemResponse
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.MenuRepository
 import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.data.utils.TokenManager
-import ru.shawarma.menu.viewmodels.MenuViewModel
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
+import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.entities.MenuElement
 import ru.shawarma.menu.viewmodels.MenuUIState
+import ru.shawarma.menu.viewmodels.MenuViewModel
 
 class MenuViewModelTest {
 

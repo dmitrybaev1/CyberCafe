@@ -13,4 +13,6 @@ interface CommonComponentsController {
     fun clearToolbarMenu()
 
     fun changeToolbarMenuItemClickListener(onMenuItemClickListener: OnMenuItemClickListener)
+
+    fun setCloseToolbarIcon()
 }

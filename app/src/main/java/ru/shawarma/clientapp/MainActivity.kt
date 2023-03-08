@@ -1,19 +1,17 @@
 package ru.shawarma.clientapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.fragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
-import ru.shawarma.auth.AuthFragment
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
@@ -85,6 +83,10 @@ class MainActivity : AppCompatActivity(), AppNavigation,
 
     override fun changeToolbarMenuItemClickListener(onMenuItemClickListener: Toolbar.OnMenuItemClickListener) {
         toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
+    }
+
+    override fun setCloseToolbarIcon() {
+        toolbar.setNavigationIcon(com.google.android.material.R.drawable.ic_m3_chip_close)
     }
 
     override fun isOnline(): Boolean = true
