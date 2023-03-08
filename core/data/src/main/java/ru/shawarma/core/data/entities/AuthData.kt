@@ -10,6 +10,11 @@ data class AuthData(
     val tokenType: String,
     val expiresIn: Long
 ): Parcelable{
+    companion object{
+        fun empty(): AuthData = AuthData("","","",0)
+    }
+
     fun isEmpty(): Boolean =
-        this == AuthData("","","",0)
+        this == empty()
+
 }

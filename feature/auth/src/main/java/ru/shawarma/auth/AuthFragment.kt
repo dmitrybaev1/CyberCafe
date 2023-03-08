@@ -37,7 +37,6 @@ class AuthFragment : Fragment() {
     in STARTED state again*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupToolbarUpButton()
         viewModel.navCommand.observe(this){
             findNavController().navigate(R.id.actionAuthToRegister)
         }
@@ -48,12 +47,13 @@ class AuthFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setupToolbarUpButton()
         val binding = FragmentAuthBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
         this.binding = binding
         arguments?.let{bundle ->
-            viewModel.setRefreshTokenError(bundle.getString("error") ?: Errors.REFRESH_TOKEN_ERROR)
+            viewModel.setRefreshTokenErrorAndClearData(bundle.getString("error") ?: Errors.REFRESH_TOKEN_ERROR)
         }
         return binding.root
     }
@@ -93,7 +93,9 @@ class AuthFragment : Fragment() {
         val toolbarGraph = findNavController().createGraph(startDestination = R.id.authFragment){
             fragment<AuthFragment>(R.id.authFragment){}
         }
-        (requireActivity() as CommonComponentsController).setupToolbarForInsideNavigation(subGraph = toolbarGraph)
+        val activity = requireActivity() as CommonComponentsController
+        activity.clearToolbarMenu()
+        activity.setupToolbarForInsideNavigation(subGraph = toolbarGraph)
     }
 
     override fun onDestroyView() {

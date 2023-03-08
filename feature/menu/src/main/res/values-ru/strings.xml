@@ -2,11 +2,19 @@
 <resources>
     <string name="menu">Меню</string>
     <string name="cart">Корзина</string>
+    <string name="choose_product">Выбор товара</string>
     <string name="loading_error">Ошибка загрузки, попробуйте еще раз</string>
     <string name="retry">Повторить</string>
     <string name="add_to_cart">В корзину</string>
-    <string name="settings">Настройки</string>
-    <string name="order_with_details">ОФОРМИТЬ ЗАКАЗ&lt;br>&lt;small>&lt;font color=\"#FFFF00\">На сумму: %d\u20BD&lt;/font>&lt;/small></string>
+    <string name="settings">Профиль и настройки</string>
+    <string name="order_with_details">ОФОРМИТЬ ЗАКАЗ&lt;br>&lt;small>&lt;font color=\"#FFFF00\">На сумму: %d \u20BD&lt;/font>&lt;/small></string>
     <string name="order">Оформить заказ</string>
-    <string name="total_price">Итого: %d</string>
+    <string name="total_price">Итого: %d \u20BD</string>
+    <string name="empty_cart">В корзине пусто</string>
+    <string name="choose_payment_type">Выберите тип оплаты:</string>
+    <string-array name="payment_type_array">
+        <item>Наличные</item>
+        <item>Картой</item>
+        <item>Картой в приложении</item>
+    </string-array>
 </resources>

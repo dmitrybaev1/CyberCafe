@@ -1,31 +1,39 @@
 package ru.shawarma.menu.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.MenuController
+import ru.shawarma.menu.R
 import ru.shawarma.menu.databinding.CartItemBinding
+import ru.shawarma.menu.entities.MenuElement
 
 class CartAdapter(
-    private val list: List<CartMenuItem>,
     private val menuController: MenuController
 ) : RecyclerView.Adapter<CartAdapter.CartItemViewHolder>() {
 
+    private var list: List<CartMenuItem>? = null
+
+    fun setList(list: List<CartMenuItem>){
+        this.list = list
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartItemViewHolder {
         val binding = DataBindingUtil.inflate<CartItemBinding>(
-            LayoutInflater.from(parent.context),viewType,parent,false
+            LayoutInflater.from(parent.context), R.layout.cart_item,parent,false
         )
         return CartItemViewHolder(binding,menuController)
     }
 
     override fun onBindViewHolder(holder: CartItemViewHolder, position: Int) {
-        val cartItem = list[position]
-        holder.bind(cartItem)
+        val cartItem = list?.get(position)
+        cartItem?.let { holder.bind(it) }
     }
 
-    override fun getItemCount(): Int = list.size
+    override fun getItemCount(): Int = list?.size ?: 0
 
     class CartItemViewHolder(
         private val binding: CartItemBinding,

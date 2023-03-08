@@ -1,12 +1,12 @@
 package ru.shawarma.clientapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
-import androidx.navigation.NavController
-import androidx.navigation.NavGraph
-import androidx.navigation.createGraph
+import androidx.navigation.*
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
         toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        //setSupportActionBar(toolbar)
         val appBarConfig = AppBarConfiguration(navController.graph)
         toolbar.setupWithNavController(navController,appBarConfig)
     }
@@ -41,6 +41,13 @@ class MainActivity : AppCompatActivity(), AppNavigation,
     override fun navigateToMenu(authData: AuthData) {
         val bundle = bundleOf("authData" to authData)
         navController.navigate(ru.shawarma.menu.R.id.menu_nav_graph, bundle)
+    }
+
+    override fun navigateToAuth(errorMessage: String) {
+        val request = NavDeepLinkRequest.Builder
+            .fromUri("android-app://ru.shawarma.app/authFragment/$errorMessage".toUri())
+            .build()
+        navController.navigate(request)
     }
 
     override fun navigateToSettings() {
@@ -67,10 +74,18 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         menuRes: Int,
         onMenuItemClickListener: Toolbar.OnMenuItemClickListener
     ) {
+        toolbar.menu.clear()
         toolbar.inflateMenu(menuRes)
         toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
     }
 
+    override fun clearToolbarMenu() {
+        toolbar.menu.clear()
+    }
+
+    override fun changeToolbarMenuItemClickListener(onMenuItemClickListener: Toolbar.OnMenuItemClickListener) {
+        toolbar.setOnMenuItemClickListener(onMenuItemClickListener)
+    }
 
     override fun isOnline(): Boolean = true
 

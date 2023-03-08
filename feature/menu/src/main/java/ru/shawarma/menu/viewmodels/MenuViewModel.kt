@@ -1,5 +1,6 @@
 package ru.shawarma.menu.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -40,7 +41,7 @@ class MenuViewModel @Inject constructor(
     private val menuList = arrayListOf<MenuElement>(MenuElement.Loading)
 
     private val _menuState = MutableStateFlow<MenuUIState>(
-        MenuUIState.Success(menuList)
+        MenuUIState.Success(listOf(MenuElement.Loading))
     )
 
     val menuState = _menuState.asStateFlow()
@@ -55,25 +56,24 @@ class MenuViewModel @Inject constructor(
 
     private val _totalPriceText = MutableLiveData<CharSequence>()
 
-    val totalPriceText: LiveData<CharSequence> = _orderWithDetailsText
+    val totalPriceText: LiveData<CharSequence> = _totalPriceText
 
     private val _getPlaceholderString = MutableLiveData<Map<PlaceholderStringType,Array<Any>>>()
 
     val getPlaceholderString: LiveData<Map<PlaceholderStringType,Array<Any>>> = _getPlaceholderString
 
-    private val _cartListLiveData = MutableLiveData<List<CartMenuItem>>()
+    private val _cartListLiveData = MutableLiveData<List<CartMenuItem>>(listOf())
 
     val cartListLiveData: LiveData<List<CartMenuItem>> = _cartListLiveData
 
     private val rawCartList = arrayListOf<MenuElement.MenuItem>()
 
-    private var cartList = arrayListOf<CartMenuItem>()
+    private val _chosenMenuItem = MutableLiveData<MenuElement.MenuItem>()
+
+    val chosenMenuItem: LiveData<MenuElement.MenuItem> = _chosenMenuItem
 
     var totalCurrentCartPrice = 0
 
-    init {
-        getMenu()
-    }
 
     fun setToken(authData: AuthData){
         this.authData = authData
@@ -87,9 +87,8 @@ class MenuViewModel @Inject constructor(
             }
             if(loadNext)
                 menuOffset += STANDARD_REQUEST_OFFSET
-            val token = authData!!.accessToken
-            if(menuList.last() is MenuElement.Error || menuList.last() is MenuElement.Loading)
-                menuList.removeLast()
+            val token = "Bearer ${authData!!.accessToken}"
+            checkAndRemoveOldErrorAndLoading()
             when(val result = menuRepository.getMenu(token,menuOffset,menuCount)){
                 is Result.Success<List<MenuItemResponse>> -> {
                     val items = mapMenuItemResponseToMenuItem(result.data)
@@ -97,33 +96,60 @@ class MenuViewModel @Inject constructor(
                     menuList.addAll(items)
                     if(items.isNotEmpty()) {
                         menuList.add(MenuElement.Loading)
-                        _menuState.value = MenuUIState.Success(menuList)
+                        val newList = arrayListOf<MenuElement>()
+                        newList.addAll(menuList)
+                        _menuState.value = MenuUIState.Success(newList)
                     }
-                    else
-                        _menuState.value = MenuUIState.Success(menuList,true)
+                    else {
+                        repeat(2){
+                            // empty spacer for overlay button when scroll down
+                            menuList.add(MenuElement.Header(""))
+                        }
+                        val newList = arrayListOf<MenuElement>()
+                        newList.addAll(menuList)
+                        _menuState.value = MenuUIState.Success(newList, true)
+                    }
                 }
                 is Result.Failure -> {
                     if(result.message == Errors.UNAUTHORIZED_ERROR)
                         _menuState.value = MenuUIState.TokenInvalidError
                     else {
-                        menuList.add(MenuElement.Error)
-                        _menuState.value = MenuUIState.Error(menuList)
+                        if(menuList.lastOrNull() !is MenuElement.Error)
+                            menuList.add(MenuElement.Error)
+                        val newList = arrayListOf<MenuElement>()
+                        newList.addAll(menuList)
+                        _menuState.value = MenuUIState.Error(newList)
                     }
                 }
                 is Result.NetworkFailure -> {
-                    menuList.add(MenuElement.Error)
-                    _menuState.value = MenuUIState.Error(menuList)
+                    if(menuList.lastOrNull() !is MenuElement.Error)
+                        menuList.add(MenuElement.Error)
+                    val newList = arrayListOf<MenuElement>()
+                    newList.addAll(menuList)
+                    _menuState.value = MenuUIState.Error(newList)
                 }
             }
         }
     }
-
+    private fun checkAndRemoveOldErrorAndLoading(){
+        if(menuList.lastOrNull() is MenuElement.Error || menuList.lastOrNull() is MenuElement.Loading)
+            menuList.removeLast()
+    }
     override fun reloadMenu() {
+        if(menuList.last() is MenuElement.Error)
+            menuList.removeLast()
+        menuList.add(MenuElement.Loading)
+        val newList = arrayListOf<MenuElement>()
+        newList.addAll(menuList)
+        // better have separate state LoadingAfterError or smth like that in this case
+        _menuState.value = MenuUIState.Error(newList)
         getMenu(loadNext = false)
     }
 
     override fun addToCart(menuItem: MenuElement.MenuItem) {
         rawCartList.add(menuItem)
+        if(!menuItem.isPicked.get())
+            menuItem.isPicked.set(true)
         _cartListLiveData.value = buildCartMenuItemList()
         val totalPrice = getTotalPrice()
         totalCurrentCartPrice = totalPrice
@@ -135,6 +161,8 @@ class MenuViewModel @Inject constructor(
 
     override fun removeFromCart(menuItem: MenuElement.MenuItem) {
         rawCartList.remove(menuItem)
+        if(getMenuItemCount(menuItem) == 0)
+            menuItem.isPicked.set(false)
         _cartListLiveData.value = buildCartMenuItemList()
         val totalPrice = getTotalPrice()
         totalCurrentCartPrice = totalPrice
@@ -144,6 +172,9 @@ class MenuViewModel @Inject constructor(
         )
     }
 
+    override fun getMenuItemCount(menuItem: MenuElement.MenuItem): Int =
+        rawCartList.filter { item -> item == menuItem }.size
+
     fun setFormattedString(type: PlaceholderStringType, formattedString: CharSequence){
         when(type) {
             PlaceholderStringType.ORDER_WITH_DETAILS -> _orderWithDetailsText.value = formattedString
@@ -152,7 +183,12 @@ class MenuViewModel @Inject constructor(
     }
 
     fun goToCart(){
-        _navCommand.value = NavigationCommand.ToCart
+        _navCommand.value = NavigationCommand.ToCartFragment
+    }
+
+    override fun goToMenuItemFragment(menuItem: MenuElement.MenuItem, count: Int){
+        _chosenMenuItem.value = menuItem
+        _navCommand.value = NavigationCommand.ToMenuItemFragment
     }
 
     private suspend fun checkTokenValid(): Boolean =
@@ -169,12 +205,13 @@ class MenuViewModel @Inject constructor(
     }
 
     private fun buildCartMenuItemList(): List<CartMenuItem>{
-        cartList = arrayListOf()
+        val cartList = arrayListOf<CartMenuItem>()
         val map = rawCartList.groupingBy { it }.eachCount()
         for(key in map.keys){
             val cartItem = CartMenuItem(key,map[key]!!)
             cartList.add(cartItem)
         }
+        cartList.sortBy { it.menuItem.id }
         return cartList
     }
 }

@@ -2,11 +2,19 @@
 <resources>
     <string name="menu">Menu</string>
     <string name="cart">Cart</string>
+    <string name="choose_product">Choose product</string>
     <string name="loading_error">Loading error, try again</string>
     <string name="retry">Retry</string>
     <string name="add_to_cart">Add to cart</string>
-    <string name="settings">Settings</string>
-    <string name="order_with_details">ORDER&lt;br>&lt;small>&lt;font color=\"#FFFF00\">Total price: %d\u20BD&lt;/font>&lt;/small></string>
+    <string name="settings">Profile and settings</string>
+    <string name="order_with_details">ORDER&lt;br>&lt;small>&lt;font color=\"#FFFF00\">Total price: %d \u20BD&lt;/font>&lt;/small></string>
     <string name="order">Order</string>
-    <string name="total_price">Total: %d</string>
+    <string name="total_price">Total: %d \u20BD</string>
+    <string name="empty_cart">Empty cart</string>
+    <string name="choose_payment_type">Choose payment type:</string>
+    <string-array name="payment_type_array">
+        <item>Cash</item>
+        <item>Card</item>
+        <item>Card online</item>
+    </string-array>
 </resources>

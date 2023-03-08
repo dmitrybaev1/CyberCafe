@@ -23,6 +23,8 @@
         tools:layout="@layout/fragment_auth">
         <action android:id="@+id/actionAuthToRegister"
             app:destination="@id/registerFragment" />
+        <deepLink
+            app:uri="android-app://ru.shawarma.app/authFragment/{error}" />
     </fragment>
 
     <fragment

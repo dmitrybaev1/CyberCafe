@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
 import ru.shawarma.menu.adapters.MenuAdapter
 import ru.shawarma.menu.databinding.FragmentMenuBinding
@@ -32,7 +34,7 @@ import ru.shawarma.menu.viewmodels.MenuViewModel
 @AndroidEntryPoint
 class MenuFragment : Fragment() {
 
-    private val viewModel: MenuViewModel by activityViewModels()
+    private val viewModel: MenuViewModel by hiltNavGraphViewModels(R.id.menu_nav_graph)
 
     private var binding: FragmentMenuBinding? = null
 
@@ -44,14 +46,13 @@ class MenuFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val authData: AuthData? = arguments?.getParcelable("authData")
-        viewModel.setToken(authData!!)
-        setupToolbarUpButton()
-        inflateMenu()
-        viewModel.navCommand.observe(this){
-            findNavController().navigate(R.id.actionMenuToCart)
+        viewModel.navCommand.observe(this){navCommand ->
+            when(navCommand){
+                NavigationCommand.ToCartFragment -> findNavController().navigate(R.id.actionMenuToCart)
+                NavigationCommand.ToMenuItemFragment -> findNavController().navigate(R.id.actionMenuToMenuItem)
+            }
         }
-        viewModel.getPlaceholderString.observe(this){map ->
+        viewModel.getPlaceholderString.observeForever{map ->
             if(map.containsKey(PlaceholderStringType.ORDER_WITH_DETAILS)){
                 val intParam = map[PlaceholderStringType.ORDER_WITH_DETAILS]?.get(0) as Int
                 val text = requireContext().getString(R.string.order_with_details,intParam)
@@ -65,6 +66,9 @@ class MenuFragment : Fragment() {
                 viewModel.setFormattedString(PlaceholderStringType.TOTAL_PRICE,text)
             }
         }
+        val authData: AuthData? = arguments?.getParcelable("authData")
+        viewModel.setToken(authData!!)
+        viewModel.getMenu()
     }
 
     override fun onCreateView(
@@ -72,6 +76,8 @@ class MenuFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        setupToolbarUpButton()
+        inflateMenu()
         val binding = FragmentMenuBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
@@ -86,18 +92,20 @@ class MenuFragment : Fragment() {
                 viewModel.menuState.collect{state ->
                     when(state){
                         is MenuUIState.Success -> {
-                            menuAdapter?.notifyDataSetChanged() ?: run {
-                                menuAdapter = MenuAdapter(state.items,viewModel)
-                                binding!!.menuRecyclerView.adapter = menuAdapter
-                            }
+                            menuAdapter?.setList(state.items)
+                            menuAdapter?.notifyDataSetChanged()
                             if(state.isFullyLoaded)
                                 isFullyLoaded = true
                         }
                         is MenuUIState.Error -> {
+                            val items = state.items
+                            menuAdapter?.setList(items)
                             menuAdapter?.notifyDataSetChanged()
+                            binding!!.menuRecyclerView.scrollToPosition(items.size-1)
                         }
                         is MenuUIState.TokenInvalidError -> {
-                            //выкинуть на авторизацию
+                            findNavController().popBackStack(R.id.menuFragment,true)
+                            (requireActivity() as AppNavigation).navigateToAuth(Errors.REFRESH_TOKEN_ERROR)
                         }
                     }
                     isRequestInProgress = false
@@ -107,6 +115,7 @@ class MenuFragment : Fragment() {
     }
 
     private fun setupMenuRecyclerView(){
+        menuAdapter = MenuAdapter(viewModel)
         val gridLayoutManager = GridLayoutManager(requireActivity(),2)
         gridLayoutManager.spanSizeLookup = object: SpanSizeLookup(){
             override fun getSpanSize(position: Int): Int =
@@ -114,6 +123,7 @@ class MenuFragment : Fragment() {
                 else MENU_FULL_SPAN_SIZE
         }
         binding!!.menuRecyclerView.apply {
+            adapter = menuAdapter
             layoutManager = gridLayoutManager
             addOnScrollListener(object: OnScrollListener(){
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -149,4 +159,5 @@ class MenuFragment : Fragment() {
         super.onDestroyView()
         binding = null
     }
+
 }
