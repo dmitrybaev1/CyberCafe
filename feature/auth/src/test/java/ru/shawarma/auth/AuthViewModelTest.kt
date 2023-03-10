@@ -12,6 +12,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import ru.shawarma.auth.viewmodels.AuthUIState
 import ru.shawarma.auth.viewmodels.AuthViewModel
+import ru.shawarma.auth.viewmodels.RegisterUIState
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
@@ -41,8 +42,30 @@ class AuthViewModelTest {
     @Test
     fun `Successful auth`() = runTest {
         whenever(authRepository.login(any())).thenReturn(Result.Success(authData))
+        viewModel.email.value = "example@example.com"
+        viewModel.password.value = "12345678"
         viewModel.auth()
         assertTrue(viewModel.authState.value is AuthUIState.Success && !viewModel.isError.value!!)
+    }
+
+    @Test
+    fun `Incorrect email when trying auth`() = runTest {
+        viewModel.email.value = "example@example"
+        viewModel.password.value = "12345678"
+        viewModel.auth()
+        val state = viewModel.authState.value as AuthUIState.Error
+        assertEquals(Errors.EMAIL_ERROR,state.message)
+        assertTrue(viewModel.isError.value!!)
+    }
+
+    @Test
+    fun `Incorrect password when trying auth`() = runTest {
+        viewModel.email.value = "example@example.com"
+        viewModel.password.value = "1234567"
+        viewModel.auth()
+        val state = viewModel.authState.value as AuthUIState.Error
+        assertEquals(Errors.PASSWORD_ERROR,state.message)
+        assertTrue(viewModel.isError.value!!)
     }
 
     @Test
@@ -56,6 +79,8 @@ class AuthViewModelTest {
     @Test
     fun `Network error when trying auth`() = runTest {
         whenever(authRepository.login(any())).thenReturn(Result.NetworkFailure)
+        viewModel.email.value = "example@example.com"
+        viewModel.password.value = "12345678"
         viewModel.auth()
         val state = viewModel.authState.value as AuthUIState.Error
         assertEquals(Errors.NETWORK_ERROR, state.message)
@@ -65,6 +90,8 @@ class AuthViewModelTest {
     @Test
     fun `Api error when trying auth`() = runTest {
         whenever(authRepository.login(any())).thenReturn(Result.Failure(""))
+        viewModel.email.value = "example@example.com"
+        viewModel.password.value = "12345678"
         viewModel.auth()
         val state = viewModel.authState.value as AuthUIState.Error
         assertEquals("", state.message)

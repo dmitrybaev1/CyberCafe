@@ -40,8 +40,30 @@ class RegisterViewModelTest {
     @Test
     fun `Successful register`() = runTest {
         whenever(authRepository.register(any())).thenReturn(Result.Success(registeredUser))
+        viewModel.email.value = "example@example.com"
+        viewModel.password.value = "12345678"
         viewModel.register()
         assertTrue(viewModel.registerState.value is RegisterUIState.Success && !viewModel.isError.value!!)
+    }
+
+    @Test
+    fun `Incorrect password when trying register`() = runTest {
+        viewModel.email.value = "example@example.com"
+        viewModel.password.value = "1234567"
+        viewModel.register()
+        val state = viewModel.registerState.value as RegisterUIState.Error
+        assertEquals(Errors.PASSWORD_ERROR,state.message)
+        assertTrue(viewModel.isError.value!!)
+    }
+
+    @Test
+    fun `Incorrect email when trying register`() = runTest {
+        viewModel.email.value = "example@example"
+        viewModel.password.value = "12345678"
+        viewModel.register()
+        val state = viewModel.registerState.value as RegisterUIState.Error
+        assertEquals(Errors.EMAIL_ERROR,state.message)
+        assertTrue(viewModel.isError.value!!)
     }
 
     @Test
@@ -55,6 +77,8 @@ class RegisterViewModelTest {
     @Test
     fun `Network error when trying register`() = runTest {
         whenever(authRepository.register(any())).thenReturn(Result.NetworkFailure)
+        viewModel.email.value = "example@example.com"
+        viewModel.password.value = "12345678"
         viewModel.register()
         val state = viewModel.registerState.value as RegisterUIState.Error
         assertEquals(Errors.NETWORK_ERROR, state.message)
@@ -64,6 +88,8 @@ class RegisterViewModelTest {
     @Test
     fun `Api error when trying auth`() = runTest {
         whenever(authRepository.register(any())).thenReturn(Result.Failure(""))
+        viewModel.email.value = "example@example.com"
+        viewModel.password.value = "12345678"
         viewModel.register()
         val state = viewModel.registerState.value as RegisterUIState.Error
         assertEquals("", state.message)
