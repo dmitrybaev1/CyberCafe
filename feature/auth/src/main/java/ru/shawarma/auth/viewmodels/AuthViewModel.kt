@@ -64,7 +64,7 @@ class AuthViewModel @Inject constructor(
                 is Result.Success<AuthData> -> {
                     val authData = result.data
                     tokenManager.update(authData)
-                    _authState.value = AuthUIState.Success(authData)
+                    _authState.value = AuthUIState.Success
                     _isError.value = false
                 }
                 is Result.Failure -> { _authState.value = AuthUIState.Error(result.message); _isError.value = true }
@@ -88,6 +88,6 @@ class AuthViewModel @Inject constructor(
 }
 
 sealed interface AuthUIState{
-    data class Success(val authData: AuthData): AuthUIState
+    object Success: AuthUIState
     data class Error(val message: String): AuthUIState
 }

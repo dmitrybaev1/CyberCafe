@@ -75,7 +75,7 @@ class AuthFragment : Fragment() {
             is AuthUIState.Success -> {
                 binding!!.authErrorTextView.text = ""
                 findNavController().popBackStack(R.id.authFragment,true)
-                (requireActivity() as AppNavigation).navigateToMenu(state.authData)
+                (requireActivity() as AppNavigation).navigateToMenu()
             }
             is AuthUIState.Error -> {
                 when(val message = state.message){

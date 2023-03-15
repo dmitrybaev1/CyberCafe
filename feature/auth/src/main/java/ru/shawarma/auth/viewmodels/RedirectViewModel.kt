@@ -38,7 +38,7 @@ class RedirectViewModel(
             val authData = tokenManager.getAuthData()
             if(!authData.isEmpty()){
                 if(checkNotExpiresOrTryRefresh(authData, authRepository, tokenManager))
-                    _redirectState.value = RedirectState.TokenValid(authData)
+                    _redirectState.value = RedirectState.TokenValid
                 else
                     _redirectState.value = RedirectState.RefreshError(Errors.REFRESH_TOKEN_ERROR)
             }
@@ -49,7 +49,7 @@ class RedirectViewModel(
 }
 
 sealed interface RedirectState{
-    data class TokenValid(val authData: AuthData): RedirectState
+    object TokenValid: RedirectState
     data class RefreshError(val message: String): RedirectState
     object NoToken: RedirectState
 }

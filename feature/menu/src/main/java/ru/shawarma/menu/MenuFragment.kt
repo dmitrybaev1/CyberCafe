@@ -66,8 +66,6 @@ class MenuFragment : Fragment() {
                 viewModel.setFormattedString(PlaceholderStringType.TOTAL_PRICE,text)
             }
         }
-        val authData: AuthData? = arguments?.getParcelable("authData")
-        viewModel.setToken(authData!!)
         viewModel.getMenu()
     }
 

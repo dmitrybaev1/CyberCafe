@@ -74,9 +74,7 @@ class RedirectViewModelTest {
 
     @Test
     fun `No existing auth data`() = runTest {
-        whenever(tokenManager.getAuthData()).thenReturn(
-            authData
-        )
+        whenever(tokenManager.getAuthData()).thenReturn(authData)
         viewModel.tryToAuthIfValidData()
         assertTrue(viewModel.redirectState.value is RedirectState.NoToken)
     }

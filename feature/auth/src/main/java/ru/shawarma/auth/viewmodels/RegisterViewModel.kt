@@ -53,7 +53,7 @@ class RegisterViewModel @Inject constructor(
             val result = authRepository.register(userRegisterRequest)
             _isLoading.value = false
             when(result){
-                is Result.Success<RegisteredUser> -> { _registerState.value = RegisterUIState.Success(result.data); _isError.value = false }
+                is Result.Success<RegisteredUser> -> { _registerState.value = RegisterUIState.Success; _isError.value = false }
                 is Result.Failure -> { _registerState.value = RegisterUIState.Error(result.message); _isError.value = true }
                 is Result.NetworkFailure -> { _registerState.value = RegisterUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }
@@ -67,6 +67,6 @@ class RegisterViewModel @Inject constructor(
 }
 
 sealed interface RegisterUIState{
-    data class Success(val user: RegisteredUser): RegisterUIState
+    object Success: RegisterUIState
     data class Error(val message: String): RegisterUIState
 }
