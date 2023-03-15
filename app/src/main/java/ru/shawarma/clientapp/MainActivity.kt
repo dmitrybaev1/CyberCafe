@@ -36,9 +36,8 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         toolbar.setupWithNavController(navController,appBarConfig)
     }
 
-    override fun navigateToMenu(authData: AuthData) {
-        val bundle = bundleOf("authData" to authData)
-        navController.navigate(ru.shawarma.menu.R.id.menu_nav_graph, bundle)
+    override fun navigateToMenu() {
+        navController.navigate(ru.shawarma.menu.R.id.menu_nav_graph)
     }
 
     override fun navigateToAuth(errorMessage: String) {

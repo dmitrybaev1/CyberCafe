@@ -45,7 +45,7 @@ class RedirectFragment : Fragment() {
                             }
                             is RedirectState.TokenValid -> {
                                 findNavController().popBackStack(R.id.redirectFragment,true)
-                                (requireActivity() as AppNavigation).navigateToMenu(state.authData)
+                                (requireActivity() as AppNavigation).navigateToMenu()
                             }
                         }
                     }

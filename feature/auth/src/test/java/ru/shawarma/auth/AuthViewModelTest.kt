@@ -41,8 +41,30 @@ class AuthViewModelTest {
     @Test
     fun `Successful auth`() = runTest {
         whenever(authRepository.login(any())).thenReturn(Result.Success(authData))
+        viewModel.password.value = "12345678"
+        viewModel.email.value = "example@example.com"
         viewModel.auth()
         assertTrue(viewModel.authState.value is AuthUIState.Success && !viewModel.isError.value!!)
+    }
+
+    @Test
+    fun `Password error when trying auth`() = runTest {
+        viewModel.password.value = "1234567"
+        viewModel.email.value = "example@example.com"
+        viewModel.auth()
+        val state = viewModel.authState.value as AuthUIState.Error
+        assertEquals(Errors.PASSWORD_ERROR,state.message)
+        assertTrue(viewModel.isError.value!!)
+    }
+
+    @Test
+    fun `Email error when trying auth`() = runTest {
+        viewModel.password.value = "12345678"
+        viewModel.email.value = "example@example"
+        viewModel.auth()
+        val state = viewModel.authState.value as AuthUIState.Error
+        assertEquals(Errors.EMAIL_ERROR,state.message)
+        assertTrue(viewModel.isError.value!!)
     }
 
     @Test
@@ -56,6 +78,8 @@ class AuthViewModelTest {
     @Test
     fun `Network error when trying auth`() = runTest {
         whenever(authRepository.login(any())).thenReturn(Result.NetworkFailure)
+        viewModel.password.value = "12345678"
+        viewModel.email.value = "example@example.com"
         viewModel.auth()
         val state = viewModel.authState.value as AuthUIState.Error
         assertEquals(Errors.NETWORK_ERROR, state.message)
@@ -65,6 +89,8 @@ class AuthViewModelTest {
     @Test
     fun `Api error when trying auth`() = runTest {
         whenever(authRepository.login(any())).thenReturn(Result.Failure(""))
+        viewModel.password.value = "12345678"
+        viewModel.email.value = "example@example.com"
         viewModel.auth()
         val state = viewModel.authState.value as AuthUIState.Error
         assertEquals("", state.message)

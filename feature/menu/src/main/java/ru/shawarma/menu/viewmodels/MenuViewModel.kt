@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -74,13 +75,13 @@ class MenuViewModel @Inject constructor(
 
     var totalCurrentCartPrice = 0
 
-
-    fun setToken(authData: AuthData){
-        this.authData = authData
+    private var getAuthDataJob = viewModelScope.launch {
+        this@MenuViewModel.authData = tokenManager.getAuthData()
     }
 
     fun getMenu(loadNext: Boolean = true){
         viewModelScope.launch {
+            getAuthDataJob.join()
             if(!checkTokenValid()){
                 _menuState.value = MenuUIState.TokenInvalidError
                 return@launch
