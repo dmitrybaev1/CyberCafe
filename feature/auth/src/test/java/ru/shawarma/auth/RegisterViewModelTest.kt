@@ -39,7 +39,7 @@ class RegisterViewModelTest {
 
     @Test
     fun `Successful register`() = runTest {
-        whenever(authRepository.register(any())).thenReturn(Result.Success(registeredUser))
+		whenever(authRepository.register(any())).thenReturn(Result.Success(registeredUser))
         viewModel.password.value = "12345678"
         viewModel.email.value = "example@example.com"
         viewModel.register()

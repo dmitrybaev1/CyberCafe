@@ -12,6 +12,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import ru.shawarma.auth.viewmodels.AuthUIState
 import ru.shawarma.auth.viewmodels.AuthViewModel
+import ru.shawarma.auth.viewmodels.RegisterUIState
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors

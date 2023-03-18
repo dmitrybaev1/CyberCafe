@@ -147,8 +147,10 @@ class MenuFragment : Fragment() {
 
     private fun inflateMenu(){
         (requireActivity() as CommonComponentsController).inflateToolbarMenu(R.menu.menu_menu) {
-             if(it.itemId == R.id.action_cart)
-                 findNavController().navigate(R.id.actionMenuToCart)
+             when(it.itemId){
+                 R.id.action_cart -> findNavController().navigate(R.id.actionMenuToCart)
+                 R.id.action_settings -> (requireActivity() as AppNavigation).navigateToSettings()
+             }
              true
         }
     }
@@ -156,6 +158,7 @@ class MenuFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+        menuAdapter = null
     }
 
 }

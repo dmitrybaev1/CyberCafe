@@ -3,12 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settings_nav_graph"
-    app:startDestination="@id/settingsFragment">
+    app:startDestination="@id/profileFragment">
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:label="@string/profile"
+        android:name="ru.shawarma.settings.ProfileFragment"
+        tools:layout="@layout/fragment_profile">
+        <action android:id="@+id/actionProfileToSettings"
+            app:destination="@id/settingsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/settingsFragment"
         android:label="@string/settings"
         android:name="ru.shawarma.settings.SettingsFragment"
-        tools:layout="@layout/fragment_settings"/>
+        tools:layout="@layout/fragment_settings" />
 
 </navigation>
