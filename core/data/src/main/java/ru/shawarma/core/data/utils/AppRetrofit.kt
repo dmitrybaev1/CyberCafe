@@ -1,5 +1,6 @@
 package ru.shawarma.core.data.utils
 
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
@@ -58,8 +59,9 @@ object AppRetrofit {
             }
             FeatureApi.ORDER -> {
                 return orderInstance ?: run {
+                    val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
                     val builder = Retrofit.Builder()
-                        .addConverterFactory(GsonConverterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create(gson))
                         .baseUrl("http://10.0.2.2:5029/api/v1/")
                         .client(client)
                     val retrofit = builder.build()

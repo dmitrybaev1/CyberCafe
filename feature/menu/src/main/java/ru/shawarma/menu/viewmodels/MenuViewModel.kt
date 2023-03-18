@@ -35,6 +35,10 @@ class MenuViewModel @Inject constructor(
 
     private var authData: AuthData? = null
 
+    private var getAuthDataJob = viewModelScope.launch {
+        this@MenuViewModel.authData = tokenManager.getAuthData()
+    }
+
     private var menuOffset = - STANDARD_REQUEST_OFFSET
 
     private val menuCount = STANDARD_REQUEST_OFFSET
@@ -75,10 +79,6 @@ class MenuViewModel @Inject constructor(
 
     var totalCurrentCartPrice = 0
 
-    private var getAuthDataJob = viewModelScope.launch {
-        this@MenuViewModel.authData = tokenManager.getAuthData()
-    }
-
     fun getMenu(loadNext: Boolean = true){
         viewModelScope.launch {
             getAuthDataJob.join()
@@ -97,19 +97,16 @@ class MenuViewModel @Inject constructor(
                     menuList.addAll(items)
                     if(items.isNotEmpty()) {
                         menuList.add(MenuElement.Loading)
-                        val newList = arrayListOf<MenuElement>()
-                        newList.addAll(menuList)
-                        _menuState.value = MenuUIState.Success(newList)
+                        copyAndSetMenuList(true)
                     }
                     else {
                         repeat(2){
                             // empty spacer for overlay button when scroll down
                             menuList.add(MenuElement.Header(""))
                         }
-                        val newList = arrayListOf<MenuElement>()
-                        newList.addAll(menuList)
-                        _menuState.value = MenuUIState.Success(newList, true)
+                        copyAndSetMenuList(true, isFullyLoaded = true)
                     }
+
                 }
                 is Result.Failure -> {
                     if(result.message == Errors.UNAUTHORIZED_ERROR)
@@ -117,17 +114,13 @@ class MenuViewModel @Inject constructor(
                     else {
                         if(menuList.lastOrNull() !is MenuElement.Error)
                             menuList.add(MenuElement.Error)
-                        val newList = arrayListOf<MenuElement>()
-                        newList.addAll(menuList)
-                        _menuState.value = MenuUIState.Error(newList)
+                        copyAndSetMenuList(false)
                     }
                 }
                 is Result.NetworkFailure -> {
                     if(menuList.lastOrNull() !is MenuElement.Error)
                         menuList.add(MenuElement.Error)
-                    val newList = arrayListOf<MenuElement>()
-                    newList.addAll(menuList)
-                    _menuState.value = MenuUIState.Error(newList)
+                    copyAndSetMenuList(false)
                 }
             }
         }
@@ -140,10 +133,7 @@ class MenuViewModel @Inject constructor(
         if(menuList.last() is MenuElement.Error)
             menuList.removeLast()
         menuList.add(MenuElement.Loading)
-        val newList = arrayListOf<MenuElement>()
-        newList.addAll(menuList)
-        // better have separate state LoadingAfterError or smth like that in this case
-        _menuState.value = MenuUIState.Error(newList)
+        copyAndSetMenuList(false)
         getMenu(loadNext = false)
     }
 
@@ -214,6 +204,15 @@ class MenuViewModel @Inject constructor(
         }
         cartList.sortBy { it.menuItem.id }
         return cartList
+    }
+
+    private fun copyAndSetMenuList(isSuccess: Boolean,isFullyLoaded: Boolean = false){
+        val newList = arrayListOf<MenuElement>()
+        newList.addAll(menuList)
+        if(isSuccess)
+            _menuState.value = MenuUIState.Success(newList,isFullyLoaded)
+        else
+            _menuState.value = MenuUIState.Error(newList)
     }
 }
 sealed interface MenuUIState{

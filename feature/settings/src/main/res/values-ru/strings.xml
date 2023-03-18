@@ -4,4 +4,13 @@
     <string name="profile">Профиль</string>
     <string name="info">Инфо</string>
     <string name="orders">Заказы</string>
+    <string name="order_with_number">Заказ № </string>
+    <string name="in_queue">В очереди</string>
+    <string name="cooking">Готовится</string>
+    <string name="ready">Готов</string>
+    <string name="closed">Завершен</string>
+    <string name="canceled">Отменен</string>
+    <string name="info_error">Ошибка получения данных</string>
+    <string name="retry">Повторить</string>
+    <string name="loading_error">Ошибка загрузки, попробуйте еще раз</string>
 </resources>

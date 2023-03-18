@@ -4,4 +4,13 @@
     <string name="profile">Profile</string>
     <string name="info">Info</string>
     <string name="orders">Orders</string>
+    <string name="order_with_number">Order № </string>
+    <string name="in_queue">In queue</string>
+    <string name="cooking">Cooking</string>
+    <string name="ready">Ready</string>
+    <string name="closed">Closed</string>
+    <string name="canceled">Canceled</string>
+    <string name="info_error">Fetching data error</string>
+    <string name="retry">Retry</string>
+    <string name="loading_error">Loading error, try again</string>
 </resources>

@@ -1,6 +1,137 @@
 package ru.shawarma.settings.viewmodels
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.core.data.entities.OrderResponse
+import ru.shawarma.core.data.repositories.AuthRepository
+import ru.shawarma.core.data.repositories.OrderRepository
+import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.data.utils.TokenManager
+import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
+import ru.shawarma.settings.NavigationCommand
+import ru.shawarma.settings.SettingsController
+import ru.shawarma.settings.entities.OrderElement
+import ru.shawarma.settings.utils.STANDARD_REQUEST_OFFSET
+import ru.shawarma.core.data.utils.Result
+import ru.shawarma.settings.utils.mapOrderResponseToOrderItem
+import javax.inject.Inject
 
-class OrdersViewModel : ViewModel() {
+@HiltViewModel
+class OrdersViewModel @Inject constructor(
+    private val orderRepository: OrderRepository,
+    private val authRepository: AuthRepository,
+    private val tokenManager: TokenManager
+) : ViewModel(), SettingsController {
+
+    private var authData: AuthData? = null
+
+    private var getAuthDataJob = viewModelScope.launch {
+        this@OrdersViewModel.authData = tokenManager.getAuthData()
+    }
+
+    private var ordersOffset = - STANDARD_REQUEST_OFFSET
+
+    private val ordersCount = STANDARD_REQUEST_OFFSET
+
+    private val _ordersState = MutableStateFlow<OrdersUIState>(
+        OrdersUIState.Success(listOf(OrderElement.Loading))
+    )
+
+    val ordersState = _ordersState.asStateFlow()
+
+    private val _navCommand = MutableLiveData<NavigationCommand>()
+
+    val navCommand: LiveData<NavigationCommand> = _navCommand
+
+    private val ordersList = arrayListOf<OrderElement>(OrderElement.Loading)
+
+    init {
+        getOrders()
+    }
+
+    fun getOrders(loadNext: Boolean = true){
+        viewModelScope.launch {
+            getAuthDataJob.join()
+            if(!checkTokenValid()){
+                _ordersState.value = OrdersUIState.TokenInvalidError
+                return@launch
+            }
+            if(loadNext)
+                ordersOffset += STANDARD_REQUEST_OFFSET
+            val token = "Bearer ${authData!!.accessToken}"
+            checkAndRemoveOldErrorAndLoading()
+            when(val result = orderRepository.getOrders(token,ordersOffset,ordersCount)){
+                is Result.Success<List<OrderResponse>> -> {
+                    if(result.data.isNotEmpty()) {
+                        val items = mapOrderResponseToOrderItem(result.data)
+                        ordersList.addAll(items)
+                        ordersList.add(OrderElement.Loading)
+                        copyAndSetOrdersList(true)
+                    }
+                    else
+                        copyAndSetOrdersList(true, isFullyLoaded = true)
+                }
+                is Result.Failure -> {
+                    if(result.message == Errors.UNAUTHORIZED_ERROR)
+                        _ordersState.value = OrdersUIState.TokenInvalidError
+                    else {
+                        if(ordersList.lastOrNull() !is OrderElement.Error)
+                            ordersList.add(OrderElement.Error)
+                        copyAndSetOrdersList(false)
+                    }
+                }
+                is Result.NetworkFailure -> {
+                    if(ordersList.lastOrNull() !is OrderElement.Error)
+                        ordersList.add(OrderElement.Error)
+                    copyAndSetOrdersList(false)
+                }
+            }
+        }
+    }
+
+    override fun goToOrder(id: Int) {
+        _navCommand.value = NavigationCommand.ToOrderModule(id)
+    }
+
+    override fun reloadOrders() {
+        if(ordersList.last() is OrderElement.Error)
+            ordersList.removeLast()
+        ordersList.add(OrderElement.Loading)
+        copyAndSetOrdersList(false)
+        getOrders(loadNext = false)
+    }
+
+    private fun checkAndRemoveOldErrorAndLoading(){
+        if(ordersList.lastOrNull() is OrderElement.Error || ordersList.lastOrNull() is OrderElement.Loading)
+            ordersList.removeLast()
+    }
+
+    private suspend fun checkTokenValid(): Boolean =
+        if(checkNotExpiresOrTryRefresh(authData!!,authRepository, tokenManager)){
+            authData = tokenManager.getAuthData()
+            true
+        }
+        else false
+
+    private fun copyAndSetOrdersList(isSuccess: Boolean, isFullyLoaded: Boolean = false){
+        val newList = arrayListOf<OrderElement>()
+        newList.addAll(ordersList)
+        if(isSuccess)
+            _ordersState.value = OrdersUIState.Success(newList,isFullyLoaded)
+        else
+            _ordersState.value = OrdersUIState.Error(newList)
+    }
+}
+sealed interface OrdersUIState{
+    data class Success(val items: List<OrderElement>, val isFullyLoaded: Boolean = false): OrdersUIState
+    data class Error(val items: List<OrderElement>): OrdersUIState
+    object TokenInvalidError: OrdersUIState
 }
