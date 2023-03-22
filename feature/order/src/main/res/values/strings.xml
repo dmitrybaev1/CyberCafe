@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="order">Order</string>
+    <string name="loading_error">Loading error, try again</string>
+    <string name="retry">Retry</string>
+    <string name="in_queue">In queue</string>
+    <string name="cooking">Cooking</string>
+    <string name="ready">Ready</string>
+    <string name="closed">Closed</string>
+    <string name="canceled">Canceled</string>
+    <string name="order_with_number">Order № </string>
+    <string name="missed">missed</string>
 </resources>

@@ -17,7 +17,7 @@ class MainOrderRepository @Inject constructor(
     ): Result<List<OrderResponse>> =
         orderRemoteDataSource.getOrders(token, offset, count)
 
-    override suspend fun getOrder(token: String, id: Long): Result<OrderResponse> =
+    override suspend fun getOrder(token: String, id: Int): Result<OrderResponse> =
         orderRemoteDataSource.getOrder(token, id)
 
     override suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse> =

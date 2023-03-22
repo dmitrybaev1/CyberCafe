@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="order">Заказ</string>
+    <string name="loading_error">Ошибка загрузки, попробуйте еще раз</string>
+    <string name="retry">Повторить</string>
+    <string name="in_queue">В очереди</string>
+    <string name="cooking">Готовится</string>
+    <string name="ready">Готов</string>
+    <string name="closed">Завершен</string>
+    <string name="canceled">Отменен</string>
+    <string name="order_with_number">Заказ № </string>
+    <string name="missed">отсутствует</string>
 </resources>

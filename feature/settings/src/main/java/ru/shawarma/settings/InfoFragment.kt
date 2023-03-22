@@ -66,7 +66,7 @@ class InfoFragment : Fragment() {
                                 layoutManager = LinearLayoutManager(requireContext())
                                 val infoAdapter = InfoAdapter(state.items)
                                 adapter = infoAdapter
-                                infoAdapter.notifyDataSetChanged()
+                                //infoAdapter.notifyDataSetChanged()
                             }
                         }
                         is InfoUIState.Error -> {

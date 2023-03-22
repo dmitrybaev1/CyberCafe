@@ -8,7 +8,7 @@ interface OrderRepository {
 
     suspend fun getOrders(token: String, offset: Int, count: Int): Result<List<OrderResponse>>
 
-    suspend fun getOrder(token: String, id: Long): Result<OrderResponse>
+    suspend fun getOrder(token: String, id: Int): Result<OrderResponse>
 
     suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse>
 

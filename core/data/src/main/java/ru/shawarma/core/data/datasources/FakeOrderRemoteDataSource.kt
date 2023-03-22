@@ -37,12 +37,12 @@ class FakeOrderRemoteDataSource @Inject constructor() : OrderRemoteDataSource {
             Result.Success(list)
     }
 
-    override suspend fun getOrder(token: String, id: Long): Result<OrderResponse> =
+    override suspend fun getOrder(token: String, id: Int): Result<OrderResponse> =
         withContext(Dispatchers.IO){
             delay(1000)
             Result.Success(
                 OrderResponse(
-                    0,
+                    id,
                     listOf(OrderMenuItemResponse(0,"Kebab",100,1)),
                     "clientId",
                     Date(),
