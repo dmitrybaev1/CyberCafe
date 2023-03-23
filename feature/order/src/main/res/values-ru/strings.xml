@@ -10,4 +10,6 @@
     <string name="canceled">Отменен</string>
     <string name="order_with_number">Заказ № </string>
     <string name="missed">отсутствует</string>
+    <string name="amount">" шт."</string>
+    <string name="total">"Итого: "</string>
 </resources>

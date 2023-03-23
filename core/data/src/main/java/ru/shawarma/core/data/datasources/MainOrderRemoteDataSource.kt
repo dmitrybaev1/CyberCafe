@@ -22,7 +22,7 @@ class MainOrderRemoteDataSource @Inject constructor(
         }
 
 
-    override suspend fun getOrder(token: String, id: Long): Result<OrderResponse> =
+    override suspend fun getOrder(token: String, id: Int): Result<OrderResponse> =
         safeServiceCall(dispatcher){
             orderService.getOrder(token, id)
         }

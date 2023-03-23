@@ -10,4 +10,6 @@
     <string name="canceled">Canceled</string>
     <string name="order_with_number">Order № </string>
     <string name="missed">missed</string>
+    <string name="amount">" p."</string>
+    <string name="total">"Total: "</string>
 </resources>

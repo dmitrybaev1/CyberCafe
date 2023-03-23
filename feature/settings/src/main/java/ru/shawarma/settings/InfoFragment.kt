@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -28,7 +29,7 @@ import ru.shawarma.settings.viewmodels.InfoViewModel
 @AndroidEntryPoint
 class InfoFragment : Fragment() {
 
-    private val viewModel: InfoViewModel by viewModels()
+    private val viewModel: InfoViewModel by hiltNavGraphViewModels(R.id.settings_nav_graph)
 
     private var binding: FragmentInfoBinding? = null
 

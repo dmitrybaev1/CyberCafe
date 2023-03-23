@@ -43,7 +43,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
     implementation 'androidx.hilt:hilt-navigation-fragment:1.0.0'
-    implementation 'nl.isaac:android-step-indicator:1.0.0'
     implementation 'com.google.dagger:hilt-android:2.44'
     kapt 'com.google.dagger:hilt-android-compiler:2.44'
     testImplementation 'junit:junit:4.13.2'

@@ -11,13 +11,6 @@ class OrderMenuItemAdapter(
     private val list: List<OrderMenuItem>
 ) : RecyclerView.Adapter<OrderMenuItemAdapter.OrderMenuItemViewHolder>() {
 
-
-    class OrderMenuItemViewHolder(private val binding: OrderMenuItemBinding): ViewHolder(binding.root){
-        fun bind(orderMenuItem: OrderMenuItem){
-
-        }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderMenuItemViewHolder {
         val binding = DataBindingUtil.inflate<OrderMenuItemBinding>(
             LayoutInflater.from(parent.context),R.layout.order_menu_item,parent,false)
@@ -29,4 +22,10 @@ class OrderMenuItemAdapter(
     }
 
     override fun getItemCount(): Int = list.size
+
+    class OrderMenuItemViewHolder(private val binding: OrderMenuItemBinding): ViewHolder(binding.root){
+        fun bind(orderMenuItem: OrderMenuItem){
+            binding.orderMenuItem = orderMenuItem
+        }
+    }
 }

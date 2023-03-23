@@ -21,7 +21,7 @@ interface OrderService {
     @GET("orders/{id}")
     suspend fun getOrder(
         @Header("Authorization") token: String,
-        @Path("id") id: Long
+        @Path("id") id: Int
     ): OrderResponse
 
     @POST("orders")

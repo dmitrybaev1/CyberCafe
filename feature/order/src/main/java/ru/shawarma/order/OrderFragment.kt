@@ -10,10 +10,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.order.databinding.FragmentOrderBinding
 
+@AndroidEntryPoint
 class OrderFragment : Fragment() {
 
     private val viewModel: OrderViewModel by viewModels()
@@ -27,7 +29,7 @@ class OrderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        id = arguments?.getInt("id")
+        id = arguments?.getInt("orderId")
         viewModel.getOrder(id!!)
         val binding = FragmentOrderBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner

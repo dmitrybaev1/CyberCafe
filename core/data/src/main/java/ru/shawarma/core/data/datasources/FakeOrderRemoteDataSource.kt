@@ -43,12 +43,18 @@ class FakeOrderRemoteDataSource @Inject constructor() : OrderRemoteDataSource {
             Result.Success(
                 OrderResponse(
                     id,
-                    listOf(OrderMenuItemResponse(0,"Kebab",100,1)),
+                    listOf(
+                        OrderMenuItemResponse(0,"Kebab",100,3),
+                        OrderMenuItemResponse(1,"Shawa",200,3),
+                        OrderMenuItemResponse(2,"Kebab with cheese",100,1),
+                        OrderMenuItemResponse(3,"Kebab with cream",100,1),
+                        OrderMenuItemResponse(4,"Kebab with chees",100,1)
+                    ),
                     "clientId",
                     Date(),
                     Date(),
-                    OrderStatus.CANCELED,
-                    100
+                    OrderStatus.CLOSED,
+                    1200
                 )
             )
         }
@@ -64,7 +70,7 @@ class FakeOrderRemoteDataSource @Inject constructor() : OrderRemoteDataSource {
                     "clientId",
                     Date(),
                     Date(),
-                    OrderStatus.CANCELED,
+                    OrderStatus.IN_QUEUE,
                     100
                 )
             )
