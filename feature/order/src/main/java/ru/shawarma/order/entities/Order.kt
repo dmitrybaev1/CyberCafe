@@ -1,6 +1,5 @@
-package ru.shawarma.order
+package ru.shawarma.order.entities
 
-import ru.shawarma.core.data.entities.OrderMenuItemResponse
 import ru.shawarma.core.data.entities.OrderStatus
 import java.util.*
 

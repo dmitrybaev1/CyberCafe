@@ -90,8 +90,8 @@
             android:layout_height="30dp"
             android:elevation="10dp"
             android:visibility="@{viewModel.isLoading() ? View.VISIBLE : View.GONE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/authSignInButton"
+            app:layout_constraintStart_toStartOf="@+id/authSignInButton"
             app:layout_constraintTop_toTopOf="@+id/authSignInButton"
             app:layout_constraintBottom_toBottomOf="@+id/authSignInButton"/>
 

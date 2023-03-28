@@ -2,6 +2,8 @@ package ru.shawarma.order
 
 import ru.shawarma.core.data.entities.OrderMenuItemResponse
 import ru.shawarma.core.data.entities.OrderResponse
+import ru.shawarma.order.entities.Order
+import ru.shawarma.order.entities.OrderMenuItem
 
 fun mapOrderMenuItemResponseToOrderMenuItem(
     itemResponses: List<OrderMenuItemResponse>

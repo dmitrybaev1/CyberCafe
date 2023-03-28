@@ -9,11 +9,18 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.OrderStatus
+import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.AppNavigation
+import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.order.adapters.OrderMenuItemAdapter
 import ru.shawarma.order.databinding.FragmentOrderBinding
+import ru.shawarma.order.viewmodels.OrderUIState
+import ru.shawarma.order.viewmodels.OrderViewModel
 
 @AndroidEntryPoint
 class OrderFragment : Fragment() {
@@ -29,6 +36,7 @@ class OrderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        clearMenu()
         id = arguments?.getInt("orderId")
         viewModel.getOrder(id!!)
         val binding = FragmentOrderBinding.inflate(inflater,container,false)
@@ -90,11 +98,18 @@ class OrderFragment : Fragment() {
                                 viewModel.getOrder(id)
                             }
                         }
-                        is OrderUIState.TokenInvalidError -> {}//выкинуть
+                        is OrderUIState.TokenInvalidError -> {
+                            findNavController().popBackStack(R.id.orderFragment,true)
+                            (requireActivity() as AppNavigation).navigateToAuth(Errors.REFRESH_TOKEN_ERROR)
+                        }
                     }
                 }
             }
         }
+    }
+    
+    private fun clearMenu(){
+        (requireActivity() as CommonComponentsController).clearToolbarMenu()
     }
 
     override fun onDestroyView() {

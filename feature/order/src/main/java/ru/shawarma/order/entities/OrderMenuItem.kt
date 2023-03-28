@@ -1,4 +1,4 @@
-package ru.shawarma.order
+package ru.shawarma.order.entities
 
 data class OrderMenuItem (
     val id: Int,

@@ -6,8 +6,8 @@
     <data>
         <variable
             name="viewModel"
-            type="ru.shawarma.order.OrderViewModel" />
-        <import type="ru.shawarma.order.OrderUIState"/>
+            type="ru.shawarma.order.viewmodels.OrderViewModel" />
+        <import type="ru.shawarma.order.viewmodels.OrderUIState"/>
         <import type="android.view.View"/>
         <import type="ru.shawarma.core.data.entities.OrderStatus"/>
     </data>

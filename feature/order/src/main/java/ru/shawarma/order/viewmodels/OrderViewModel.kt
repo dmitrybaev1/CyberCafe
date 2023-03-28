@@ -1,4 +1,4 @@
-package ru.shawarma.order
+package ru.shawarma.order.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,7 +16,8 @@ import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
-import java.util.Date
+import ru.shawarma.order.entities.Order
+import ru.shawarma.order.mapOrderResponseToOrder
 import javax.inject.Inject
 
 @HiltViewModel

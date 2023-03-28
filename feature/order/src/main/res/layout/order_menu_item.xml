@@ -5,7 +5,7 @@
     <data>
         <variable
             name="orderMenuItem"
-            type="ru.shawarma.order.OrderMenuItem" />
+            type="ru.shawarma.order.entities.OrderMenuItem" />
     </data>
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"

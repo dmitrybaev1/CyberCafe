@@ -12,6 +12,7 @@
     <string name="total_price">Total: %d \u20BD</string>
     <string name="empty_cart">Empty cart</string>
     <string name="choose_payment_type">Choose payment type:</string>
+    <string name="create_order_error">Error when create order</string>
     <string-array name="payment_type_array">
         <item>Cash</item>
         <item>Card</item>

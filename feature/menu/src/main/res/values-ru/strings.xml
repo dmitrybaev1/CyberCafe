@@ -12,6 +12,7 @@
     <string name="total_price">Итого: %d \u20BD</string>
     <string name="empty_cart">В корзине пусто</string>
     <string name="choose_payment_type">Выберите тип оплаты:</string>
+    <string name="create_order_error">Ошибка создания заказа</string>
     <string-array name="payment_type_array">
         <item>Наличные</item>
         <item>Картой</item>

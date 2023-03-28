@@ -58,9 +58,7 @@ class AuthViewModel @Inject constructor(
         _isLoading.value = true
         val userLoginRequest = UserLoginRequest(email.value!!,password.value!!)
         viewModelScope.launch {
-            val result = authRepository.login(userLoginRequest)
-            _isLoading.value = false
-            when(result){
+            when(val result = authRepository.login(userLoginRequest)){
                 is Result.Success<AuthData> -> {
                     val authData = result.data
                     tokenManager.update(authData)
@@ -70,6 +68,7 @@ class AuthViewModel @Inject constructor(
                 is Result.Failure -> { _authState.value = AuthUIState.Error(result.message); _isError.value = true }
                 is Result.NetworkFailure -> { _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }
+            _isLoading.value = false
         }
     }
 

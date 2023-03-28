@@ -30,18 +30,20 @@ class InfoViewModel @Inject constructor(
     }
     fun getInfo(){
         viewModelScope.launch {
+            _infoState.value = null
             delay(2000)
-            _infoState.value = InfoUIState.Success(
+           /* _infoState.value = InfoUIState.Success(
                 listOf(
                     InfoItem("role","client"),
                     InfoItem("email","example@exmaple.com"),
                 )
-            )
+            )*/
+            _infoState.value = InfoUIState.Error("Hardcoded error")
         }
     }
 }
 sealed interface InfoUIState{
     data class Success(val items: List<InfoItem>): InfoUIState
-    data class Error(val message: String): InfoUIState
+    class Error(val message: String): InfoUIState
     object TokenInvalidError: InfoUIState
 }
