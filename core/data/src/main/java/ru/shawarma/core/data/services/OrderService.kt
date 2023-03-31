@@ -25,7 +25,10 @@ interface OrderService {
     ): OrderResponse
 
     @POST("orders")
-    suspend fun createOrder(@Body request: CreateOrderRequest): OrderResponse
+    suspend fun createOrder(
+        @Header("Authorization") token: String,
+        @Body request: CreateOrderRequest
+    ): OrderResponse
 
 
 }

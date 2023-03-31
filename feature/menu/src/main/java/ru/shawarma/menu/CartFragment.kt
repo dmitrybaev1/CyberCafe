@@ -1,6 +1,7 @@
 package ru.shawarma.menu
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,19 +13,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.*
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.data.workers.OrderWorker
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
 import ru.shawarma.menu.adapters.CartAdapter
 import ru.shawarma.menu.databinding.FragmentCartBinding
 import ru.shawarma.menu.viewmodels.MenuViewModel
 import ru.shawarma.menu.viewmodels.OrderUIState
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class CartFragment : Fragment() {
@@ -70,8 +74,17 @@ class CartFragment : Fragment() {
                 viewModel.orderState.filterNotNull().stateIn(this).collect{ state ->
                     when(state){
                         is OrderUIState.Success -> {
-                            findNavController().popBackStack(R.id.menuFragment,false)
-                            (requireActivity() as AppNavigation).navigateToOrder(state.orderId)
+                            val paymentType = binding!!.cartPaymentSpinner.selectedItem.toString()
+                            val options = resources.getStringArray(R.array.payment_type_array)
+                            if(paymentType != options[2]) {
+                                viewModel.resetOrderState()
+                                startOrderNotifications(state.orderId)
+                                findNavController().popBackStack(R.id.menuFragment, false)
+                                (requireActivity() as AppNavigation).navigateToOrder(state.orderId)
+                            }
+                            else{
+
+                            }//кинуть на оплату онлайн
                         }
                         is OrderUIState.Error -> {
                             Snackbar.make(
@@ -87,7 +100,21 @@ class CartFragment : Fragment() {
             }
         }
     }
-
+    private fun startOrderNotifications(orderId: Int){
+        val orderWorkRequest = OneTimeWorkRequestBuilder<OrderWorker>()
+            .addTag("WORK_ORDER_$orderId")
+            .setInputData(Data.Builder()
+                .putInt("orderId",orderId)
+                .build())
+            .setBackoffCriteria(
+                BackoffPolicy.LINEAR,
+                WorkRequest.MIN_BACKOFF_MILLIS,
+                TimeUnit.MILLISECONDS
+            )
+            .build()
+        WorkManager.getInstance(requireContext()).enqueueUniqueWork(
+            orderWorkRequest.tags.toList()[1],ExistingWorkPolicy.KEEP,orderWorkRequest)
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null

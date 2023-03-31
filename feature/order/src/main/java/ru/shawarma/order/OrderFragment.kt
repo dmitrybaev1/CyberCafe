@@ -31,6 +31,8 @@ class OrderFragment : Fragment() {
 
     private var id: Int? = null
 
+    private var isHubStarted = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -59,7 +61,8 @@ class OrderFragment : Fragment() {
                                 layoutManager = LinearLayoutManager(requireContext())
                                 adapter = orderMenuItemAdapter
                             }
-                            when(state.order.status){
+                            val status = state.order.status
+                            when(status){
                                 OrderStatus.IN_QUEUE -> {
                                     viewModel.setStatus(getString(R.string.in_queue))
                                     binding.orderStepIndicatorImageView.setImageResource(
@@ -91,11 +94,14 @@ class OrderFragment : Fragment() {
                                     binding.orderClosedTextView.text = viewModel.closedDate.value
                                 }
                             }
+                            if(status != OrderStatus.CANCELED && status != OrderStatus.CLOSED && !isHubStarted){
+                                isHubStarted = true
+                                viewModel.startOrderStatusObserving(id!!)
+                            }
                         }
                         is OrderUIState.Error -> {
-                            val id = id!!
                             binding!!.orderRetryButton.setOnClickListener {
-                                viewModel.getOrder(id)
+                                viewModel.getOrder(id!!)
                             }
                         }
                         is OrderUIState.TokenInvalidError -> {

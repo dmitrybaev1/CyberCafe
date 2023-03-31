@@ -1,7 +1,9 @@
 package ru.shawarma.core.data.datasources
 
+import kotlinx.coroutines.flow.Flow
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.OrderResponse
+import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.core.data.utils.Result
 
 interface OrderRemoteDataSource {
@@ -11,5 +13,9 @@ interface OrderRemoteDataSource {
     suspend fun getOrder(token: String, id: Int): Result<OrderResponse>
 
     suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse>
+
+    fun startOrdersStatusHub(token: String ,callback: (OrderResponse) -> (Unit))
+
+    fun stopOrdersStatusHub()
 
 }

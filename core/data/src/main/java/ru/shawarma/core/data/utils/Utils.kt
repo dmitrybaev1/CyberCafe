@@ -52,7 +52,7 @@ suspend fun checkNotExpiresOrTryRefresh(
     }
 
 internal fun parseError(httpException: HttpException): ApiError {
-    val converter = AppRetrofit.getInstance().responseBodyConverter<ApiError>(
+    val converter = RetrofitManager.getInstance().responseBodyConverter<ApiError>(
         ApiError::class.java,
         arrayOf<Annotation>())
     val apiError: ApiError

@@ -52,7 +52,7 @@ class OrderViewModel @Inject constructor(
     private val _orderStatus = MutableLiveData<String>()
     val orderStatus: LiveData<String> = _orderStatus
 
-    fun getOrder(id: Int){
+    fun getOrder(orderId: Int){
         viewModelScope.launch {
             getAuthDataJob.join()
             if(!checkTokenValid()){
@@ -60,7 +60,7 @@ class OrderViewModel @Inject constructor(
                 return@launch
             }
             val token = "Bearer ${authData!!.accessToken}"
-            when(val result = orderRepository.getOrder(token, id)){
+            when(val result = orderRepository.getOrder(token, orderId)){
                 is Result.Success<OrderResponse> -> {
                     val order = mapOrderResponseToOrder(result.data)
                     _orderId.value = order.id
@@ -79,7 +79,21 @@ class OrderViewModel @Inject constructor(
             }
         }
     }
-
+    fun startOrderStatusObserving(orderId: Int){
+        viewModelScope.launch {
+            getAuthDataJob.join()
+            if(!checkTokenValid()){
+                _orderState.value = OrderUIState.TokenInvalidError
+                return@launch
+            }
+            val token = "Bearer ${authData!!.accessToken}"
+            orderRepository.startOrdersStatusHub(token){orderResponse ->
+                if(orderResponse.id == orderId){
+                    _orderState.value = OrderUIState.Success(mapOrderResponseToOrder(orderResponse))
+                }
+            }
+        }
+    }
     fun setStatus(value: String){
         _orderStatus.value = value
     }
@@ -90,6 +104,11 @@ class OrderViewModel @Inject constructor(
             true
         }
         else false
+
+    override fun onCleared() {
+        super.onCleared()
+        orderRepository.stopOrdersStatusHub()
+    }
 }
 sealed interface OrderUIState{
     object Loading: OrderUIState

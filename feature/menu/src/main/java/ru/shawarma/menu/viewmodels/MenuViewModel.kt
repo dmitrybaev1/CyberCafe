@@ -1,5 +1,6 @@
 package ru.shawarma.menu.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -191,6 +192,7 @@ class MenuViewModel @Inject constructor(
     }
 
     fun makeOrder(){
+        Log.d("token",authData!!.accessToken)
         viewModelScope.launch {
             if(!checkTokenValid()){
                 _orderState.value = OrderUIState.TokenInvalidError
@@ -216,6 +218,10 @@ class MenuViewModel @Inject constructor(
             }
             _isOrderCreating.value = false
         }
+    }
+
+    fun resetOrderState(){
+        _orderState.value = null
     }
 
     override fun goToMenuItemFragment(menuItem: MenuElement.MenuItem, count: Int){
@@ -264,7 +270,7 @@ sealed interface MenuUIState{
     object TokenInvalidError: MenuUIState
 }
 sealed interface OrderUIState{
-    data class Success(val orderId: Int): OrderUIState
-    data class Error(val message: String): OrderUIState
+    class Success(val orderId: Int): OrderUIState
+    class Error(val message: String): OrderUIState
     object TokenInvalidError: OrderUIState
 }
