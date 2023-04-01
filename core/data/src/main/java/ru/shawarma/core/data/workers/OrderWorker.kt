@@ -5,7 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -15,12 +14,9 @@ import androidx.work.WorkerParameters
 import com.google.gson.GsonBuilder
 import com.microsoft.signalr.GsonHubProtocol
 import com.microsoft.signalr.HubConnectionBuilder
-import com.microsoft.signalr.HubConnectionState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.core.SingleSource
-import io.reactivex.rxjava3.functions.Supplier
 import kotlinx.coroutines.*
 import ru.shawarma.core.data.R
 import ru.shawarma.core.data.entities.OrderResponse
@@ -52,15 +48,17 @@ class OrderWorker @AssistedInject constructor(
                         }
                     }).build()
                 hubConnection.on("Notify", {message ->
-                    Log.d("orderWorker",message.toString())
                     runBlocking {
-                        //проверка на orderId, за которым будем следить
-                        setForeground(createForegroundInfo(OrderStatus.CLOSED,orderId))
-                        isEnd = true
+                        if(message.id == orderId){
+                            setForeground(createForegroundInfo(message.status,orderId))
+                            if(message.status == OrderStatus.CLOSED || message.status == OrderStatus.CANCELED){
+                                delay(1000)
+                                isEnd = true
+                            }
+                        }
                     }
                 }, OrderResponse::class.java)
                 hubConnection.start().blockingAwait()
-                Log.d("connection",hubConnection.connectionState.name)
                 setForeground(createForegroundInfo(OrderStatus.IN_QUEUE,orderId))
                 while(!isEnd){
                     delay(5000)
@@ -120,7 +118,6 @@ class OrderWorker @AssistedInject constructor(
     }
     companion object{
         const val ORDER_CHANNEL_ID = "ORDER_STATUS_CHANNEL"
-        const val ORDER_NOTIFICATION_ID_BASE = "ORDER_ID_"
         const val ORDER_NOTIFICATION_GROUP = "ORDER_GROUP"
     }
 }

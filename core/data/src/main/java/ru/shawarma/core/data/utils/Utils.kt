@@ -1,7 +1,6 @@
 package ru.shawarma.core.data.utils
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -60,7 +59,6 @@ internal fun parseError(httpException: HttpException): ApiError {
         apiError = httpException.response()?.errorBody()?.let { converter.convert(it) }!!
     }
     catch (e: Exception){
-        Log.d("parseError","${e.message}")
         return ApiError("Unknown error")
     }
     return apiError

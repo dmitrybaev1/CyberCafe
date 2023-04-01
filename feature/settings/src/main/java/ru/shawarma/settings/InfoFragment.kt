@@ -2,12 +2,10 @@ package ru.shawarma.settings
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,12 +33,10 @@ class InfoFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        Log.d("infoFragment","onAttach")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("infoFragment","onCreate")
     }
 
     override fun onCreateView(
@@ -48,7 +44,6 @@ class InfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("infoFragment","onCreateView")
         val binding = FragmentInfoBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
@@ -62,7 +57,6 @@ class InfoFragment : Fragment() {
                 viewModel.infoState.filterNotNull().stateIn(this).collect{ state ->
                     when(state){
                         is InfoUIState.Success -> {
-                            Log.d("infoFragment",state.items.size.toString())
                             binding?.infoRecyclerView?.apply {
                                 layoutManager = LinearLayoutManager(requireContext())
                                 val infoAdapter = InfoAdapter(state.items)
@@ -90,31 +84,5 @@ class InfoFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        Log.d("infoFragment","onDestroyView")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("infoFragment","onDestroy")
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.d("infoFragment","onDetach")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d("infoFragment","onPause")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d("infoFragment","onStop")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("infoFragment","onResume")
     }
 }

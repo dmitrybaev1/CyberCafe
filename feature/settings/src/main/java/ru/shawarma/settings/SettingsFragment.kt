@@ -3,7 +3,6 @@ package ru.shawarma.settings
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import dagger.hilt.android.AndroidEntryPoint
-import ru.shawarma.settings.viewmodels.InfoViewModel
 import ru.shawarma.settings.viewmodels.SettingsViewModel
 
 @AndroidEntryPoint

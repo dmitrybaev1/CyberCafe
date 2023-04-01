@@ -60,9 +60,11 @@ class OrderViewModel @Inject constructor(
                 return@launch
             }
             val token = "Bearer ${authData!!.accessToken}"
-            when(val result = orderRepository.getOrder(token, orderId)){
-                is Result.Success<OrderResponse> -> {
-                    val order = mapOrderResponseToOrder(result.data)
+            //when(val result = orderRepository.getOrder(token, orderId)){
+            when(val result = orderRepository.getOrders(token, 0,100)){
+                is Result.Success<List<OrderResponse>> -> {
+                    val orderResponse = result.data.find { it.id == orderId }
+                    val order = mapOrderResponseToOrder(orderResponse!!)
                     _orderId.value = order.id
                     _totalPrice.value = order.totalPrice
                     _createdDate.value = order.createdDate.toString()

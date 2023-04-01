@@ -1,6 +1,5 @@
 package ru.shawarma.core.data.datasources
 
-import android.util.Log
 import com.google.gson.GsonBuilder
 import com.microsoft.signalr.GsonHubProtocol
 import com.microsoft.signalr.HubConnection
@@ -8,8 +7,6 @@ import com.microsoft.signalr.HubConnectionBuilder
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import ru.shawarma.core.data.entities.CreateOrderRequest
@@ -17,7 +14,7 @@ import ru.shawarma.core.data.entities.OrderMenuItemResponse
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.core.data.utils.Result
-import java.util.Date
+import java.util.*
 import javax.inject.Inject
 
 class FakeOrderRemoteDataSource @Inject constructor() : OrderRemoteDataSource {
@@ -71,7 +68,7 @@ class FakeOrderRemoteDataSource @Inject constructor() : OrderRemoteDataSource {
         }
 
 
-    override suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse> =
+    override suspend fun createOrder(token: String, request: CreateOrderRequest): Result<OrderResponse> =
         withContext(Dispatchers.IO){
             delay(1000)
             Result.Success(
@@ -98,7 +95,6 @@ class FakeOrderRemoteDataSource @Inject constructor() : OrderRemoteDataSource {
                 }
             }).build()
         hubConnection?.on("Notify", {message ->
-            Log.d("dataSource",message.toString())
             callback.invoke(message)
         }, OrderResponse::class.java)
         hubConnection?.start()

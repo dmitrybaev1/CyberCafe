@@ -1,8 +1,5 @@
 package ru.shawarma.core.data.entities
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
 data class AuthData(
     val accessToken: String,
     val refreshToken: String,

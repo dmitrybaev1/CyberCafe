@@ -1,7 +1,6 @@
 package ru.shawarma.menu
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +26,6 @@ import ru.shawarma.menu.adapters.CartAdapter
 import ru.shawarma.menu.databinding.FragmentCartBinding
 import ru.shawarma.menu.viewmodels.MenuViewModel
 import ru.shawarma.menu.viewmodels.OrderUIState
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
@@ -83,8 +81,8 @@ class CartFragment : Fragment() {
                                 (requireActivity() as AppNavigation).navigateToOrder(state.orderId)
                             }
                             else{
-
-                            }//кинуть на оплату онлайн
+                                //кинуть на оплату онлайн
+                            }
                         }
                         is OrderUIState.Error -> {
                             Snackbar.make(

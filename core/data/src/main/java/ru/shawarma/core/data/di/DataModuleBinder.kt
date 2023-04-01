@@ -20,7 +20,7 @@ abstract class DataModuleBinder {
     abstract fun bindMenuRemoteDataSource(dataSource: MainMenuRemoteDataSource): MenuRemoteDataSource
 
     @Binds
-    abstract fun bindOrderRemoteDataSource(dataSource: FakeOrderRemoteDataSource): OrderRemoteDataSource
+    abstract fun bindOrderRemoteDataSource(dataSource: MainOrderRemoteDataSource): OrderRemoteDataSource
 
     @Binds
     abstract fun bindAuthRepository(repository: MainAuthRepository): AuthRepository

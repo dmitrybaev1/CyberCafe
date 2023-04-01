@@ -1,10 +1,8 @@
 package ru.shawarma.core.data.repositories
 
-import kotlinx.coroutines.flow.Flow
 import ru.shawarma.core.data.datasources.OrderRemoteDataSource
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.OrderResponse
-import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.core.data.utils.Result
 import javax.inject.Inject
 
@@ -22,8 +20,8 @@ class MainOrderRepository @Inject constructor(
     override suspend fun getOrder(token: String, id: Int): Result<OrderResponse> =
         orderRemoteDataSource.getOrder(token, id)
 
-    override suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse> =
-        orderRemoteDataSource.createOrder(request)
+    override suspend fun createOrder(token: String, request: CreateOrderRequest): Result<OrderResponse> =
+        orderRemoteDataSource.createOrder(token, request)
 
     override fun startOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit) =
         orderRemoteDataSource.startOrdersStatusHub(token, callback)

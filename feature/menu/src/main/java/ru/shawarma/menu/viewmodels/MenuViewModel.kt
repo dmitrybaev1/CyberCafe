@@ -1,12 +1,10 @@
 package ru.shawarma.menu.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -192,7 +190,6 @@ class MenuViewModel @Inject constructor(
     }
 
     fun makeOrder(){
-        Log.d("token",authData!!.accessToken)
         viewModelScope.launch {
             if(!checkTokenValid()){
                 _orderState.value = OrderUIState.TokenInvalidError
@@ -200,7 +197,7 @@ class MenuViewModel @Inject constructor(
             }
             _isOrderCreating.value = true
             val token = "Bearer ${authData!!.accessToken}"
-            when(val result = orderRepository.createOrder(CreateOrderRequest(
+            when(val result = orderRepository.createOrder(token, CreateOrderRequest(
                 mapCartListToOrderMenuItemRequest(buildCartMenuItemList())
             ))){
                 is Result.Success<OrderResponse> -> {
