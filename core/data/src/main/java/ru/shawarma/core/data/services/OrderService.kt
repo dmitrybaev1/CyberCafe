@@ -1,11 +1,6 @@
 package ru.shawarma.core.data.services
 
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.OrderResponse
 
@@ -21,11 +16,14 @@ interface OrderService {
     @GET("orders/{id}")
     suspend fun getOrder(
         @Header("Authorization") token: String,
-        @Path("id") id: Long
+        @Path("id") id: Int
     ): OrderResponse
 
     @POST("orders")
-    suspend fun createOrder(@Body request: CreateOrderRequest): OrderResponse
+    suspend fun createOrder(
+        @Header("Authorization") token: String,
+        @Body request: CreateOrderRequest
+    ): OrderResponse
 
 
 }

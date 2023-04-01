@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import ru.shawarma.core.data.services.AuthService
 import ru.shawarma.core.data.services.MenuService
 import ru.shawarma.core.data.services.OrderService
-import ru.shawarma.core.data.utils.AppRetrofit
+import ru.shawarma.core.data.utils.RetrofitManager
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -19,11 +19,11 @@ object DataModuleProvider {
     fun provideDispatcher(): CoroutineDispatcher = Dispatchers.IO
 
     @Provides
-    fun provideAuthService(): AuthService = AppRetrofit.authService
+    fun provideAuthService(): AuthService = RetrofitManager.authService
 
     @Provides
-    fun provideMenuService(): MenuService = AppRetrofit.menuService
+    fun provideMenuService(): MenuService = RetrofitManager.menuService
 
     @Provides
-    fun provideOrderService(): OrderService = AppRetrofit.orderService
+    fun provideOrderService(): OrderService = RetrofitManager.orderService
 }

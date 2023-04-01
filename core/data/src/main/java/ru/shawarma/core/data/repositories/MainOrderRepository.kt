@@ -17,10 +17,16 @@ class MainOrderRepository @Inject constructor(
     ): Result<List<OrderResponse>> =
         orderRemoteDataSource.getOrders(token, offset, count)
 
-    override suspend fun getOrder(token: String, id: Long): Result<OrderResponse> =
+    override suspend fun getOrder(token: String, id: Int): Result<OrderResponse> =
         orderRemoteDataSource.getOrder(token, id)
 
-    override suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse> =
-        orderRemoteDataSource.createOrder(request)
+    override suspend fun createOrder(token: String, request: CreateOrderRequest): Result<OrderResponse> =
+        orderRemoteDataSource.createOrder(token, request)
+
+    override fun startOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit) =
+        orderRemoteDataSource.startOrdersStatusHub(token, callback)
+
+    override fun stopOrdersStatusHub() =
+        orderRemoteDataSource.stopOrdersStatusHub()
 
 }

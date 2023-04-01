@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.tabs.TabLayoutMediator
-import dagger.hilt.android.AndroidEntryPoint
 import ru.shawarma.core.ui.CommonComponentsController
 import ru.shawarma.settings.adapters.SettingsStateAdapter
 import ru.shawarma.settings.databinding.FragmentProfileBinding

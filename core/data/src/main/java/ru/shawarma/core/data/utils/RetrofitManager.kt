@@ -15,7 +15,7 @@ enum class FeatureApi{
     AUTH,MENU,ORDER
 }
 
-object AppRetrofit {
+object RetrofitManager {
 
     private var authInstance: Retrofit? = null
     private var menuInstance: Retrofit? = null

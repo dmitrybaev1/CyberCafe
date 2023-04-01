@@ -1,14 +1,11 @@
 package ru.shawarma.settings
 
-import android.app.Activity
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -28,7 +25,7 @@ import ru.shawarma.settings.viewmodels.OrdersViewModel
 @AndroidEntryPoint
 class OrdersFragment : Fragment() {
 
-    private val viewModel: OrdersViewModel by viewModels()
+    private val viewModel: OrdersViewModel by hiltNavGraphViewModels(R.id.settings_nav_graph)
 
     private var binding: FragmentOrdersBinding? = null
 
@@ -38,15 +35,12 @@ class OrdersFragment : Fragment() {
 
     private var isFullyLoaded = false
 
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.d("ordersFragment","onAttach")
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("ordersFragment","onCreate")
+        viewModel.navCommand.observe(this){ command ->
+            if(command is NavigationCommand.ToOrderModule)
+                (requireActivity() as AppNavigation).navigateToOrder(command.orderId)
+        }
     }
 
     override fun onCreateView(
@@ -54,7 +48,6 @@ class OrdersFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("ordersFragment","onCreateView")
         val binding = FragmentOrdersBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
@@ -64,10 +57,6 @@ class OrdersFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupOrdersRecyclerView()
-        viewModel.navCommand.observe(viewLifecycleOwner){ command ->
-            if(command is NavigationCommand.ToOrderModule)
-                (requireActivity() as AppNavigation).navigateToOrder(command.orderId)
-        }
         viewLifecycleOwner.lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.RESUMED){
                 viewModel.ordersState.collect{ state ->
@@ -116,33 +105,7 @@ class OrdersFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("ordersFragment","onDestroyView")
         binding = null
         ordersAdapter = null
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d("ordersFragment","onDestroy")
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.d("ordersFragment","onDetach")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d("ordersFragment","onPause")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d("ordersFragment","onStop")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("ordersFragment","onResume")
     }
 }

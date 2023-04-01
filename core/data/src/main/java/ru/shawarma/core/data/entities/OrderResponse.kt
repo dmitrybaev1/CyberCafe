@@ -1,6 +1,6 @@
 package ru.shawarma.core.data.entities
 
-import java.util.Date
+import java.util.*
 
 data class OrderResponse(
     val id: Int,

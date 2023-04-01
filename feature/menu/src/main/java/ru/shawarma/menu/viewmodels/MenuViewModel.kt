@@ -5,14 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.MenuItemResponse
+import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.MenuRepository
+import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
@@ -23,12 +25,14 @@ import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.entities.MenuElement
 import ru.shawarma.menu.utlis.PlaceholderStringType
 import ru.shawarma.menu.utlis.STANDARD_REQUEST_OFFSET
+import ru.shawarma.menu.utlis.mapCartListToOrderMenuItemRequest
 import ru.shawarma.menu.utlis.mapMenuItemResponseToMenuItem
 import javax.inject.Inject
 
 @HiltViewModel
 class MenuViewModel @Inject constructor(
     private val menuRepository: MenuRepository,
+    private val orderRepository: OrderRepository,
     private val authRepository: AuthRepository,
     private val tokenManager: TokenManager
 ) : ViewModel(), MenuController {
@@ -50,6 +54,10 @@ class MenuViewModel @Inject constructor(
     )
 
     val menuState = _menuState.asStateFlow()
+
+    private val _orderState = MutableStateFlow<OrderUIState?>(null)
+
+    val orderState = _orderState.asStateFlow()
 
     private val _navCommand = MutableLiveData<NavigationCommand>()
 
@@ -78,6 +86,10 @@ class MenuViewModel @Inject constructor(
     val chosenMenuItem: LiveData<MenuElement.MenuItem> = _chosenMenuItem
 
     var totalCurrentCartPrice = 0
+
+    private val _isOrderCreating = MutableLiveData(false)
+
+    val isOrderCreating: LiveData<Boolean> = _isOrderCreating
 
     fun getMenu(loadNext: Boolean = true){
         viewModelScope.launch {
@@ -177,6 +189,38 @@ class MenuViewModel @Inject constructor(
         _navCommand.value = NavigationCommand.ToCartFragment
     }
 
+    fun makeOrder(){
+        viewModelScope.launch {
+            if(!checkTokenValid()){
+                _orderState.value = OrderUIState.TokenInvalidError
+                return@launch
+            }
+            _isOrderCreating.value = true
+            val token = "Bearer ${authData!!.accessToken}"
+            when(val result = orderRepository.createOrder(token, CreateOrderRequest(
+                mapCartListToOrderMenuItemRequest(buildCartMenuItemList())
+            ))){
+                is Result.Success<OrderResponse> -> {
+                    val id = result.data.id
+                    clearCartMenuItemList()
+                    _orderState.value = OrderUIState.Success(id)
+                }
+                is Result.Failure -> {
+                    if(result.message == Errors.REFRESH_TOKEN_ERROR)
+                        _orderState.value = OrderUIState.TokenInvalidError
+                    else
+                        _orderState.value = OrderUIState.Error(result.message)
+                }
+                is Result.NetworkFailure -> _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
+            }
+            _isOrderCreating.value = false
+        }
+    }
+
+    fun resetOrderState(){
+        _orderState.value = null
+    }
+
     override fun goToMenuItemFragment(menuItem: MenuElement.MenuItem, count: Int){
         _chosenMenuItem.value = menuItem
         _navCommand.value = NavigationCommand.ToMenuItemFragment
@@ -194,7 +238,9 @@ class MenuViewModel @Inject constructor(
         rawCartList.forEach { totalPrice += it.price }
         return totalPrice
     }
-
+    private fun clearCartMenuItemList(){
+        rawCartList.clear()
+    }
     private fun buildCartMenuItemList(): List<CartMenuItem>{
         val cartList = arrayListOf<CartMenuItem>()
         val map = rawCartList.groupingBy { it }.eachCount()
@@ -219,4 +265,9 @@ sealed interface MenuUIState{
     data class Success(val items: List<MenuElement>, val isFullyLoaded: Boolean = false): MenuUIState
     data class Error(val items: List<MenuElement>): MenuUIState
     object TokenInvalidError: MenuUIState
+}
+sealed interface OrderUIState{
+    class Success(val orderId: Int): OrderUIState
+    class Error(val message: String): OrderUIState
+    object TokenInvalidError: OrderUIState
 }

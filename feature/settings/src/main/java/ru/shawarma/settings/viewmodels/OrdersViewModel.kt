@@ -1,6 +1,5 @@
 package ru.shawarma.settings.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,13 +13,13 @@ import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
 import ru.shawarma.settings.NavigationCommand
 import ru.shawarma.settings.SettingsController
 import ru.shawarma.settings.entities.OrderElement
 import ru.shawarma.settings.utils.STANDARD_REQUEST_OFFSET
-import ru.shawarma.core.data.utils.Result
 import ru.shawarma.settings.utils.mapOrderResponseToOrderItem
 import javax.inject.Inject
 
@@ -55,6 +54,7 @@ class OrdersViewModel @Inject constructor(
 
     init {
         getOrders()
+        startOrdersStatusObserving()
     }
 
     fun getOrders(loadNext: Boolean = true){
@@ -97,6 +97,30 @@ class OrdersViewModel @Inject constructor(
         }
     }
 
+    private fun startOrdersStatusObserving(){
+        viewModelScope.launch {
+            getAuthDataJob.join()
+            if(!checkTokenValid()){
+                _ordersState.value = OrdersUIState.TokenInvalidError
+                return@launch
+            }
+            val token = "Bearer ${authData!!.accessToken}"
+            orderRepository.startOrdersStatusHub(token){orderResponse ->
+                val newList = ordersList.map {
+                    if(it is OrderElement.OrderItem){
+                        if(it.id == orderResponse.id)
+                            mapOrderResponseToOrderItem(listOf(orderResponse))[0]
+                        else
+                            it
+                    }
+                    else
+                        it
+                }
+                _ordersState.value = OrdersUIState.Success(newList)
+            }
+        }
+    }
+
     override fun goToOrder(id: Int) {
         _navCommand.value = NavigationCommand.ToOrderModule(id)
     }
@@ -128,6 +152,11 @@ class OrdersViewModel @Inject constructor(
             _ordersState.value = OrdersUIState.Success(newList,isFullyLoaded)
         else
             _ordersState.value = OrdersUIState.Error(newList)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        orderRepository.stopOrdersStatusHub()
     }
 }
 sealed interface OrdersUIState{
