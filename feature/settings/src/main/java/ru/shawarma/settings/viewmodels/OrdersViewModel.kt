@@ -70,7 +70,7 @@ class OrdersViewModel @Inject constructor(
                     else {
                         if(ordersList.lastOrNull() !is OrderElement.Error)
                             ordersList.add(OrderElement.Error)
-                        copyAndSetOrdersList(false)
+                        copyAndSetOrdersList(false, noInternet = result.message == Errors.NO_INTERNET_ERROR)
                     }
                 }
                 is Result.NetworkFailure -> {
@@ -117,13 +117,13 @@ class OrdersViewModel @Inject constructor(
             ordersList.removeLast()
     }
 
-    private fun copyAndSetOrdersList(isSuccess: Boolean, isFullyLoaded: Boolean = false){
+    private fun copyAndSetOrdersList(isSuccess: Boolean, isFullyLoaded: Boolean = false, noInternet: Boolean = false){
         val newList = arrayListOf<OrderElement>()
         newList.addAll(ordersList)
         if(isSuccess)
             _ordersState.value = OrdersUIState.Success(newList,isFullyLoaded)
         else
-            _ordersState.value = OrdersUIState.Error(newList)
+            _ordersState.value = OrdersUIState.Error(newList,noInternet)
     }
 
     override fun onCleared() {
@@ -133,6 +133,6 @@ class OrdersViewModel @Inject constructor(
 }
 sealed interface OrdersUIState{
     data class Success(val items: List<OrderElement>, val isFullyLoaded: Boolean = false): OrdersUIState
-    data class Error(val items: List<OrderElement>): OrdersUIState
+    data class Error(val items: List<OrderElement>,val noInternet: Boolean = false): OrdersUIState
     object TokenInvalidError: OrdersUIState
 }

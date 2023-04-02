@@ -15,6 +15,7 @@ import ru.shawarma.core.data.repositories.AuthRepository
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "authData")
 
 object Errors {
+    const val NO_INTERNET_ERROR = "NoInternetError"
     const val EMPTY_INPUT_ERROR = "EmptyInputError"
     const val PASSWORD_ERROR = "PasswordError"
     const val EMAIL_ERROR = "EmailError"

@@ -111,7 +111,7 @@ class MenuViewModel @Inject constructor(
                     else {
                         if(menuList.lastOrNull() !is MenuElement.Error)
                             menuList.add(MenuElement.Error)
-                        copyAndSetMenuList(false)
+                        copyAndSetMenuList(false, noInternet = result.message == Errors.NO_INTERNET_ERROR)
                     }
                 }
                 is Result.NetworkFailure -> {
@@ -225,18 +225,18 @@ class MenuViewModel @Inject constructor(
         return cartList
     }
 
-    private fun copyAndSetMenuList(isSuccess: Boolean,isFullyLoaded: Boolean = false){
+    private fun copyAndSetMenuList(isSuccess: Boolean,isFullyLoaded: Boolean = false, noInternet: Boolean = false){
         val newList = arrayListOf<MenuElement>()
         newList.addAll(menuList)
         if(isSuccess)
             _menuState.value = MenuUIState.Success(newList,isFullyLoaded)
         else
-            _menuState.value = MenuUIState.Error(newList)
+            _menuState.value = MenuUIState.Error(newList,noInternet)
     }
 }
 sealed interface MenuUIState{
     data class Success(val items: List<MenuElement>, val isFullyLoaded: Boolean = false): MenuUIState
-    data class Error(val items: List<MenuElement>): MenuUIState
+    data class Error(val items: List<MenuElement>,val noInternet: Boolean = false): MenuUIState
     object TokenInvalidError: MenuUIState
 }
 sealed interface OrderUIState{

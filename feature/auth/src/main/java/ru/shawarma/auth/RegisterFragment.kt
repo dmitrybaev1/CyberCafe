@@ -19,6 +19,7 @@ import ru.shawarma.auth.databinding.FragmentRegisterBinding
 import ru.shawarma.auth.viewmodels.RegisterUIState
 import ru.shawarma.auth.viewmodels.RegisterViewModel
 import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.CommonComponentsController
 
 @AndroidEntryPoint
 class RegisterFragment : Fragment() {
@@ -44,13 +45,13 @@ class RegisterFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.registerState.filterNotNull().stateIn(this)
                     .collect{state ->
-                        handleRegisterState(state)
+                        handleRegisterState(state,view)
                     }
             }
         }
     }
 
-    private fun handleRegisterState(state: RegisterUIState){
+    private fun handleRegisterState(state: RegisterUIState,view: View){
         when(state){
             is RegisterUIState.Success -> {
                 AlertDialog.Builder(requireContext())
@@ -63,6 +64,7 @@ class RegisterFragment : Fragment() {
             }
             is RegisterUIState.Error -> {
                 when(val message = state.message){
+                    Errors.NO_INTERNET_ERROR -> (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                     Errors.EMPTY_INPUT_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.empty_input_error)
                     Errors.EMAIL_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.email_error)
                     Errors.PASSWORD_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.password_error)

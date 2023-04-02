@@ -7,8 +7,10 @@ interface AuthRepository {
 
     suspend fun login(userLoginRequest: UserLoginRequest): Result<AuthData>
 
-    suspend fun refreshToken(tokensRequest: TokensRequest): Result<AuthData>
-
     suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser>
+
+    suspend fun clearAuthData()
+
+    suspend fun getActualAuthData(): Result<AuthData>
 
 }

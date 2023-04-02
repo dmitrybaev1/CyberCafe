@@ -85,9 +85,12 @@ class CartFragment : Fragment() {
                             }
                         }
                         is OrderUIState.Error -> {
-                            Snackbar.make(
-                                view,getString(R.string.create_order_error),Snackbar.LENGTH_LONG)
-                                .show()
+                            if(state.message == Errors.NO_INTERNET_ERROR)
+                                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                            else
+                                Snackbar.make(
+                                    view,getString(R.string.create_order_error),Snackbar.LENGTH_LONG)
+                                    .show()
                         }
                         is OrderUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.menuFragment,true)

@@ -103,6 +103,8 @@ class OrderFragment : Fragment() {
                             binding!!.orderRetryButton.setOnClickListener {
                                 viewModel.getOrder(id!!)
                             }
+                            if(state.message == Errors.NO_INTERNET_ERROR)
+                                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                         }
                         is OrderUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.orderFragment,true)

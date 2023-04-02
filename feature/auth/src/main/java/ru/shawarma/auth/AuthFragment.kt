@@ -63,14 +63,14 @@ class AuthFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.authState.filterNotNull().stateIn(this)
                     .collect{state ->
-                        handleAuthState(state)
+                        handleAuthState(state,view)
                     }
             }
         }
 
     }
 
-    private fun handleAuthState(state: AuthUIState){
+    private fun handleAuthState(state: AuthUIState, view: View){
         when(state){
             is AuthUIState.Success -> {
                 binding!!.authErrorTextView.text = ""
@@ -79,6 +79,7 @@ class AuthFragment : Fragment() {
             }
             is AuthUIState.Error -> {
                 when(val message = state.message){
+                    Errors.NO_INTERNET_ERROR -> (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                     Errors.EMPTY_INPUT_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.empty_input_error)
                     Errors.EMAIL_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.email_error)
                     Errors.PASSWORD_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.password_error)

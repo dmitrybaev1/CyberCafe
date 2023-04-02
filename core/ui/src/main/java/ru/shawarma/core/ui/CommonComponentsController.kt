@@ -1,5 +1,6 @@
 package ru.shawarma.core.ui
 
+import android.view.View
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.Toolbar.OnMenuItemClickListener
 import androidx.navigation.NavController
@@ -15,4 +16,6 @@ interface CommonComponentsController {
     fun changeToolbarMenuItemClickListener(onMenuItemClickListener: OnMenuItemClickListener)
 
     fun setCloseToolbarIcon()
+
+    fun showNoInternetSnackbar(view: View)
 }

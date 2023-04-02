@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.ui.AppNavigation
+import ru.shawarma.core.ui.CommonComponentsController
 import ru.shawarma.settings.adapters.OrdersAdapter
 import ru.shawarma.settings.databinding.FragmentOrdersBinding
 import ru.shawarma.settings.viewmodels.OrdersUIState
@@ -72,6 +73,8 @@ class OrdersFragment : Fragment() {
                             ordersAdapter?.setList(state.items)
                             ordersAdapter?.notifyDataSetChanged()
                             binding!!.ordersRecyclerView.scrollToPosition(items.size-1)
+                            if(state.noInternet)
+                                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                         }
                         is OrdersUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.profileFragment,true)

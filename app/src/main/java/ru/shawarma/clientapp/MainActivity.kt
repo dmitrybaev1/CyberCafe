@@ -1,6 +1,7 @@
 package ru.shawarma.clientapp
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
@@ -11,14 +12,14 @@ import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
-import ru.shawarma.core.ui.InternetConnectionStatus
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), AppNavigation,
-    CommonComponentsController,InternetConnectionStatus {
+    CommonComponentsController {
 
     private lateinit var toolbar: Toolbar
     private lateinit var navController: NavController
@@ -88,7 +89,7 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         toolbar.setNavigationIcon(com.google.android.material.R.drawable.ic_m3_chip_close)
     }
 
-    override fun isOnline(): Boolean = true
-
-
+    override fun showNoInternetSnackbar(view: View) {
+        Snackbar.make(view, ru.shawarma.core.ui.R.string.no_internet,Snackbar.LENGTH_LONG).show()
+    }
 }
