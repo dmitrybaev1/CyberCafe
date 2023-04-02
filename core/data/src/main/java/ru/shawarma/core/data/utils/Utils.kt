@@ -25,30 +25,8 @@ object Errors {
     const val NOT_FOUND_ERROR = "404Error"
 }
 
-fun checkExpires(expiresIn: Long): Boolean =
+internal fun checkExpires(expiresIn: Long): Boolean =
     System.currentTimeMillis() / 1000L + 60L >= expiresIn
-
-
-suspend fun checkNotExpiresOrTryRefresh(
-    authData: AuthData,
-    authRepository: AuthRepository,
-    tokenManager: TokenManager,
-): Boolean =
-    if(!checkExpires(authData.expiresIn)) {
-        true
-    }
-    else{
-        val tokensRequest = TokensRequest(authData.refreshToken,authData.accessToken)
-        when(val result = authRepository.refreshToken(tokensRequest)){
-            is Result.Success<AuthData> -> {
-                val authData = result.data
-                tokenManager.update(authData)
-                true
-            }
-            else ->
-                false
-        }
-    }
 
 internal fun parseError(httpException: HttpException): ApiError {
     val converter = RetrofitManager.getInstance().responseBodyConverter<ApiError>(

@@ -6,23 +6,22 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.core.data.exceptions.NoTokenException
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.data.utils.TokenManager
-import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
+import ru.shawarma.core.data.utils.Result
 import javax.inject.Inject
 
 @HiltViewModel
 class RedirectViewModel(
     private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager,
     isManualAuthorization: Boolean
 ) : ViewModel() {
 
     @Inject constructor(
-        authRepository: AuthRepository,
-        tokenManager: TokenManager
-    ) : this(authRepository,tokenManager,false)
+        authRepository: AuthRepository
+    ) : this(authRepository,false)
 
     private val _redirectState = MutableStateFlow<RedirectState?>(null)
     val redirectState = _redirectState.asStateFlow()
@@ -34,21 +33,21 @@ class RedirectViewModel(
 
     fun tryToAuthIfValidData(){
         viewModelScope.launch {
-            val authData = tokenManager.getAuthData()
-            if(!authData.isEmpty()){
-                if(checkNotExpiresOrTryRefresh(authData, authRepository, tokenManager))
-                    _redirectState.value = RedirectState.TokenValid
-                else
-                    _redirectState.value = RedirectState.RefreshError(Errors.REFRESH_TOKEN_ERROR)
+            try{
+                when(authRepository.getActualAuthData()){
+                    is Result.Success -> _redirectState.value = RedirectState.TokenValid
+                    else -> _redirectState.value = RedirectState.RefreshError
+                }
             }
-            else
+            catch(e: NoTokenException) {
                 _redirectState.value = RedirectState.NoToken
+            }
         }
     }
 }
 
 sealed interface RedirectState{
     object TokenValid: RedirectState
-    data class RefreshError(val message: String): RedirectState
+    object RefreshError: RedirectState
     object NoToken: RedirectState
 }

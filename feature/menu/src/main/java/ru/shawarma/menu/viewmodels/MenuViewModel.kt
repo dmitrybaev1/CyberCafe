@@ -18,7 +18,6 @@ import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
-import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.NavigationCommand
 import ru.shawarma.menu.entities.CartMenuItem
@@ -32,16 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MenuViewModel @Inject constructor(
     private val menuRepository: MenuRepository,
-    private val orderRepository: OrderRepository,
-    private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager
+    private val orderRepository: OrderRepository
 ) : ViewModel(), MenuController {
-
-    private var authData: AuthData? = null
-
-    private var getAuthDataJob = viewModelScope.launch {
-        this@MenuViewModel.authData = tokenManager.getAuthData()
-    }
 
     private var menuOffset = - STANDARD_REQUEST_OFFSET
 
@@ -93,16 +84,10 @@ class MenuViewModel @Inject constructor(
 
     fun getMenu(loadNext: Boolean = true){
         viewModelScope.launch {
-            getAuthDataJob.join()
-            if(!checkTokenValid()){
-                _menuState.value = MenuUIState.TokenInvalidError
-                return@launch
-            }
             if(loadNext)
                 menuOffset += STANDARD_REQUEST_OFFSET
-            val token = "Bearer ${authData!!.accessToken}"
             checkAndRemoveOldErrorAndLoading()
-            when(val result = menuRepository.getMenu(token,menuOffset,menuCount)){
+            when(val result = menuRepository.getMenu(menuOffset,menuCount)){
                 is Result.Success<List<MenuItemResponse>> -> {
                     val items = mapMenuItemResponseToMenuItem(result.data)
                     menuList.add(MenuElement.Header("Шаверма"))
@@ -121,7 +106,7 @@ class MenuViewModel @Inject constructor(
 
                 }
                 is Result.Failure -> {
-                    if(result.message == Errors.UNAUTHORIZED_ERROR)
+                    if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _menuState.value = MenuUIState.TokenInvalidError
                     else {
                         if(menuList.lastOrNull() !is MenuElement.Error)
@@ -191,13 +176,8 @@ class MenuViewModel @Inject constructor(
 
     fun makeOrder(){
         viewModelScope.launch {
-            if(!checkTokenValid()){
-                _orderState.value = OrderUIState.TokenInvalidError
-                return@launch
-            }
             _isOrderCreating.value = true
-            val token = "Bearer ${authData!!.accessToken}"
-            when(val result = orderRepository.createOrder(token, CreateOrderRequest(
+            when(val result = orderRepository.createOrder(CreateOrderRequest(
                 mapCartListToOrderMenuItemRequest(buildCartMenuItemList())
             ))){
                 is Result.Success<OrderResponse> -> {
@@ -206,7 +186,7 @@ class MenuViewModel @Inject constructor(
                     _orderState.value = OrderUIState.Success(id)
                 }
                 is Result.Failure -> {
-                    if(result.message == Errors.REFRESH_TOKEN_ERROR)
+                    if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _orderState.value = OrderUIState.TokenInvalidError
                     else
                         _orderState.value = OrderUIState.Error(result.message)
@@ -225,13 +205,6 @@ class MenuViewModel @Inject constructor(
         _chosenMenuItem.value = menuItem
         _navCommand.value = NavigationCommand.ToMenuItemFragment
     }
-
-    private suspend fun checkTokenValid(): Boolean =
-        if(checkNotExpiresOrTryRefresh(authData!!,authRepository, tokenManager)){
-            authData = tokenManager.getAuthData()
-            true
-        }
-        else false
 
     private fun getTotalPrice(): Int {
         var totalPrice = 0

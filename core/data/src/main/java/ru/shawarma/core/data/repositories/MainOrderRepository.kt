@@ -1,30 +1,49 @@
 package ru.shawarma.core.data.repositories
 
 import ru.shawarma.core.data.datasources.OrderRemoteDataSource
+import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.OrderResponse
+import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.data.utils.TokenManager
 import javax.inject.Inject
 
 class MainOrderRepository @Inject constructor(
-    private val orderRemoteDataSource: OrderRemoteDataSource
+    private val orderRemoteDataSource: OrderRemoteDataSource,
+    private val authRepository: AuthRepository
 ) : OrderRepository {
 
-    override suspend fun getOrders(
-        token: String,
-        offset: Int,
-        count: Int
-    ): Result<List<OrderResponse>> =
-        orderRemoteDataSource.getOrders(token, offset, count)
+    override suspend fun getOrders(offset: Int, count: Int): Result<List<OrderResponse>> =
+        when(val result = authRepository.getActualAuthData()){
+            is Result.Success<AuthData> ->
+                orderRemoteDataSource.getOrders("Bearer ${result.data.accessToken}", offset, count)
+            is Result.Failure -> result
+            is Result.NetworkFailure -> result
+        }
 
-    override suspend fun getOrder(token: String, id: Int): Result<OrderResponse> =
-        orderRemoteDataSource.getOrder(token, id)
+    override suspend fun getOrder(id: Int): Result<OrderResponse> =
+        when(val result = authRepository.getActualAuthData()){
+            is Result.Success<AuthData> ->
+                orderRemoteDataSource.getOrder("Bearer ${result.data.accessToken}", id)
+            is Result.Failure -> result
+            is Result.NetworkFailure -> result
+        }
 
-    override suspend fun createOrder(token: String, request: CreateOrderRequest): Result<OrderResponse> =
-        orderRemoteDataSource.createOrder(token, request)
+    override suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse> =
+        when(val result = authRepository.getActualAuthData()){
+            is Result.Success<AuthData> ->
+                orderRemoteDataSource.createOrder("Bearer ${result.data.accessToken}", request)
+            is Result.Failure -> result
+            is Result.NetworkFailure -> result
+        }
 
-    override fun startOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit) =
-        orderRemoteDataSource.startOrdersStatusHub(token, callback)
+    override suspend fun startOrdersStatusHub(callback: (OrderResponse) -> Unit) {
+        val result = authRepository.getActualAuthData()
+        if(result is Result.Success<AuthData>){
+            orderRemoteDataSource.startOrdersStatusHub("Bearer ${result.data.accessToken}", callback)
+        }
+    }
 
     override fun stopOrdersStatusHub() =
         orderRemoteDataSource.stopOrdersStatusHub()

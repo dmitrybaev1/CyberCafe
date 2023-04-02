@@ -14,8 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InfoViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager
+
 ) : ViewModel() {
 
     private val _infoState = MutableStateFlow<InfoUIState?>(null)

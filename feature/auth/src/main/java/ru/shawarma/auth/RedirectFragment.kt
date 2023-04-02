@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.auth.viewmodels.RedirectState
 import ru.shawarma.auth.viewmodels.RedirectViewModel
+import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.ui.AppNavigation
 
 @AndroidEntryPoint
@@ -41,7 +42,7 @@ class RedirectFragment : Fragment() {
                             }
                             is RedirectState.RefreshError -> {
                                 findNavController().navigate(R.id.actionRedirectToAuth,
-                                bundleOf("error" to state.message))
+                                bundleOf("error" to Errors.REFRESH_TOKEN_ERROR))
                             }
                             is RedirectState.TokenValid -> {
                                 findNavController().popBackStack(R.id.redirectFragment,true)

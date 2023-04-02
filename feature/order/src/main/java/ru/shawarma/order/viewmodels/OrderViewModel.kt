@@ -15,23 +15,14 @@ import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
-import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
 import ru.shawarma.order.entities.Order
 import ru.shawarma.order.mapOrderResponseToOrder
 import javax.inject.Inject
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
-    private val orderRepository: OrderRepository,
-    private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager
+    private val orderRepository: OrderRepository
 ) : ViewModel() {
-
-    private var authData: AuthData? = null
-
-    private var getAuthDataJob = viewModelScope.launch {
-        this@OrderViewModel.authData = tokenManager.getAuthData()
-    }
 
     private val _orderState = MutableStateFlow<OrderUIState>(OrderUIState.Loading)
 
@@ -54,17 +45,9 @@ class OrderViewModel @Inject constructor(
 
     fun getOrder(orderId: Int){
         viewModelScope.launch {
-            getAuthDataJob.join()
-            if(!checkTokenValid()){
-                _orderState.value = OrderUIState.TokenInvalidError
-                return@launch
-            }
-            val token = "Bearer ${authData!!.accessToken}"
-            //when(val result = orderRepository.getOrder(token, orderId)){
-            when(val result = orderRepository.getOrders(token, 0,100)){
-                is Result.Success<List<OrderResponse>> -> {
-                    val orderResponse = result.data.find { it.id == orderId }
-                    val order = mapOrderResponseToOrder(orderResponse!!)
+            when(val result = orderRepository.getOrder(orderId)){
+                is Result.Success<OrderResponse> -> {
+                    val order = mapOrderResponseToOrder(result.data)
                     _orderId.value = order.id
                     _totalPrice.value = order.totalPrice
                     _createdDate.value = order.createdDate.toString()
@@ -72,7 +55,7 @@ class OrderViewModel @Inject constructor(
                     _orderState.value = OrderUIState.Success(order)
                 }
                 is Result.Failure -> {
-                    if(result.message == Errors.REFRESH_TOKEN_ERROR)
+                    if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _orderState.value = OrderUIState.TokenInvalidError
                     else
                         _orderState.value = OrderUIState.Error(result.message)
@@ -83,13 +66,7 @@ class OrderViewModel @Inject constructor(
     }
     fun startOrderStatusObserving(orderId: Int){
         viewModelScope.launch {
-            getAuthDataJob.join()
-            if(!checkTokenValid()){
-                _orderState.value = OrderUIState.TokenInvalidError
-                return@launch
-            }
-            val token = "Bearer ${authData!!.accessToken}"
-            orderRepository.startOrdersStatusHub(token){orderResponse ->
+            orderRepository.startOrdersStatusHub{orderResponse ->
                 if(orderResponse.id == orderId){
                     _orderState.value = OrderUIState.Success(mapOrderResponseToOrder(orderResponse))
                 }
@@ -99,13 +76,6 @@ class OrderViewModel @Inject constructor(
     fun setStatus(value: String){
         _orderStatus.value = value
     }
-
-    private suspend fun checkTokenValid(): Boolean =
-        if(checkNotExpiresOrTryRefresh(authData!!,authRepository, tokenManager)){
-            authData = tokenManager.getAuthData()
-            true
-        }
-        else false
 
     override fun onCleared() {
         super.onCleared()

@@ -15,7 +15,6 @@ import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.utils.TokenManager
-import ru.shawarma.core.data.utils.checkNotExpiresOrTryRefresh
 import ru.shawarma.settings.NavigationCommand
 import ru.shawarma.settings.SettingsController
 import ru.shawarma.settings.entities.OrderElement
@@ -25,16 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrdersViewModel @Inject constructor(
-    private val orderRepository: OrderRepository,
-    private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager
+    private val orderRepository: OrderRepository
 ) : ViewModel(), SettingsController {
-
-    private var authData: AuthData? = null
-
-    private var getAuthDataJob = viewModelScope.launch {
-        this@OrdersViewModel.authData = tokenManager.getAuthData()
-    }
 
     private var ordersOffset = - STANDARD_REQUEST_OFFSET
 
@@ -59,16 +50,10 @@ class OrdersViewModel @Inject constructor(
 
     fun getOrders(loadNext: Boolean = true){
         viewModelScope.launch {
-            getAuthDataJob.join()
-            if(!checkTokenValid()){
-                _ordersState.value = OrdersUIState.TokenInvalidError
-                return@launch
-            }
             if(loadNext)
                 ordersOffset += STANDARD_REQUEST_OFFSET
-            val token = "Bearer ${authData!!.accessToken}"
             checkAndRemoveOldErrorAndLoading()
-            when(val result = orderRepository.getOrders(token,ordersOffset,ordersCount)){
+            when(val result = orderRepository.getOrders(ordersOffset,ordersCount)){
                 is Result.Success<List<OrderResponse>> -> {
                     if(result.data.isNotEmpty()) {
                         val items = mapOrderResponseToOrderItem(result.data)
@@ -80,7 +65,7 @@ class OrdersViewModel @Inject constructor(
                         copyAndSetOrdersList(true, isFullyLoaded = true)
                 }
                 is Result.Failure -> {
-                    if(result.message == Errors.UNAUTHORIZED_ERROR)
+                    if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _ordersState.value = OrdersUIState.TokenInvalidError
                     else {
                         if(ordersList.lastOrNull() !is OrderElement.Error)
@@ -99,13 +84,7 @@ class OrdersViewModel @Inject constructor(
 
     private fun startOrdersStatusObserving(){
         viewModelScope.launch {
-            getAuthDataJob.join()
-            if(!checkTokenValid()){
-                _ordersState.value = OrdersUIState.TokenInvalidError
-                return@launch
-            }
-            val token = "Bearer ${authData!!.accessToken}"
-            orderRepository.startOrdersStatusHub(token){orderResponse ->
+            orderRepository.startOrdersStatusHub{orderResponse ->
                 val newList = ordersList.map {
                     if(it is OrderElement.OrderItem){
                         if(it.id == orderResponse.id)
@@ -137,13 +116,6 @@ class OrdersViewModel @Inject constructor(
         if(ordersList.lastOrNull() is OrderElement.Error || ordersList.lastOrNull() is OrderElement.Loading)
             ordersList.removeLast()
     }
-
-    private suspend fun checkTokenValid(): Boolean =
-        if(checkNotExpiresOrTryRefresh(authData!!,authRepository, tokenManager)){
-            authData = tokenManager.getAuthData()
-            true
-        }
-        else false
 
     private fun copyAndSetOrdersList(isSuccess: Boolean, isFullyLoaded: Boolean = false){
         val newList = arrayListOf<OrderElement>()

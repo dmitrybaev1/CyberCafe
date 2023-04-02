@@ -21,8 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _navCommand = MutableLiveData<NavigationCommand>()
@@ -60,8 +59,6 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             when(val result = authRepository.login(userLoginRequest)){
                 is Result.Success<AuthData> -> {
-                    val authData = result.data
-                    tokenManager.update(authData)
                     _authState.value = AuthUIState.Success
                     _isError.value = false
                 }
@@ -80,7 +77,7 @@ class AuthViewModel @Inject constructor(
     fun setRefreshTokenErrorAndClearData(message: String){
         _isError.value = true
         viewModelScope.launch {
-            tokenManager.update(AuthData.empty())
+            authRepository.clearAuthData()
         }
         _authState.value = AuthUIState.Error(message)
     }
