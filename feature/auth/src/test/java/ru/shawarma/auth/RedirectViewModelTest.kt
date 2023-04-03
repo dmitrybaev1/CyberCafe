@@ -16,7 +16,7 @@ import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
+import ru.shawarma.core.data.managers.TokenManager
 
 class RedirectViewModelTest {
 

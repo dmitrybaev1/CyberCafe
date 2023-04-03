@@ -103,8 +103,6 @@ class OrderFragment : Fragment() {
                             binding!!.orderRetryButton.setOnClickListener {
                                 viewModel.getOrder(id!!)
                             }
-                            if(state.message == Errors.NO_INTERNET_ERROR)
-                                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                         }
                         is OrderUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.orderFragment,true)
@@ -112,6 +110,12 @@ class OrderFragment : Fragment() {
                         }
                     }
                 }
+            }
+        }
+        viewModel.isConnectedToInternet.observe(viewLifecycleOwner){isConnected ->
+            if(isConnected){
+                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                viewModel.resetNoInternetState()
             }
         }
     }

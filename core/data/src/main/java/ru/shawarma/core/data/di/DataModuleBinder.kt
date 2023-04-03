@@ -6,9 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ru.shawarma.core.data.datasources.*
 import ru.shawarma.core.data.repositories.*
-import ru.shawarma.core.data.utils.InternetManager
-import ru.shawarma.core.data.utils.MainTokenManager
-import ru.shawarma.core.data.utils.TokenManager
+import ru.shawarma.core.data.managers.InternetManager
+import ru.shawarma.core.data.managers.MainTokenManager
+import ru.shawarma.core.data.managers.TokenManager
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -35,7 +35,7 @@ abstract class DataModuleBinder {
     @Binds
     abstract fun bindTokenManager(tokenManager: MainTokenManager): TokenManager
 
-    @Binds
-    abstract fun bindInternetManager(internetManager: InternetManager): InternetManager
+    //@Binds
+    //abstract fun bindInternetManager(internetManager: InternetManager): InternetManager
 
 }

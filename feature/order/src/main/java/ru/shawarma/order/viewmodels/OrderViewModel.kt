@@ -8,13 +8,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.OrderResponse
-import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.order.entities.Order
 import ru.shawarma.order.mapOrderResponseToOrder
 import javax.inject.Inject
@@ -27,6 +24,10 @@ class OrderViewModel @Inject constructor(
     private val _orderState = MutableStateFlow<OrderUIState>(OrderUIState.Loading)
 
     val orderState = _orderState.asStateFlow()
+
+    private val _isConnectedToInternet = MutableLiveData<Boolean>()
+
+    val isConnectedToInternet: LiveData<Boolean> = _isConnectedToInternet
 
     private val _orderId = MutableLiveData<Int>()
     val orderId: LiveData<Int> = _orderId
@@ -57,13 +58,21 @@ class OrderViewModel @Inject constructor(
                 is Result.Failure -> {
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _orderState.value = OrderUIState.TokenInvalidError
-                    else
+                    else {
+                        if(result.message == Errors.NO_INTERNET_ERROR)
+                            _isConnectedToInternet.value = true
                         _orderState.value = OrderUIState.Error(result.message)
+                    }
                 }
                 is Result.NetworkFailure -> _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
             }
         }
     }
+
+    fun resetNoInternetState(){
+        _isConnectedToInternet.value = false
+    }
+
     fun startOrderStatusObserving(orderId: Int){
         viewModelScope.launch {
             orderRepository.startOrdersStatusHub{orderResponse ->

@@ -16,7 +16,6 @@ import ru.shawarma.core.data.entities.UserLoginRequest
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
 import javax.inject.Inject
 
 @HiltViewModel
@@ -62,11 +61,19 @@ class AuthViewModel @Inject constructor(
                     _authState.value = AuthUIState.Success
                     _isError.value = false
                 }
-                is Result.Failure -> { _authState.value = AuthUIState.Error(result.message); _isError.value = true }
+                is Result.Failure -> {
+                    _authState.value = AuthUIState.Error(result.message)
+                    if(result.message != Errors.NO_INTERNET_ERROR)
+                        _isError.value = true
+                }
                 is Result.NetworkFailure -> { _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }
             _isLoading.value = false
         }
+    }
+
+    fun resetState(){
+        _authState.value = null
     }
 
     fun setEmptyInputError(){
@@ -85,5 +92,5 @@ class AuthViewModel @Inject constructor(
 
 sealed interface AuthUIState{
     object Success: AuthUIState
-    data class Error(val message: String): AuthUIState
+    class Error(val message: String): AuthUIState
 }

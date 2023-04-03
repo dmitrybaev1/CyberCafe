@@ -73,8 +73,6 @@ class OrdersFragment : Fragment() {
                             ordersAdapter?.setList(state.items)
                             ordersAdapter?.notifyDataSetChanged()
                             binding!!.ordersRecyclerView.scrollToPosition(items.size-1)
-                            if(state.noInternet)
-                                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                         }
                         is OrdersUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.profileFragment,true)
@@ -83,6 +81,12 @@ class OrdersFragment : Fragment() {
                     }
                     isRequestInProgress = false
                 }
+            }
+        }
+        viewModel.isConnectedToInternet.observe(viewLifecycleOwner){isConnected ->
+            if(isConnected){
+                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                viewModel.resetNoInternetState()
             }
         }
     }

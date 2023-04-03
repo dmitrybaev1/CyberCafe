@@ -18,7 +18,7 @@ import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.MenuRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
+import ru.shawarma.core.data.managers.TokenManager
 import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.entities.MenuElement
 import ru.shawarma.menu.viewmodels.MenuUIState

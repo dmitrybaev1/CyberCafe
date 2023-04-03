@@ -7,8 +7,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.shawarma.core.data.repositories.AuthRepository
-import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.settings.entities.InfoItem
 import javax.inject.Inject
 

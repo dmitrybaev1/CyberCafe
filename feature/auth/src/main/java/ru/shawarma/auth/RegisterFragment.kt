@@ -64,7 +64,10 @@ class RegisterFragment : Fragment() {
             }
             is RegisterUIState.Error -> {
                 when(val message = state.message){
-                    Errors.NO_INTERNET_ERROR -> (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                    Errors.NO_INTERNET_ERROR -> {
+                        (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                        viewModel.resetState()
+                    }
                     Errors.EMPTY_INPUT_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.empty_input_error)
                     Errors.EMAIL_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.email_error)
                     Errors.PASSWORD_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.password_error)

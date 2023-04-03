@@ -8,9 +8,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import ru.shawarma.core.data.entities.ApiError
-import ru.shawarma.core.data.entities.AuthData
-import ru.shawarma.core.data.entities.TokensRequest
-import ru.shawarma.core.data.repositories.AuthRepository
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "authData")
 
@@ -30,7 +27,7 @@ internal fun checkExpires(expiresIn: Long): Boolean =
     System.currentTimeMillis() / 1000L + 60L >= expiresIn
 
 internal fun parseError(httpException: HttpException): ApiError {
-    val converter = RetrofitManager.getInstance().responseBodyConverter<ApiError>(
+    val converter = ApplicationRetrofit.getInstance().responseBodyConverter<ApiError>(
         ApiError::class.java,
         arrayOf<Annotation>())
     val apiError: ApiError

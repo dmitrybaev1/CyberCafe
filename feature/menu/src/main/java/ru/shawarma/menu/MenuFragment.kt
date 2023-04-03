@@ -99,8 +99,6 @@ class MenuFragment : Fragment() {
                             menuAdapter?.setList(items)
                             menuAdapter?.notifyDataSetChanged()
                             binding!!.menuRecyclerView.scrollToPosition(items.size-1)
-                            if(state.noInternet)
-                                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                         }
                         is MenuUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.menuFragment,true)
@@ -109,6 +107,12 @@ class MenuFragment : Fragment() {
                     }
                     isRequestInProgress = false
                 }
+            }
+        }
+        viewModel.isConnectedToInternet.observe(viewLifecycleOwner){isConnected ->
+            if(isConnected){
+                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                viewModel.resetNoInternetState()
             }
         }
     }

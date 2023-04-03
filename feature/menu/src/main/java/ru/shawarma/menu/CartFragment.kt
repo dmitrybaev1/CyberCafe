@@ -85,12 +85,11 @@ class CartFragment : Fragment() {
                             }
                         }
                         is OrderUIState.Error -> {
-                            if(state.message == Errors.NO_INTERNET_ERROR)
-                                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-                            else
+                            if(state.message != Errors.NO_INTERNET_ERROR)
                                 Snackbar.make(
                                     view,getString(R.string.create_order_error),Snackbar.LENGTH_LONG)
                                     .show()
+                            viewModel.resetOrderState()
                         }
                         is OrderUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.menuFragment,true)
@@ -98,6 +97,12 @@ class CartFragment : Fragment() {
                         }
                     }
                 }
+            }
+        }
+        viewModel.isConnectedToInternet.observe(viewLifecycleOwner){isConnected ->
+            if(isConnected){
+                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                viewModel.resetNoInternetState()
             }
         }
     }

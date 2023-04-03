@@ -21,7 +21,7 @@ import kotlinx.coroutines.*
 import ru.shawarma.core.data.R
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.entities.OrderStatus
-import ru.shawarma.core.data.utils.TokenManager
+import ru.shawarma.core.data.managers.TokenManager
 
 @HiltWorker
 class OrderWorker @AssistedInject constructor(

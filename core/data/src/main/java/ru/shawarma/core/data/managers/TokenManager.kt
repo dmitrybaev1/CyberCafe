@@ -1,4 +1,4 @@
-package ru.shawarma.core.data.utils
+package ru.shawarma.core.data.managers
 
 import ru.shawarma.core.data.entities.AuthData
 

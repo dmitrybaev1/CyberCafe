@@ -3,6 +3,8 @@ package ru.shawarma.core.data.repositories
 import ru.shawarma.core.data.exceptions.NoTokenException
 import ru.shawarma.core.data.datasources.AuthRemoteDataSource
 import ru.shawarma.core.data.entities.*
+import ru.shawarma.core.data.managers.InternetManager
+import ru.shawarma.core.data.managers.TokenManager
 import ru.shawarma.core.data.utils.*
 import ru.shawarma.core.data.utils.checkExpires
 import javax.inject.Inject

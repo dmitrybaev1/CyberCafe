@@ -4,9 +4,8 @@ import ru.shawarma.core.data.datasources.MenuRemoteDataSource
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.MenuItemResponse
 import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.data.utils.InternetManager
+import ru.shawarma.core.data.managers.InternetManager
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
 import javax.inject.Inject
 
 class MainMenuRepository @Inject constructor(

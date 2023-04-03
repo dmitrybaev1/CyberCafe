@@ -8,16 +8,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.MenuItemResponse
 import ru.shawarma.core.data.entities.OrderResponse
-import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.MenuRepository
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.NavigationCommand
 import ru.shawarma.menu.entities.CartMenuItem
@@ -49,6 +46,10 @@ class MenuViewModel @Inject constructor(
     private val _orderState = MutableStateFlow<OrderUIState?>(null)
 
     val orderState = _orderState.asStateFlow()
+
+    private val _isConnectedToInternet = MutableLiveData<Boolean>()
+
+    val isConnectedToInternet: LiveData<Boolean> = _isConnectedToInternet
 
     private val _navCommand = MutableLiveData<NavigationCommand>()
 
@@ -109,9 +110,10 @@ class MenuViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _menuState.value = MenuUIState.TokenInvalidError
                     else {
+                        _isConnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
                         if(menuList.lastOrNull() !is MenuElement.Error)
                             menuList.add(MenuElement.Error)
-                        copyAndSetMenuList(false, noInternet = result.message == Errors.NO_INTERNET_ERROR)
+                        copyAndSetMenuList(false)
                     }
                 }
                 is Result.NetworkFailure -> {
@@ -122,10 +124,16 @@ class MenuViewModel @Inject constructor(
             }
         }
     }
+
+    fun resetNoInternetState(){
+        _isConnectedToInternet.value = false
+    }
+
     private fun checkAndRemoveOldErrorAndLoading(){
         if(menuList.lastOrNull() is MenuElement.Error || menuList.lastOrNull() is MenuElement.Loading)
             menuList.removeLast()
     }
+
     override fun reloadMenu() {
         if(menuList.last() is MenuElement.Error)
             menuList.removeLast()
@@ -188,8 +196,11 @@ class MenuViewModel @Inject constructor(
                 is Result.Failure -> {
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _orderState.value = OrderUIState.TokenInvalidError
-                    else
+                    else {
+                        if(result.message == Errors.NO_INTERNET_ERROR)
+                            _isConnectedToInternet.value = true
                         _orderState.value = OrderUIState.Error(result.message)
+                    }
                 }
                 is Result.NetworkFailure -> _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
             }
@@ -225,18 +236,18 @@ class MenuViewModel @Inject constructor(
         return cartList
     }
 
-    private fun copyAndSetMenuList(isSuccess: Boolean,isFullyLoaded: Boolean = false, noInternet: Boolean = false){
+    private fun copyAndSetMenuList(isSuccess: Boolean,isFullyLoaded: Boolean = false){
         val newList = arrayListOf<MenuElement>()
         newList.addAll(menuList)
         if(isSuccess)
             _menuState.value = MenuUIState.Success(newList,isFullyLoaded)
         else
-            _menuState.value = MenuUIState.Error(newList,noInternet)
+            _menuState.value = MenuUIState.Error(newList)
     }
 }
 sealed interface MenuUIState{
     data class Success(val items: List<MenuElement>, val isFullyLoaded: Boolean = false): MenuUIState
-    data class Error(val items: List<MenuElement>,val noInternet: Boolean = false): MenuUIState
+    data class Error(val items: List<MenuElement>): MenuUIState
     object TokenInvalidError: MenuUIState
 }
 sealed interface OrderUIState{

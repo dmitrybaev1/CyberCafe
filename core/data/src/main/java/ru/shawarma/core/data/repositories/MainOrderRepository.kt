@@ -5,9 +5,8 @@ import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.data.utils.InternetManager
+import ru.shawarma.core.data.managers.InternetManager
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
 import javax.inject.Inject
 
 class MainOrderRepository @Inject constructor(

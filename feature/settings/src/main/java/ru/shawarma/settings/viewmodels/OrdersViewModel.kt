@@ -8,13 +8,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.OrderResponse
-import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.utils.TokenManager
 import ru.shawarma.settings.NavigationCommand
 import ru.shawarma.settings.SettingsController
 import ru.shawarma.settings.entities.OrderElement
@@ -36,6 +33,10 @@ class OrdersViewModel @Inject constructor(
     )
 
     val ordersState = _ordersState.asStateFlow()
+
+    private val _isConnectedToInternet = MutableLiveData<Boolean>()
+
+    val isConnectedToInternet: LiveData<Boolean> = _isConnectedToInternet
 
     private val _navCommand = MutableLiveData<NavigationCommand>()
 
@@ -68,9 +69,10 @@ class OrdersViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _ordersState.value = OrdersUIState.TokenInvalidError
                     else {
+                        _isConnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
                         if(ordersList.lastOrNull() !is OrderElement.Error)
                             ordersList.add(OrderElement.Error)
-                        copyAndSetOrdersList(false, noInternet = result.message == Errors.NO_INTERNET_ERROR)
+                        copyAndSetOrdersList(false)
                     }
                 }
                 is Result.NetworkFailure -> {
@@ -80,6 +82,10 @@ class OrdersViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun resetNoInternetState(){
+        _isConnectedToInternet.value = false
     }
 
     private fun startOrdersStatusObserving(){
@@ -117,13 +123,13 @@ class OrdersViewModel @Inject constructor(
             ordersList.removeLast()
     }
 
-    private fun copyAndSetOrdersList(isSuccess: Boolean, isFullyLoaded: Boolean = false, noInternet: Boolean = false){
+    private fun copyAndSetOrdersList(isSuccess: Boolean, isFullyLoaded: Boolean = false){
         val newList = arrayListOf<OrderElement>()
         newList.addAll(ordersList)
         if(isSuccess)
             _ordersState.value = OrdersUIState.Success(newList,isFullyLoaded)
         else
-            _ordersState.value = OrdersUIState.Error(newList,noInternet)
+            _ordersState.value = OrdersUIState.Error(newList)
     }
 
     override fun onCleared() {
@@ -133,6 +139,6 @@ class OrdersViewModel @Inject constructor(
 }
 sealed interface OrdersUIState{
     data class Success(val items: List<OrderElement>, val isFullyLoaded: Boolean = false): OrdersUIState
-    data class Error(val items: List<OrderElement>,val noInternet: Boolean = false): OrdersUIState
+    data class Error(val items: List<OrderElement>): OrdersUIState
     object TokenInvalidError: OrdersUIState
 }
