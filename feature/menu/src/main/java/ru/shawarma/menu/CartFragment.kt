@@ -119,7 +119,7 @@ class CartFragment : Fragment() {
             )
             .build()
         WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-            orderWorkRequest.tags.toList()[1],ExistingWorkPolicy.KEEP,orderWorkRequest)
+            orderWorkRequest.tags.toList()[1],ExistingWorkPolicy.REPLACE,orderWorkRequest)
     }
     override fun onDestroyView() {
         super.onDestroyView()

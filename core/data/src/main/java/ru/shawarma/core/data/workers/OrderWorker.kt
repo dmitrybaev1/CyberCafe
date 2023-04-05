@@ -5,6 +5,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -14,6 +15,8 @@ import androidx.work.WorkerParameters
 import com.google.gson.GsonBuilder
 import com.microsoft.signalr.GsonHubProtocol
 import com.microsoft.signalr.HubConnectionBuilder
+import com.microsoft.signalr.HubConnectionState
+import com.microsoft.signalr.TransportEnum
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.rxjava3.core.Single
@@ -21,18 +24,24 @@ import kotlinx.coroutines.*
 import ru.shawarma.core.data.R
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.entities.OrderStatus
+import ru.shawarma.core.data.managers.InternetManager
 import ru.shawarma.core.data.managers.TokenManager
+import ru.shawarma.core.data.repositories.OrderRepository
+import java.net.SocketException
 
 @HiltWorker
 class OrderWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val internetManager: InternetManager,
+    private val orderRepository: OrderRepository
 ): CoroutineWorker(context,params) {
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as
                 NotificationManager
     private var isEnd = false
+    private var isReconnectFailed = false
 
     override suspend fun doWork(): Result =
         withContext(Dispatchers.IO) {
@@ -42,6 +51,7 @@ class OrderWorker @AssistedInject constructor(
                 val hubConnection = HubConnectionBuilder
                     .create("http://10.0.2.2:5029/notifications/client/orders")
                     .withHubProtocol(GsonHubProtocol(gson))
+                    .withTransport(TransportEnum.WEBSOCKETS)
                     .withAccessTokenProvider(Single.defer {
                         runBlocking {
                             Single.just(tokenManager.getAuthData().accessToken)
@@ -58,20 +68,65 @@ class OrderWorker @AssistedInject constructor(
                         }
                     }
                 }, OrderResponse::class.java)
+                hubConnection.onClosed { e ->
+                    if(e is java.lang.RuntimeException){
+                        runBlocking {
+                            while(!internetManager.isOnline())
+                                delay(5000)
+                            var connected = false
+                            var n = 0
+                            while(!connected && n < 5) {
+                                Log.d("orderWorker","trying to reconnect")
+                                delay(5000)
+                                ++n
+                                try {
+                                    hubConnection.start().blockingAwait()
+                                    if(hubConnection.connectionState == HubConnectionState.CONNECTED) {
+                                        connected = true
+                                        n = 100
+                                        if(!tryToSetActualStatus(orderId)){
+                                            isReconnectFailed = true
+                                            isEnd = true
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                            if(n == 5) {
+                                isReconnectFailed = true
+                                isEnd = true
+                            }
+                        }
+                    }
+                }
+                if(!tryToSetActualStatus(orderId))
+                    Result.failure()
                 hubConnection.start().blockingAwait()
-                setForeground(createForegroundInfo(OrderStatus.IN_QUEUE,orderId))
                 while(!isEnd){
                     delay(5000)
                 }
                 hubConnection.stop().blockingAwait()
-                Result.success()
+                if(isReconnectFailed)
+                    Result.failure()
+                else
+                    Result.success()
             }
             catch (e: Exception){
-                e.printStackTrace()
-                Result.retry()
+                Result.failure()
             }
         }
-
+    private suspend fun tryToSetActualStatus(orderId: Int): Boolean{
+        val orderResult = orderRepository.getOrder(orderId)
+        return if(orderResult is ru.shawarma.core.data.utils.Result.Success) {
+            setForeground(createForegroundInfo(orderResult.data.status, orderId))
+            if(orderResult.data.status == OrderStatus.CANCELED ||
+                orderResult.data.status == OrderStatus.CLOSED)
+                isEnd = true
+            true
+        } else
+            false
+    }
     private fun createForegroundInfo(
         status: OrderStatus,
         orderId: Int
