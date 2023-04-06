@@ -47,9 +47,9 @@ class MenuViewModel @Inject constructor(
 
     val orderState = _orderState.asStateFlow()
 
-    private val _isConnectedToInternet = MutableLiveData<Boolean>()
+    private val _isDisconnectedToInternet = MutableLiveData<Boolean>()
 
-    val isConnectedToInternet: LiveData<Boolean> = _isConnectedToInternet
+    val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
 
     private val _navCommand = MutableLiveData<NavigationCommand>()
 
@@ -110,7 +110,7 @@ class MenuViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _menuState.value = MenuUIState.TokenInvalidError
                     else {
-                        _isConnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
+                        _isDisconnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
                         if(menuList.lastOrNull() !is MenuElement.Error)
                             menuList.add(MenuElement.Error)
                         copyAndSetMenuList(false)
@@ -126,7 +126,7 @@ class MenuViewModel @Inject constructor(
     }
 
     fun resetNoInternetState(){
-        _isConnectedToInternet.value = false
+        _isDisconnectedToInternet.value = false
     }
 
     private fun checkAndRemoveOldErrorAndLoading(){
@@ -198,7 +198,7 @@ class MenuViewModel @Inject constructor(
                         _orderState.value = OrderUIState.TokenInvalidError
                     else {
                         if(result.message == Errors.NO_INTERNET_ERROR)
-                            _isConnectedToInternet.value = true
+                            _isDisconnectedToInternet.value = true
                         _orderState.value = OrderUIState.Error(result.message)
                     }
                 }

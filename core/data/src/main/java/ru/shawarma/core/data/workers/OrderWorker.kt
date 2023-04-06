@@ -25,9 +25,9 @@ import ru.shawarma.core.data.R
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.core.data.managers.InternetManager
+import ru.shawarma.core.data.managers.MainInternetManager
 import ru.shawarma.core.data.managers.TokenManager
 import ru.shawarma.core.data.repositories.OrderRepository
-import java.net.SocketException
 
 @HiltWorker
 class OrderWorker @AssistedInject constructor(
@@ -51,7 +51,6 @@ class OrderWorker @AssistedInject constructor(
                 val hubConnection = HubConnectionBuilder
                     .create("http://10.0.2.2:5029/notifications/client/orders")
                     .withHubProtocol(GsonHubProtocol(gson))
-                    .withTransport(TransportEnum.WEBSOCKETS)
                     .withAccessTokenProvider(Single.defer {
                         runBlocking {
                             Single.just(tokenManager.getAuthData().accessToken)

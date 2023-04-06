@@ -1,20 +1,5 @@
 package ru.shawarma.core.data.managers
 
-import android.content.Context
-import android.net.ConnectivityManager
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class InternetManager @Inject constructor(
-    @ApplicationContext private val context: Context
-) {
-
-    private val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-    fun isOnline(): Boolean {
-        val networkInfo = cm.activeNetworkInfo
-        return networkInfo != null && networkInfo.isConnected
-    }
+interface InternetManager {
+    fun isOnline(): Boolean
 }

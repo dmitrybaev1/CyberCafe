@@ -34,9 +34,9 @@ class OrdersViewModel @Inject constructor(
 
     val ordersState = _ordersState.asStateFlow()
 
-    private val _isConnectedToInternet = MutableLiveData<Boolean>()
+    private val _isDisconnectedToInternet = MutableLiveData<Boolean>()
 
-    val isConnectedToInternet: LiveData<Boolean> = _isConnectedToInternet
+    val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
 
     private val _navCommand = MutableLiveData<NavigationCommand>()
 
@@ -69,7 +69,7 @@ class OrdersViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _ordersState.value = OrdersUIState.TokenInvalidError
                     else {
-                        _isConnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
+                        _isDisconnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
                         if(ordersList.lastOrNull() !is OrderElement.Error)
                             ordersList.add(OrderElement.Error)
                         copyAndSetOrdersList(false)
@@ -84,26 +84,45 @@ class OrdersViewModel @Inject constructor(
         }
     }
 
+    fun refreshOrders(){
+        ordersList.clear()
+        ordersOffset = - STANDARD_REQUEST_OFFSET
+        getOrders()
+        refreshOrdersStatusObserving()
+    }
+
     fun resetNoInternetState(){
-        _isConnectedToInternet.value = false
+        _isDisconnectedToInternet.value = false
     }
 
     private fun startOrdersStatusObserving(){
         viewModelScope.launch {
             orderRepository.startOrdersStatusHub{orderResponse ->
-                val newList = ordersList.map {
-                    if(it is OrderElement.OrderItem){
-                        if(it.id == orderResponse.id)
-                            mapOrderResponseToOrderItem(listOf(orderResponse))[0]
-                        else
-                            it
-                    }
-                    else
-                        it
-                }
-                _ordersState.value = OrdersUIState.Success(newList)
+                updateState(orderResponse)
             }
         }
+    }
+
+    private fun refreshOrdersStatusObserving(){
+        viewModelScope.launch {
+            orderRepository.refreshOrdersStatusHub{orderResponse ->
+                updateState(orderResponse)
+            }
+        }
+    }
+
+    private fun updateState(orderResponse: OrderResponse){
+        val newList = ordersList.map {
+            if(it is OrderElement.OrderItem){
+                if(it.id == orderResponse.id)
+                    mapOrderResponseToOrderItem(listOf(orderResponse))[0]
+                else
+                    it
+            }
+            else
+                it
+        }
+        _ordersState.value = OrdersUIState.Success(newList)
     }
 
     override fun goToOrder(id: Int) {
@@ -138,7 +157,7 @@ class OrdersViewModel @Inject constructor(
     }
 }
 sealed interface OrdersUIState{
-    data class Success(val items: List<OrderElement>, val isFullyLoaded: Boolean = false): OrdersUIState
+    class Success(val items: List<OrderElement>, val isFullyLoaded: Boolean = false): OrdersUIState
     data class Error(val items: List<OrderElement>): OrdersUIState
     object TokenInvalidError: OrdersUIState
 }

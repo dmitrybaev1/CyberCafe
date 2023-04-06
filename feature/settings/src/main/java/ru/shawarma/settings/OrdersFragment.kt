@@ -65,8 +65,7 @@ class OrdersFragment : Fragment() {
                         is OrdersUIState.Success -> {
                             ordersAdapter?.setList(state.items)
                             ordersAdapter?.notifyDataSetChanged()
-                            if(state.isFullyLoaded)
-                                isFullyLoaded = true
+                            isFullyLoaded = state.isFullyLoaded
                         }
                         is OrdersUIState.Error -> {
                             val items = state.items
@@ -79,15 +78,20 @@ class OrdersFragment : Fragment() {
                             (requireActivity() as AppNavigation).navigateToAuth(Errors.REFRESH_TOKEN_ERROR)
                         }
                     }
+                    binding!!.ordersSwipeRefreshLayout.isRefreshing = false
                     isRequestInProgress = false
                 }
             }
         }
-        viewModel.isConnectedToInternet.observe(viewLifecycleOwner){isConnected ->
-            if(isConnected){
+        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
+            if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                binding!!.ordersSwipeRefreshLayout.isRefreshing = false
                 viewModel.resetNoInternetState()
             }
+        }
+        binding!!.ordersSwipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshOrders()
         }
     }
 

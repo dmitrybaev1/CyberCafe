@@ -99,8 +99,8 @@ class CartFragment : Fragment() {
                 }
             }
         }
-        viewModel.isConnectedToInternet.observe(viewLifecycleOwner){isConnected ->
-            if(isConnected){
+        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
+            if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                 viewModel.resetNoInternetState()
             }

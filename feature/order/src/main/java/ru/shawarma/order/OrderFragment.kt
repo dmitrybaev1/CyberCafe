@@ -1,6 +1,7 @@
 package ru.shawarma.order
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,7 @@ class OrderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        clearMenu()
+        inflateMenu()
         id = arguments?.getInt("orderId")
         viewModel.getOrder(id!!)
         val binding = FragmentOrderBinding.inflate(inflater,container,false)
@@ -94,10 +95,24 @@ class OrderFragment : Fragment() {
                                     binding.orderClosedTextView.text = viewModel.closedDate.value
                                 }
                             }
-                            if(status != OrderStatus.CANCELED && status != OrderStatus.CLOSED && !isHubStarted){
-                                isHubStarted = true
-                                viewModel.startOrderStatusObserving(id!!)
+                            if(status != OrderStatus.CANCELED && status != OrderStatus.CLOSED){
+                                if(!state.isRefreshRequest) {
+                                    if (!isHubStarted) {
+                                        isHubStarted = true
+                                        viewModel.startOrderStatusObserving(id!!)
+                                        Log.d("orderFragment", "starting hub...")
+                                    }
+                                }
+                                else{
+                                    viewModel.refreshOrderStatusObserving(id!!)
+                                    Log.d("orderFragment", "refreshing hub...")
+                                }
                             }
+                            else{
+                                Log.d("orderFragment", "stopping hub...")
+                                viewModel.stopOrdersStatusObserving()
+                            }
+
                         }
                         is OrderUIState.Error -> {
                             binding!!.orderRetryButton.setOnClickListener {
@@ -112,16 +127,23 @@ class OrderFragment : Fragment() {
                 }
             }
         }
-        viewModel.isConnectedToInternet.observe(viewLifecycleOwner){isConnected ->
-            if(isConnected){
+        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
+            if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                 viewModel.resetNoInternetState()
             }
         }
     }
-    
-    private fun clearMenu(){
-        (requireActivity() as CommonComponentsController).clearToolbarMenu()
+
+    private fun inflateMenu(){
+        (requireActivity() as CommonComponentsController).inflateToolbarMenu(R.menu.order_menu) {
+            when(it.itemId){
+                R.id.action_refresh -> {
+                    viewModel.getOrder(id!!,isRefreshRequest = true)
+                }
+            }
+            true
+        }
     }
 
     override fun onDestroyView() {

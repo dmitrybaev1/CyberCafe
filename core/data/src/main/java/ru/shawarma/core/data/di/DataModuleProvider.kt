@@ -8,7 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import ru.shawarma.core.data.managers.InternetManager
+import ru.shawarma.core.data.managers.MainInternetManager
 import ru.shawarma.core.data.services.AuthService
 import ru.shawarma.core.data.services.MenuService
 import ru.shawarma.core.data.services.OrderService
@@ -30,6 +30,4 @@ object DataModuleProvider {
     @Provides
     fun provideOrderService(): OrderService = ApplicationRetrofit.orderService
 
-    @Provides
-    fun provideInternetManager(@ApplicationContext context: Context): InternetManager = InternetManager(context)
 }

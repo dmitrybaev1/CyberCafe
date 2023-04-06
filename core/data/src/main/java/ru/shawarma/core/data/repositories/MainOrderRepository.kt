@@ -4,8 +4,8 @@ import ru.shawarma.core.data.datasources.OrderRemoteDataSource
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.OrderResponse
-import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.managers.InternetManager
+import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import javax.inject.Inject
 
@@ -53,6 +53,18 @@ class MainOrderRepository @Inject constructor(
             val result = authRepository.getActualAuthData()
             if (result is Result.Success<AuthData>) {
                 orderRemoteDataSource.startOrdersStatusHub(
+                    "Bearer ${result.data.accessToken}",
+                    callback
+                )
+            }
+        }
+    }
+
+    override suspend fun refreshOrdersStatusHub(callback: (OrderResponse) -> Unit) {
+        if(internetManager.isOnline()){
+            val result = authRepository.getActualAuthData()
+            if (result is Result.Success<AuthData>) {
+                orderRemoteDataSource.refreshOrdersStatusHub(
                     "Bearer ${result.data.accessToken}",
                     callback
                 )

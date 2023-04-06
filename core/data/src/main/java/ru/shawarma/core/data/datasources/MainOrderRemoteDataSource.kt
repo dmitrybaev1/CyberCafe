@@ -4,9 +4,11 @@ import com.google.gson.GsonBuilder
 import com.microsoft.signalr.GsonHubProtocol
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
+import com.microsoft.signalr.HubConnectionState
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.services.OrderService
@@ -41,21 +43,32 @@ class MainOrderRemoteDataSource @Inject constructor(
             orderService.createOrder(token, request)
         }
 
-    override fun startOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit) {
-        val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
-        hubConnection = HubConnectionBuilder
-            .create("http://10.0.2.2:5029/notifications/client/orders")
-            .withHubProtocol(GsonHubProtocol(gson))
-            .withAccessTokenProvider(Single.defer {
-                runBlocking {
-                    Single.just(token.substringAfter("Bearer "))
-                }
-            }).build()
-        hubConnection?.on("Notify", {message ->
-            callback.invoke(message)
-        }, OrderResponse::class.java)
-        hubConnection?.start()
+    override suspend fun startOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit) {
+        withContext(dispatcher) {
+            val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
+            hubConnection = HubConnectionBuilder
+                .create("http://10.0.2.2:5029/notifications/client/orders")
+                .withHubProtocol(GsonHubProtocol(gson))
+                .withAccessTokenProvider(Single.defer {
+                    runBlocking {
+                        Single.just(token.substringAfter("Bearer "))
+                    }
+                }).build()
+            hubConnection?.on("Notify", { message ->
+                callback.invoke(message)
+            }, OrderResponse::class.java)
+            hubConnection?.start()?.blockingAwait()
+        }
     }
+
+    override suspend fun refreshOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit) {
+        if(!isConnectedToHub()){
+            startOrdersStatusHub(token, callback)
+        }
+    }
+
+    private fun isConnectedToHub(): Boolean =
+        hubConnection?.connectionState == HubConnectionState.CONNECTED
 
     override fun stopOrdersStatusHub(){
         hubConnection?.stop()

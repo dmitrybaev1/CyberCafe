@@ -12,4 +12,5 @@
     <string name="missed">отсутствует</string>
     <string name="amount">" шт."</string>
     <string name="total">"Итого: "</string>
+    <string name="refresh">Обновить</string>
 </resources>
