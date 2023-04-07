@@ -8,7 +8,11 @@ class FakeSuccessAuthRepository: AuthRepository {
     override suspend fun login(userLoginRequest: UserLoginRequest): Result<AuthData> =
         Result.Success(AuthData("","","",0))
 
-    override suspend fun refreshToken(tokensRequest: TokensRequest): Result<AuthData> =
+    override suspend fun clearAuthData() {
+
+    }
+
+    override suspend fun getActualAuthData(): Result<AuthData> =
         Result.Success(AuthData("","","",0))
 
     override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser> =

@@ -7,5 +7,5 @@ class FakeTokenManager: TokenManager {
     override suspend fun update(authData: AuthData) {}
 
     override suspend fun getAuthData(): AuthData =
-        AuthData("","","",0)
+        AuthData("a","r","b",System.currentTimeMillis() / 1000L + 100)
 }

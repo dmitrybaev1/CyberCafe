@@ -34,7 +34,7 @@ class AuthViewModelTest {
     @Before
     fun setup(){
         authRepository = mock()
-        viewModel = AuthViewModel(authRepository,mock())
+        viewModel = AuthViewModel(authRepository)
         authData = AuthData("","","",0)
     }
 

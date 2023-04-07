@@ -9,7 +9,11 @@ class FakeErrorAuthRepository: AuthRepository {
     override suspend fun login(userLoginRequest: UserLoginRequest): Result<AuthData> =
         Result.Failure("")
 
-    override suspend fun refreshToken(tokensRequest: TokensRequest): Result<AuthData> =
+    override suspend fun clearAuthData() {
+
+    }
+
+    override suspend fun getActualAuthData(): Result<AuthData> =
         Result.Failure(Errors.REFRESH_TOKEN_ERROR)
 
     override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser> =

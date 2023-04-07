@@ -12,17 +12,19 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import ru.shawarma.core.data.entities.AuthData
-import ru.shawarma.core.data.entities.MenuItemResponse
+import ru.shawarma.core.data.entities.*
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.MenuRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
 import ru.shawarma.core.data.managers.TokenManager
+import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.entities.MenuElement
 import ru.shawarma.menu.viewmodels.MenuUIState
 import ru.shawarma.menu.viewmodels.MenuViewModel
+import ru.shawarma.menu.viewmodels.OrderUIState
+import java.util.*
 
 class MenuViewModelTest {
 
@@ -30,13 +32,11 @@ class MenuViewModelTest {
 
     private lateinit var menuRepository: MenuRepository
 
-    private lateinit var authRepository: AuthRepository
-
-    private lateinit var tokenManager: TokenManager
-
-    private lateinit var authData: AuthData
+    private lateinit var orderRepository: OrderRepository
 
     private lateinit var menuItemResponse: MenuItemResponse
+
+    private lateinit var orderResponse: OrderResponse
 
     @get:Rule
     val rule = MainDispatcherRule()
@@ -47,51 +47,66 @@ class MenuViewModelTest {
     @Before
     fun setup(){
         menuRepository = mock()
-        authRepository = mock()
-        tokenManager = mock()
+        orderRepository = mock()
         menuItemResponse = MenuItemResponse(0,"",0,true)
-        viewModel = MenuViewModel(menuRepository,authRepository,tokenManager)
+        orderResponse = OrderResponse(0, listOf(),"", Date(), Date(),OrderStatus.IN_QUEUE,0)
+        viewModel = MenuViewModel(menuRepository,orderRepository)
     }
 
     @Test
     fun `Get menu successfully`() = runTest {
-        authData = AuthData("","","",System.currentTimeMillis() / 1000L + 100)
-        viewModel.setToken(authData)
-        whenever(tokenManager.getAuthData()).thenReturn(authData)
-        whenever(authRepository.refreshToken(any())).thenReturn(Result.Success(authData))
-        whenever(menuRepository.getMenu(anyString(),anyInt(), anyInt())).thenReturn(Result.Success(listOf(menuItemResponse)))
+        whenever(menuRepository.getMenu(anyInt(), anyInt())).thenReturn(Result.Success(listOf(menuItemResponse)))
         viewModel.getMenu()
         assertTrue(viewModel.menuState.value is MenuUIState.Success)
     }
 
     @Test
     fun `Get menu api error`() = runTest {
-        authData = AuthData("","","",System.currentTimeMillis() / 1000L + 100)
-        viewModel.setToken(authData)
-        whenever(tokenManager.getAuthData()).thenReturn(authData)
-        whenever(authRepository.refreshToken(any())).thenReturn(Result.Success(authData))
-        whenever(menuRepository.getMenu(anyString(),anyInt(), anyInt())).thenReturn(Result.Failure(""))
+        whenever(menuRepository.getMenu(anyInt(), anyInt())).thenReturn(Result.Failure(""))
         viewModel.getMenu()
         assertTrue(viewModel.menuState.value is MenuUIState.Error)
     }
 
     @Test
-    fun `Token expired but successful refresh and get menu`() = runTest {
-        authData = AuthData("","","",System.currentTimeMillis() / 1000L - 100)
-        viewModel.setToken(authData)
-        whenever(authRepository.refreshToken(any())).thenReturn(Result.Success(authData))
-        whenever(menuRepository.getMenu(anyString(),anyInt(), anyInt())).thenReturn(Result.Success(listOf(menuItemResponse)))
+    fun `Get menu token invalid error`() = runTest {
+        whenever(menuRepository.getMenu(anyInt(), anyInt())).thenReturn(Result.Failure(Errors.REFRESH_TOKEN_ERROR))
         viewModel.getMenu()
-        assertTrue(viewModel.menuState.value is MenuUIState.Success)
+        assertTrue(viewModel.menuState.value is MenuUIState.TokenInvalidError)
     }
 
     @Test
-    fun `Get menu token invalid error`() = runTest {
-        authData = AuthData("","","",System.currentTimeMillis() / 1000L - 100)
-        viewModel.setToken(authData)
-        whenever(authRepository.refreshToken(any())).thenReturn(Result.Failure(Errors.REFRESH_TOKEN_ERROR))
+    fun `Get menu no internet error`() = runTest {
+        whenever(menuRepository.getMenu(anyInt(), anyInt())).thenReturn(Result.Failure(Errors.NO_INTERNET_ERROR))
         viewModel.getMenu()
-        assertTrue(viewModel.menuState.value is MenuUIState.TokenInvalidError)
+        assertTrue(viewModel.isDisconnectedToInternet.value!!)
+    }
+
+    @Test
+    fun `Make order successfully`() = runTest {
+        whenever(orderRepository.createOrder(any())).thenReturn(Result.Success(orderResponse))
+        viewModel.makeOrder()
+        assertTrue(viewModel.orderState.value is OrderUIState.Success)
+    }
+
+    @Test
+    fun `Make order api error`() = runTest{
+        whenever(orderRepository.createOrder(any())).thenReturn(Result.Failure(""))
+        viewModel.makeOrder()
+        assertTrue(viewModel.orderState.value is OrderUIState.Error)
+    }
+
+    @Test
+    fun `Make order token invalid error`() = runTest{
+        whenever(orderRepository.createOrder(any())).thenReturn(Result.Failure(Errors.REFRESH_TOKEN_ERROR))
+        viewModel.makeOrder()
+        assertTrue(viewModel.orderState.value is OrderUIState.TokenInvalidError)
+    }
+
+    @Test
+    fun `Make order no internet error`() = runTest{
+        whenever(orderRepository.createOrder(any())).thenReturn(Result.Failure(Errors.NO_INTERNET_ERROR))
+        viewModel.makeOrder()
+        assertTrue(viewModel.isDisconnectedToInternet.value!!)
     }
 
     @Test
