@@ -63,14 +63,12 @@ class OrdersFragment : Fragment() {
                 viewModel.ordersState.collect{ state ->
                     when(state){
                         is OrdersUIState.Success -> {
-                            ordersAdapter?.setList(state.items)
-                            ordersAdapter?.notifyDataSetChanged()
+                            ordersAdapter?.submitList(state.items)
                             isFullyLoaded = state.isFullyLoaded
                         }
                         is OrdersUIState.Error -> {
                             val items = state.items
-                            ordersAdapter?.setList(state.items)
-                            ordersAdapter?.notifyDataSetChanged()
+                            ordersAdapter?.submitList(state.items)
                             binding!!.ordersRecyclerView.scrollToPosition(items.size-1)
                         }
                         is OrdersUIState.TokenInvalidError -> {

@@ -3,6 +3,7 @@ package ru.shawarma.menu.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.R
@@ -11,13 +12,7 @@ import ru.shawarma.menu.entities.CartMenuItem
 
 class CartAdapter(
     private val menuController: MenuController
-) : RecyclerView.Adapter<CartAdapter.CartItemViewHolder>() {
-
-    private var list: List<CartMenuItem>? = null
-
-    fun setList(list: List<CartMenuItem>){
-        this.list = list
-    }
+) : ListAdapter<CartMenuItem, CartAdapter.CartItemViewHolder>(CartMenuItemDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartItemViewHolder {
         val binding = DataBindingUtil.inflate<CartItemBinding>(
@@ -27,11 +22,9 @@ class CartAdapter(
     }
 
     override fun onBindViewHolder(holder: CartItemViewHolder, position: Int) {
-        val cartItem = list?.get(position)
+        val cartItem = getItem(position)
         cartItem?.let { holder.bind(it) }
     }
-
-    override fun getItemCount(): Int = list?.size ?: 0
 
     class CartItemViewHolder(
         private val binding: CartItemBinding,

@@ -64,8 +64,7 @@ class CartFragment : Fragment() {
                 binding.cartPaymentSpinner.adapter = adapter
             }
         viewModel.cartListLiveData.observe(viewLifecycleOwner){ list ->
-            cartAdapter?.setList(list)
-            cartAdapter?.notifyDataSetChanged()
+            cartAdapter?.submitList(list)
         }
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){

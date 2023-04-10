@@ -3,6 +3,7 @@ package ru.shawarma.settings.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import ru.shawarma.core.data.entities.OrderStatus
@@ -15,13 +16,7 @@ import ru.shawarma.settings.entities.OrderElement
 
 class OrdersAdapter(
     private val settingsController: SettingsController
-) : RecyclerView.Adapter<ViewHolder>() {
-
-    private var list: List<OrderElement>? = null
-
-    fun setList(list: List<OrderElement>){
-        this.list = list
-    }
+) : ListAdapter<OrderElement, ViewHolder>(OrderItemDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when(viewType){
@@ -47,15 +42,13 @@ class OrdersAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if(holder is OrderItemViewHolder){
-            val orderItem = list?.get(position) as OrderElement.OrderItem
+            val orderItem = getItem(position) as OrderElement.OrderItem
             holder.bind(orderItem)
         }
     }
 
-    override fun getItemCount(): Int = list?.size ?: 0
-
     override fun getItemViewType(position: Int): Int {
-        return when(list?.get(position)){
+        return when(getItem(position)){
             is OrderElement.OrderItem -> R.layout.order_item
             is OrderElement.Error -> R.layout.order_error
             is OrderElement.Loading -> R.layout.order_loading

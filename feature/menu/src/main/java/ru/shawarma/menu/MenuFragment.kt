@@ -89,15 +89,13 @@ class MenuFragment : Fragment() {
                 viewModel.menuState.collect{state ->
                     when(state){
                         is MenuUIState.Success -> {
-                            menuAdapter?.setList(state.items)
-                            menuAdapter?.notifyDataSetChanged()
+                            menuAdapter?.submitList(state.items)
                             if(state.isFullyLoaded)
                                 isFullyLoaded = true
                         }
                         is MenuUIState.Error -> {
                             val items = state.items
-                            menuAdapter?.setList(items)
-                            menuAdapter?.notifyDataSetChanged()
+                            menuAdapter?.submitList(items)
                             binding!!.menuRecyclerView.scrollToPosition(items.size-1)
                         }
                         is MenuUIState.TokenInvalidError -> {

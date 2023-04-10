@@ -3,6 +3,7 @@ package ru.shawarma.menu.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import ru.shawarma.menu.MenuController
@@ -15,13 +16,7 @@ import ru.shawarma.menu.entities.MenuElement
 
 class MenuAdapter(
     private val menuController: MenuController
-) : RecyclerView.Adapter<ViewHolder>() {
-
-    private var list: List<MenuElement>? = null
-
-    fun setList(list: List<MenuElement>){
-        this.list = list
-    }
+) : ListAdapter<MenuElement, ViewHolder>(MenuItemDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when(viewType){
@@ -56,21 +51,19 @@ class MenuAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when(holder){
             is MenuItemViewHolder -> {
-                val menuItem = list?.get(position) as MenuElement.MenuItem
+                val menuItem = getItem(position) as MenuElement.MenuItem
                 holder.bind(menuItem)
             }
             is MenuHeaderViewHolder -> {
-                val headerItem = list?.get(position) as MenuElement.Header
+                val headerItem = getItem(position) as MenuElement.Header
                 holder.bind(headerItem)
             }
         }
     }
 
-    override fun getItemCount(): Int = list?.size ?: 0
-
 
     override fun getItemViewType(position: Int): Int {
-        return when(list?.get(position)){
+        return when(getItem(position)){
             is MenuElement.MenuItem -> R.layout.menu_item
             is MenuElement.Header -> R.layout.menu_header
             is MenuElement.Error -> R.layout.menu_error
