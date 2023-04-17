@@ -11,4 +11,6 @@ interface AuthRemoteDataSource {
 
     suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser>
 
+    suspend fun getInfo(token: String): Result<InfoResponse>
+
 }

@@ -1,23 +1,37 @@
 package ru.shawarma.settings.viewmodels
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.shawarma.core.data.entities.InfoResponse
+import ru.shawarma.core.data.repositories.AuthRepository
+import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.settings.entities.InfoItem
 import javax.inject.Inject
+import ru.shawarma.core.data.utils.Result
+import ru.shawarma.settings.utils.mapInfoResponseToInfoItems
 
 @HiltViewModel
 class InfoViewModel @Inject constructor(
-
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _infoState = MutableStateFlow<InfoUIState?>(null)
 
     val infoState = _infoState.asStateFlow()
+
+    private val _userName = MutableLiveData<String>()
+
+    val userName: LiveData<String> = _userName
+
+    private val _isDisconnectedToInternet = MutableLiveData<Boolean>()
+
+    val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
 
     init {
         getInfo()
@@ -25,15 +39,28 @@ class InfoViewModel @Inject constructor(
     fun getInfo(){
         viewModelScope.launch {
             _infoState.value = null
-            delay(2000)
-           /* _infoState.value = InfoUIState.Success(
-                listOf(
-                    InfoItem("role","client"),
-                    InfoItem("email","example@exmaple.com"),
-                )
-            )*/
-            _infoState.value = InfoUIState.Error("Hardcoded error")
+           when(val result = authRepository.getInfo()){
+               is Result.Success<InfoResponse> -> {
+                   val list = mapInfoResponseToInfoItems(result.data)
+                   _userName.value = list[0].value
+                   _infoState.value = InfoUIState.Success(list.subList(1,list.size))
+               }
+               is Result.Failure -> {
+                   if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
+                       _infoState.value = InfoUIState.TokenInvalidError
+                   else {
+                       if(result.message == Errors.NO_INTERNET_ERROR)
+                           _isDisconnectedToInternet.value = true
+                       _infoState.value = InfoUIState.Error(result.message)
+                   }
+               }
+               is Result.NetworkFailure -> _infoState.value = InfoUIState.Error(Errors.NETWORK_ERROR)
+           }
         }
+    }
+
+    fun resetNoInternetState(){
+        _isDisconnectedToInternet.value = false
     }
 }
 sealed interface InfoUIState{

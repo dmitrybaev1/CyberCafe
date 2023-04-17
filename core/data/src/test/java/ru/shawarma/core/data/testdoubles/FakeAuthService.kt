@@ -12,4 +12,9 @@ class FakeAuthService : AuthService {
 
     override suspend fun login(userLoginRequest: UserLoginRequest): AuthData =
         AuthData("", "", "", 0)
+
+    override suspend fun getInfo(token: String): InfoResponse =
+        InfoResponse("","","")
+
+
 }

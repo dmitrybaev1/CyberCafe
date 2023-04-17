@@ -16,7 +16,7 @@ import ru.shawarma.settings.NavigationCommand
 import ru.shawarma.settings.SettingsController
 import ru.shawarma.settings.entities.OrderElement
 import ru.shawarma.settings.utils.STANDARD_REQUEST_OFFSET
-import ru.shawarma.settings.utils.mapOrderResponseToOrderItem
+import ru.shawarma.settings.utils.mapOrderResponseToOrderItems
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,7 +57,7 @@ class OrdersViewModel @Inject constructor(
             when(val result = orderRepository.getOrders(ordersOffset,ordersCount)){
                 is Result.Success<List<OrderResponse>> -> {
                     if(result.data.isNotEmpty()) {
-                        val items = mapOrderResponseToOrderItem(result.data)
+                        val items = mapOrderResponseToOrderItems(result.data)
                         ordersList.addAll(items)
                         ordersList.add(OrderElement.Loading)
                         copyAndSetOrdersList(true)
@@ -115,7 +115,7 @@ class OrdersViewModel @Inject constructor(
         val newList = ordersList.map {
             if(it is OrderElement.OrderItem){
                 if(it.id == orderResponse.id)
-                    mapOrderResponseToOrderItem(listOf(orderResponse))[0]
+                    mapOrderResponseToOrderItems(listOf(orderResponse))[0]
                 else
                     it
             }

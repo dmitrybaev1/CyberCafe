@@ -33,6 +33,17 @@ class MainAuthRepository @Inject constructor(
         return authRemoteDataSource.register(userRegisterRequest)
     }
 
+    override suspend fun getInfo(): Result<InfoResponse> {
+        if (!internetManager.isOnline())
+            return Result.Failure(Errors.NO_INTERNET_ERROR)
+        return when (val result = getActualAuthData()) {
+            is Result.Success<AuthData> ->
+                authRemoteDataSource.getInfo("Bearer ${result.data.accessToken}")
+            is Result.Failure -> result
+            is Result.NetworkFailure -> result
+        }
+    }
+
     override suspend fun clearAuthData() {
         tokenManager.update(AuthData.empty())
     }

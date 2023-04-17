@@ -59,4 +59,13 @@ class MainAuthRemoteDataSourceTest {
         val actual = authRemoteDataSource.register(registerRequest)
         assertTrue(expected.javaClass == actual.javaClass)
     }
+
+    @Test
+    fun `get info response correctly wrapped into result`() = runTest {
+        authRemoteDataSource = MainAuthRemoteDataSource(authService,
+            StandardTestDispatcher(testScheduler))
+        val expected = Result.Success(authService.getInfo(""))
+        val actual = authRemoteDataSource.getInfo("")
+        assertTrue(expected.javaClass == actual.javaClass)
+    }
 }

@@ -1,10 +1,12 @@
 package ru.shawarma.settings.utils
 
+import ru.shawarma.core.data.entities.InfoResponse
 import ru.shawarma.core.data.entities.OrderResponse
+import ru.shawarma.settings.entities.InfoItem
 import ru.shawarma.settings.entities.OrderElement
 
 
-fun mapOrderResponseToOrderItem(ordersResponse: List<OrderResponse>): List<OrderElement.OrderItem> {
+fun mapOrderResponseToOrderItems(ordersResponse: List<OrderResponse>): List<OrderElement.OrderItem> {
     val list = arrayListOf<OrderElement.OrderItem>()
     for(order in ordersResponse){
         list.add(
@@ -17,5 +19,12 @@ fun mapOrderResponseToOrderItem(ordersResponse: List<OrderResponse>): List<Order
     }
     return list
 }
+
+fun mapInfoResponseToInfoItems(infoResponse: InfoResponse): List<InfoItem> =
+    listOf(
+        InfoItem("name",infoResponse.name),
+        InfoItem("id",infoResponse.id),
+        InfoItem("email",infoResponse.email)
+    )
 
 const val STANDARD_REQUEST_OFFSET = 10

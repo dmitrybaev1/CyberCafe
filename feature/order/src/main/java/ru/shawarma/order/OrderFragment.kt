@@ -100,19 +100,13 @@ class OrderFragment : Fragment() {
                                     if (!isHubStarted) {
                                         isHubStarted = true
                                         viewModel.startOrderStatusObserving(id!!)
-                                        Log.d("orderFragment", "starting hub...")
                                     }
                                 }
-                                else{
+                                else
                                     viewModel.refreshOrderStatusObserving(id!!)
-                                    Log.d("orderFragment", "refreshing hub...")
-                                }
                             }
-                            else{
-                                Log.d("orderFragment", "stopping hub...")
+                            else
                                 viewModel.stopOrdersStatusObserving()
-                            }
-
                         }
                         is OrderUIState.Error -> {
                             binding!!.orderRetryButton.setOnClickListener {

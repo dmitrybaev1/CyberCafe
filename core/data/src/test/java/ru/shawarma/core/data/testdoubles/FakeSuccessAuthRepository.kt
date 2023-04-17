@@ -17,4 +17,9 @@ class FakeSuccessAuthRepository: AuthRepository {
 
     override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser> =
         Result.Success(RegisteredUser("","",""))
+
+    override suspend fun getInfo(): Result<InfoResponse> =
+        Result.Success(InfoResponse("","",""))
+
+
 }

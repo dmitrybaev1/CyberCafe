@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.ui.AppNavigation
+import ru.shawarma.core.ui.CommonComponentsController
 import ru.shawarma.settings.adapters.InfoAdapter
 import ru.shawarma.settings.databinding.FragmentInfoBinding
 import ru.shawarma.settings.viewmodels.InfoUIState
@@ -61,7 +62,6 @@ class InfoFragment : Fragment() {
                                 layoutManager = LinearLayoutManager(requireContext())
                                 val infoAdapter = InfoAdapter(state.items)
                                 adapter = infoAdapter
-                                //infoAdapter.notifyDataSetChanged()
                             }
                         }
                         is InfoUIState.Error -> {
@@ -77,6 +77,12 @@ class InfoFragment : Fragment() {
                         }
                     }
                 }
+            }
+        }
+        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
+            if(isDisconnected){
+                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                viewModel.resetNoInternetState()
             }
         }
     }

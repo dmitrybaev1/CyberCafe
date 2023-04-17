@@ -31,4 +31,9 @@ class MainAuthRemoteDataSource @Inject constructor(
             authService.register(userRegisterRequest)
         }
 
+    override suspend fun getInfo(token: String): Result<InfoResponse> =
+        safeServiceCall(dispatcher){
+            authService.getInfo(token)
+        }
+
 }

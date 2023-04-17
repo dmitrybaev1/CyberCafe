@@ -13,6 +13,9 @@ class FakeAuthRemoteDataSource: AuthRemoteDataSource  {
         Result.Success(AuthData("a", "r", "b", 0))
 
     override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser> =
-        Result.Failure("")
+        Result.Success(RegisteredUser("","",""))
+
+    override suspend fun getInfo(token: String): Result<InfoResponse> =
+        Result.Success(InfoResponse("","",""))
 
 }

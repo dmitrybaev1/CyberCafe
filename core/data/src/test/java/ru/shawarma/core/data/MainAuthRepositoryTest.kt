@@ -76,8 +76,8 @@ class MainAuthRepositoryTest {
         internetManager = FakeOnlineInternetManager()
         authRepository = MainAuthRepository(authRemoteDataSource,tokenManager, internetManager)
         assertEquals(
-            (authRemoteDataSource.register(registerRequest) as Result.Failure).message,
-            (authRepository.register(registerRequest) as Result.Failure).message
+            (authRemoteDataSource.register(registerRequest) as Result.Success).data,
+            (authRepository.register(registerRequest) as Result.Success).data
         )
     }
 
@@ -87,6 +87,25 @@ class MainAuthRepositoryTest {
         authRepository = MainAuthRepository(authRemoteDataSource,tokenManager, internetManager)
         assertTrue(
             (authRepository.register(registerRequest) as Result.Failure).message == Errors.NO_INTERNET_ERROR
+        )
+    }
+
+    @Test
+    fun `Get info success`() = runTest {
+        internetManager = FakeOnlineInternetManager()
+        authRepository = MainAuthRepository(authRemoteDataSource,tokenManager, internetManager)
+        assertEquals(
+            (authRemoteDataSource.getInfo("") as Result.Success).data,
+            (authRepository.getInfo() as Result.Success).data
+        )
+    }
+
+    @Test
+    fun `Get info no internet error`() = runTest {
+        internetManager = FakeOfflineInternetManager()
+        authRepository = MainAuthRepository(authRemoteDataSource,tokenManager, internetManager)
+        assertTrue(
+            (authRepository.getInfo() as Result.Failure).message == Errors.NO_INTERNET_ERROR
         )
     }
 }

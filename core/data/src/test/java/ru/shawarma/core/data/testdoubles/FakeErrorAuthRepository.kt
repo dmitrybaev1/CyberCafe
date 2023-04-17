@@ -18,4 +18,7 @@ class FakeErrorAuthRepository: AuthRepository {
 
     override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser> =
         Result.Failure("")
+
+    override suspend fun getInfo(): Result<InfoResponse> =
+        Result.Failure("")
 }
