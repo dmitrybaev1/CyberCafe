@@ -1,9 +1,12 @@
 package ru.shawarma.auth
 
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -52,6 +55,7 @@ class RegisterFragment : Fragment() {
     }
 
     private fun handleRegisterState(state: RegisterUIState,view: View){
+        resetErrorOnFields()
         when(state){
             is RegisterUIState.Success -> {
                 AlertDialog.Builder(requireContext())
@@ -63,21 +67,44 @@ class RegisterFragment : Fragment() {
                     }.create().show()
             }
             is RegisterUIState.Error -> {
+                val registerTextInputLayoutEmail = binding!!.registerTextInputLayoutEmail
+                val registerTextInputLayoutPassword =  binding!!.registerTextInputLayoutPassword
+                val registerErrorTextView = binding!!.registerErrorTextView
                 when(val message = state.message){
                     Errors.NO_INTERNET_ERROR -> {
                         (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                         viewModel.resetState()
                     }
-                    Errors.EMPTY_INPUT_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.empty_input_error)
-                    Errors.EMAIL_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.email_error)
-                    Errors.PASSWORD_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.password_error)
-                    Errors.NETWORK_ERROR -> binding!!.registerErrorTextView.text = resources.getString(R.string.unknown_error)
-                    else -> binding!!.registerErrorTextView.text = message
+                    Errors.EMPTY_INPUT_ERROR -> {
+                        registerErrorTextView.text = resources.getString(R.string.empty_input_error)
+                        registerTextInputLayoutEmail.error = " "
+                        registerTextInputLayoutPassword.error = " "
+                    }
+                    Errors.EMAIL_ERROR -> {
+                        registerErrorTextView.text = resources.getString(R.string.email_error)
+                        registerTextInputLayoutEmail.error = " "
+                    }
+                    Errors.PASSWORD_ERROR -> {
+                        registerErrorTextView.text = resources.getString(R.string.password_error)
+                        registerTextInputLayoutPassword.error = " "
+                    }
+                    Errors.NETWORK_ERROR -> registerErrorTextView.text = resources.getString(R.string.unknown_error)
+                    else -> registerErrorTextView.text = message
+                }
+                (AnimatorInflater.loadAnimator(requireContext(), R.animator.error_text_anim) as AnimatorSet).apply {
+                    setTarget(registerErrorTextView)
+                    interpolator = LinearInterpolator()
+                    start()
                 }
             }
         }
     }
-
+    private fun resetErrorOnFields(){
+        val registerTextInputLayoutEmail = binding!!.registerTextInputLayoutEmail
+        val registerTextInputLayoutPassword =  binding!!.registerTextInputLayoutPassword
+        registerTextInputLayoutEmail.error = null
+        registerTextInputLayoutPassword.error = null
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null

@@ -1,9 +1,12 @@
 package ru.shawarma.auth
 
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -71,6 +74,7 @@ class AuthFragment : Fragment() {
     }
 
     private fun handleAuthState(state: AuthUIState, view: View){
+        resetErrorOnFields()
         when(state){
             is AuthUIState.Success -> {
                 binding!!.authErrorTextView.text = ""
@@ -78,20 +82,46 @@ class AuthFragment : Fragment() {
                 (requireActivity() as AppNavigation).navigateToMenu()
             }
             is AuthUIState.Error -> {
+                val authTextInputLayoutEmail = binding!!.authTextInputLayoutEmail
+                val authTextInputLayoutPassword =  binding!!.authTextInputLayoutPassword
+                val authErrorTextView = binding!!.authErrorTextView
                 when(val message = state.message){
                     Errors.NO_INTERNET_ERROR -> {
                         (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                         viewModel.resetState()
                     }
-                    Errors.EMPTY_INPUT_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.empty_input_error)
-                    Errors.EMAIL_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.email_error)
-                    Errors.PASSWORD_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.password_error)
-                    Errors.NETWORK_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.unknown_error)
-                    Errors.REFRESH_TOKEN_ERROR -> binding!!.authErrorTextView.text = resources.getString(R.string.refresh_token_error)
-                    else -> binding!!.authErrorTextView.text = message
+                    Errors.EMPTY_INPUT_ERROR -> {
+                        authErrorTextView.text = resources.getString(R.string.empty_input_error)
+                        authTextInputLayoutEmail.error = " "
+                        authTextInputLayoutPassword.error = " "
+                    }
+                    Errors.EMAIL_ERROR -> {
+                        authErrorTextView.text = resources.getString(R.string.email_error)
+                        authTextInputLayoutEmail.error = " "
+                    }
+                    Errors.PASSWORD_ERROR -> {
+                        authErrorTextView.text = resources.getString(R.string.password_error)
+                        authTextInputLayoutPassword.error = " "
+                    }
+                    Errors.NETWORK_ERROR -> authErrorTextView.text = resources.getString(R.string.unknown_error)
+                    Errors.REFRESH_TOKEN_ERROR -> authErrorTextView.text = resources.getString(R.string.refresh_token_error)
+                    else -> authErrorTextView.text = message
+
+                }
+                (AnimatorInflater.loadAnimator(requireContext(), R.animator.error_text_anim) as AnimatorSet).apply {
+                    setTarget(authErrorTextView)
+                    interpolator = LinearInterpolator()
+                    start()
                 }
             }
         }
+    }
+
+    private fun resetErrorOnFields(){
+        val authTextInputLayoutEmail = binding!!.authTextInputLayoutEmail
+        val authTextInputLayoutPassword =  binding!!.authTextInputLayoutPassword
+        authTextInputLayoutEmail.error = null
+        authTextInputLayoutPassword.error = null
     }
 
     private fun setupToolbarUpButton(){
