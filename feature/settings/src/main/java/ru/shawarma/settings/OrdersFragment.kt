@@ -57,6 +57,7 @@ class OrdersFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding!!.ordersSwipeRefreshLayout.setColorSchemeResources(ru.shawarma.core.ui.R.color.purple_400)
         setupOrdersRecyclerView()
         viewLifecycleOwner.lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.RESUMED){
@@ -96,6 +97,13 @@ class OrdersFragment : Fragment() {
     private fun setupOrdersRecyclerView(){
         ordersAdapter = OrdersAdapter(viewModel)
         binding!!.ordersRecyclerView.apply {
+            ordersAdapter?.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver(){
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    if(positionStart!=10)
+                        this@apply.scrollToPosition(positionStart)
+                }
+            })
             adapter = ordersAdapter
             layoutManager = LinearLayoutManager(requireContext())
             addOnScrollListener(object: OnScrollListener(){

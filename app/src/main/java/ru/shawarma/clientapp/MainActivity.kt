@@ -90,7 +90,6 @@ class MainActivity : AppCompatActivity(), AppNavigation,
     }
 
     override fun showNoInternetSnackbar(view: View) {
-        Snackbar.make(view, ru.shawarma.core.ui.R.string.no_internet,Snackbar.LENGTH_LONG)
-            .setAction("Test"){}.show()
+        Snackbar.make(view, ru.shawarma.core.ui.R.string.no_internet,Snackbar.LENGTH_LONG).show()
     }
 }

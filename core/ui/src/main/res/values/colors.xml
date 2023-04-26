@@ -7,6 +7,7 @@
     <color name="yellow_500">#e8e800</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="subtitleGray">#23000000</color>
     <color name="error_red">#b00020</color>
     <color name="error_red_light">#cf6679</color>
     <color name="red">#FB1D1D</color>

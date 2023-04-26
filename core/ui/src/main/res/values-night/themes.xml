@@ -15,15 +15,17 @@
         <item name="android:colorBackground">@color/black</item>
         <item name="colorOnBackground">@color/white</item>
         <item name="colorOnSurface">?attr/colorPrimary</item>
+        <item name="colorOnSurfaceVariant">?attr/colorOnSurface</item>
 
         <item name="colorError">@color/error_red_light</item>
         <item name="colorOnError">?attr/colorError</item>
 
-        <item name="android:textViewStyle">@style/TextViewStyle</item>
-        <item name="toolbarStyle">@style/ToolbarStyle</item>
+        <item name="android:textViewStyle">@style/AppTextView</item>
+        <item name="toolbarStyle">@style/Toolbar</item>
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
-        <item name="snackbarTextViewStyle">@style/SnackbarTextViewStyle</item>
-        <item name="snackbarButtonStyle">@style/SnackbarActionButtonStyle</item>
+        <item name="snackbarTextViewStyle">@style/SnackbarTextView</item>
+        <item name="snackbarButtonStyle">@style/SnackbarActionButton</item>
+        <item name="materialCardViewStyle">@style/AppCardView</item>
     </style>
 
     <style name="AppBarLayoutThemeOverlay" parent="ThemeOverlay.MaterialComponents.Light"/>

@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
 
         <com.google.android.material.textview.MaterialTextView
-            style="@style/TitleTextViewStyle"
+            style="@style/TitleTextView"
             android:id="@+id/registerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textview.MaterialTextView
-            style="@style/ErrorTextViewStyle"
+            style="@style/ErrorTextView"
             android:id="@+id/registerErrorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/registerRegisterButton"
-            android:layout_width="200dp"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text='@{viewModel.isLoading() ? "" : @string/register_explicit}'

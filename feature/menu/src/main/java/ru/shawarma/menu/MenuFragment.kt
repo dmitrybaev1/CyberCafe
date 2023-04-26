@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.ui.AppNavigation
@@ -124,6 +125,13 @@ class MenuFragment : Fragment() {
                 else MENU_FULL_SPAN_SIZE
         }
         binding!!.menuRecyclerView.apply {
+            menuAdapter?.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver(){
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    if(positionStart!=11)
+                        this@apply.scrollToPosition(positionStart)
+                }
+            })
             adapter = menuAdapter
             layoutManager = gridLayoutManager
             addOnScrollListener(object: OnScrollListener(){
