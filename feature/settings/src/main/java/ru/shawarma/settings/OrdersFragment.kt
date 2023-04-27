@@ -1,5 +1,6 @@
 package ru.shawarma.settings
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
@@ -57,7 +59,12 @@ class OrdersFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding!!.ordersSwipeRefreshLayout.setColorSchemeResources(ru.shawarma.core.ui.R.color.purple_400)
+        binding!!.ordersSwipeRefreshLayout.apply {
+            setColorSchemeColors(MaterialColors.getColor(requireContext(),
+                com.google.android.material.R.attr.colorPrimary, Color.BLACK))
+            setProgressBackgroundColorSchemeColor(MaterialColors.getColor(requireContext(),
+               android.R.attr.colorBackground, Color.WHITE))
+        }
         setupOrdersRecyclerView()
         viewLifecycleOwner.lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.RESUMED){

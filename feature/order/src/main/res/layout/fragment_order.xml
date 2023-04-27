@@ -18,42 +18,49 @@
             android:id="@+id/orderContentLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#EBEBEB"
             android:visibility="@{viewModel.orderState instanceof OrderUIState.Success ? View.VISIBLE : View.GONE}">
 
-            <ImageView
-                android:id="@+id/orderStepIndicatorImageView"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:theme="@style/BackdropThemeOverlay"
+                android:id="@+id/orderBackdropLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/step_indicator_1" />
-
-            <TextView
-                android:id="@+id/orderStatusTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{viewModel.orderStatus}"
-                android:textSize="30sp"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/orderStepIndicatorImageView" />
+                app:layout_constraintEnd_toEndOf="parent"
+                android:orientation="vertical">
+
+
+                <ImageView
+                    android:id="@+id/orderStepIndicatorImageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="20dp"
+                    app:srcCompat="@drawable/step_indicator_1" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/orderStatusTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:text="@{viewModel.orderStatus}"
+                    android:textSize="30sp" />
+
+            </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="20dp"
-                android:background="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/orderStatusTextView">
+                app:layout_constraintTop_toBottomOf="@+id/orderBackdropLayout">
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/orderTitleTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -64,7 +71,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/orderCreatedTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -73,7 +80,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/orderTitleTextView" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/orderClosedTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -94,7 +101,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/orderClosedTextView" />
 
-                <TextView
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/orderTotalPriceTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -141,21 +148,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@drawable/error" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/orderErrorTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/loading_error"
-                android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                style="@style/OutlinedButton"
                 android:id="@+id/orderRetryButton"
-                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/retry"

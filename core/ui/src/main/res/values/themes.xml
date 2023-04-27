@@ -28,6 +28,14 @@
         <item name="materialCardViewStyle">@style/AppCardView</item>
     </style>
 
-    <style name="AppBarLayoutThemeOverlay" parent="ThemeOverlay.MaterialComponents.Dark"/>
+    <style name="AppBarLayoutThemeOverlay" parent="ThemeOverlay.MaterialComponents.Dark">
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnBackground">@color/black</item>
+    </style>
+
+    <style name="BackdropThemeOverlay" parent="">
+        <item name="android:background">@color/yellow_100</item>
+        <item name="colorOnBackground">@color/black</item>
+    </style>
 
 </resources>

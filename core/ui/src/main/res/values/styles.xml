@@ -19,6 +19,11 @@
         <item name="android:textColor">?attr/colorError</item>
     </style>
 
+    <style name="CartItemTextView" parent="AppTextView">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="InvertedPrimaryTextView" parent="AppTextView">
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:background">?attr/colorPrimary</item>

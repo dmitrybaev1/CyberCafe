@@ -46,6 +46,7 @@ class OrderViewModel @Inject constructor(
 
     fun getOrder(orderId: Int, isRefreshRequest: Boolean = false){
         viewModelScope.launch {
+            _orderState.value = OrderUIState.Loading
             when(val result = orderRepository.getOrder(orderId)){
                 is Result.Success<OrderResponse> -> {
                     val order = mapOrderResponseToOrder(result.data)
