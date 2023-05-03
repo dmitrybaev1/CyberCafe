@@ -18,12 +18,15 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.dpToPx
 import ru.shawarma.settings.adapters.InfoAdapter
 import ru.shawarma.settings.databinding.FragmentInfoBinding
 import ru.shawarma.settings.viewmodels.InfoUIState
 import ru.shawarma.settings.viewmodels.InfoViewModel
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class InfoFragment : Fragment() {
@@ -53,6 +56,8 @@ class InfoFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding?.infoRecyclerView?.addItemDecoration(AdaptiveSpacingItemDecoration(
+                dpToPx(10f,requireContext()).roundToInt(),true))
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.infoState.filterNotNull().stateIn(this).collect{ state ->

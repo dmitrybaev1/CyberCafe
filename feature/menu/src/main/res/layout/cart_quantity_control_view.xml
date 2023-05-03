@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/minusButton"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
@@ -11,7 +11,7 @@
         android:text="—"
         android:textSize="20sp" />
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/countTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         android:text="1"
         android:textSize="20sp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/plusButton"
         android:layout_width="50dp"
         android:layout_height="wrap_content"

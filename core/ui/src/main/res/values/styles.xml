@@ -24,6 +24,11 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="MenuItemTitleTextView" parent="AppTextView">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="InvertedPrimaryTextView" parent="AppTextView">
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:background">?attr/colorPrimary</item>

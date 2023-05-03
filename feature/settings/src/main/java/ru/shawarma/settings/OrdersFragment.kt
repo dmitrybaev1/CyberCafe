@@ -18,12 +18,15 @@ import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.dpToPx
 import ru.shawarma.settings.adapters.OrdersAdapter
 import ru.shawarma.settings.databinding.FragmentOrdersBinding
 import ru.shawarma.settings.viewmodels.OrdersUIState
 import ru.shawarma.settings.viewmodels.OrdersViewModel
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class OrdersFragment : Fragment() {
@@ -104,15 +107,10 @@ class OrdersFragment : Fragment() {
     private fun setupOrdersRecyclerView(){
         ordersAdapter = OrdersAdapter(viewModel)
         binding!!.ordersRecyclerView.apply {
-            ordersAdapter?.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver(){
-                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-                    if(positionStart!=10)
-                        this@apply.scrollToPosition(positionStart)
-                }
-            })
             adapter = ordersAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(AdaptiveSpacingItemDecoration(
+                dpToPx(5f,requireContext()).roundToInt(),true))
             addOnScrollListener(object: OnScrollListener(){
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
