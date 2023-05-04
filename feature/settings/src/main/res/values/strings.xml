@@ -13,4 +13,5 @@
     <string name="info_error">Fetching data error</string>
     <string name="retry">Retry</string>
     <string name="loading_error">Loading error, try again</string>
+    <string name="empty_orders">No orders</string>
 </resources>

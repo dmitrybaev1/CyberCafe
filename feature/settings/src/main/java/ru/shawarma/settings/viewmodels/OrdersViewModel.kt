@@ -44,6 +44,11 @@ class OrdersViewModel @Inject constructor(
 
     private val ordersList = arrayListOf<OrderElement>(OrderElement.Loading)
 
+    private val _ordersListLiveData = MutableLiveData(
+        listOf<OrderElement>(OrderElement.Loading))
+
+    val ordersListLiveData: LiveData<List<OrderElement>> = _ordersListLiveData
+
     init {
         getOrders()
         startOrdersStatusObserving()
@@ -141,6 +146,7 @@ class OrdersViewModel @Inject constructor(
     private fun copyAndSetOrdersList(isSuccess: Boolean, isFullyLoaded: Boolean = false){
         val newList = arrayListOf<OrderElement>()
         newList.addAll(ordersList)
+        _ordersListLiveData.value = newList
         if(isSuccess)
             _ordersState.value = OrdersUIState.Success(newList,isFullyLoaded)
         else

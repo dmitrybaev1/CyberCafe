@@ -13,4 +13,5 @@
     <string name="info_error">Ошибка получения данных</string>
     <string name="retry">Повторить</string>
     <string name="loading_error">Ошибка загрузки, попробуйте еще раз</string>
+    <string name="empty_orders">Нет заказов</string>
 </resources>
