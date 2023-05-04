@@ -45,25 +45,21 @@ class MainOrderRemoteDataSource @Inject constructor(
 
     override suspend fun startOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit) {
         withContext(dispatcher) {
-            val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
-            hubConnection = HubConnectionBuilder
-                .create("http://10.0.2.2:5029/notifications/client/orders")
-                .withHubProtocol(GsonHubProtocol(gson))
-                .withAccessTokenProvider(Single.defer {
-                    runBlocking {
-                        Single.just(token.substringAfter("Bearer "))
-                    }
-                }).build()
-            hubConnection?.on("Notify", { message ->
-                callback.invoke(message)
-            }, OrderResponse::class.java)
-            hubConnection?.start()?.blockingAwait()
-        }
-    }
-
-    override suspend fun refreshOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit) {
-        if(!isConnectedToHub()){
-            startOrdersStatusHub(token, callback)
+            if (!isConnectedToHub()) {
+                val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
+                hubConnection = HubConnectionBuilder
+                    .create("http://10.0.2.2:5029/notifications/client/orders")
+                    .withHubProtocol(GsonHubProtocol(gson))
+                    .withAccessTokenProvider(Single.defer {
+                        runBlocking {
+                            Single.just(token.substringAfter("Bearer "))
+                        }
+                    }).build()
+                hubConnection?.on("Notify", { message ->
+                    callback.invoke(message)
+                }, OrderResponse::class.java)
+                hubConnection?.start()?.blockingAwait()
+            }
         }
     }
 

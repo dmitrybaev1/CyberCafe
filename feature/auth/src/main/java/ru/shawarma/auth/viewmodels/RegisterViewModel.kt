@@ -53,17 +53,26 @@ class RegisterViewModel @Inject constructor(
             val result = authRepository.register(userRegisterRequest)
             _isLoading.value = false
             when(result){
-                is Result.Success<RegisteredUser> -> { _registerState.value = RegisterUIState.Success; _isError.value = false }
+                is Result.Success -> {
+                    _registerState.value = RegisterUIState.Success
+                    _isError.value = false
+                }
                 is Result.Failure -> {
                     _registerState.value = RegisterUIState.Error(result.message)
-                    _isError.value = result.message != Errors.NO_INTERNET_ERROR
+                    val isNotInternetError = result.message != Errors.NO_INTERNET_ERROR
+                    _isError.value = isNotInternetError
+                    if(!isNotInternetError)
+                        resetState()
                 }
-                is Result.NetworkFailure -> { _registerState.value = RegisterUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
+                is Result.NetworkFailure -> {
+                    _registerState.value = RegisterUIState.Error(Errors.NETWORK_ERROR)
+                    _isError.value = true
+                }
             }
         }
     }
 
-    fun resetState(){
+    private fun resetState(){
         _registerState.value = null
     }
 

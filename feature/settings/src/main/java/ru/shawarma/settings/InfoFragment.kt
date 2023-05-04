@@ -35,14 +35,6 @@ class InfoFragment : Fragment() {
 
     private var binding: FragmentInfoBinding? = null
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -87,7 +79,6 @@ class InfoFragment : Fragment() {
         viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
             if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-                viewModel.resetNoInternetState()
             }
         }
     }

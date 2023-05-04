@@ -43,9 +43,11 @@ class OrdersFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.navCommand.observe(this){ command ->
-            if(command is NavigationCommand.ToOrderModule)
-                (requireActivity() as AppNavigation).navigateToOrder(command.orderId)
+        viewModel.navCommand.observe(this){
+            it?.let { command ->
+                if(command is NavigationCommand.ToOrderModule)
+                    (requireActivity() as AppNavigation).navigateToOrder(command.orderId)
+            }
         }
     }
 
@@ -62,6 +64,9 @@ class OrdersFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        savedInstanceState?.let {
+            isRequestInProgress = it.getBoolean(IS_REQUEST_IN_PROGRESS_KEY)
+        }
         binding!!.ordersSwipeRefreshLayout.apply {
             setColorSchemeColors(MaterialColors.getColor(requireContext(),
                 com.google.android.material.R.attr.colorPrimary, Color.BLACK))
@@ -96,7 +101,6 @@ class OrdersFragment : Fragment() {
             if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
                 binding!!.ordersSwipeRefreshLayout.isRefreshing = false
-                viewModel.resetNoInternetState()
             }
         }
         binding!!.ordersSwipeRefreshLayout.setOnRefreshListener {
@@ -125,9 +129,18 @@ class OrdersFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(IS_REQUEST_IN_PROGRESS_KEY,isRequestInProgress)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
         ordersAdapter = null
+    }
+
+    companion object{
+        const val IS_REQUEST_IN_PROGRESS_KEY = "IsRequestInProgress"
     }
 }

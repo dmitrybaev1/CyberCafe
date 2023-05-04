@@ -38,9 +38,9 @@ class OrdersViewModel @Inject constructor(
 
     val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
 
-    private val _navCommand = MutableLiveData<NavigationCommand>()
+    private val _navCommand = MutableLiveData<NavigationCommand?>()
 
-    val navCommand: LiveData<NavigationCommand> = _navCommand
+    val navCommand: LiveData<NavigationCommand?> = _navCommand
 
     private val ordersList = arrayListOf<OrderElement>(OrderElement.Loading)
 
@@ -70,6 +70,8 @@ class OrdersViewModel @Inject constructor(
                         _ordersState.value = OrdersUIState.TokenInvalidError
                     else {
                         _isDisconnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
+                        if(isDisconnectedToInternet.value == true)
+                            resetNoInternetState()
                         if(ordersList.lastOrNull() !is OrderElement.Error)
                             ordersList.add(OrderElement.Error)
                         copyAndSetOrdersList(false)
@@ -88,24 +90,17 @@ class OrdersViewModel @Inject constructor(
         ordersList.clear()
         ordersOffset = - STANDARD_REQUEST_OFFSET
         getOrders()
-        refreshOrdersStatusObserving()
     }
 
-    fun resetNoInternetState(){
+    private fun resetNoInternetState(){
         _isDisconnectedToInternet.value = false
     }
-
+    private fun resetNavCommand(){
+        _navCommand.value = null
+    }
     private fun startOrdersStatusObserving(){
         viewModelScope.launch {
             orderRepository.startOrdersStatusHub{orderResponse ->
-                updateState(orderResponse)
-            }
-        }
-    }
-
-    private fun refreshOrdersStatusObserving(){
-        viewModelScope.launch {
-            orderRepository.refreshOrdersStatusHub{orderResponse ->
                 updateState(orderResponse)
             }
         }
@@ -127,6 +122,7 @@ class OrdersViewModel @Inject constructor(
 
     override fun goToOrder(id: Int) {
         _navCommand.value = NavigationCommand.ToOrderModule(id)
+        resetNavCommand()
     }
 
     override fun reloadOrders() {

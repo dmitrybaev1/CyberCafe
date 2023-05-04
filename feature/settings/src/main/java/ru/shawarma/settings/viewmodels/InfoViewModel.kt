@@ -36,6 +36,7 @@ class InfoViewModel @Inject constructor(
     init {
         getInfo()
     }
+
     fun getInfo(){
         viewModelScope.launch {
             _infoState.value = null
@@ -49,8 +50,10 @@ class InfoViewModel @Inject constructor(
                    if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                        _infoState.value = InfoUIState.TokenInvalidError
                    else {
-                       if(result.message == Errors.NO_INTERNET_ERROR)
+                       if(result.message == Errors.NO_INTERNET_ERROR) {
                            _isDisconnectedToInternet.value = true
+                           resetNoInternetState()
+                       }
                        _infoState.value = InfoUIState.Error(result.message)
                    }
                }

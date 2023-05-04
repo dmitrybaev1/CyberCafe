@@ -60,18 +60,6 @@ class MainOrderRepository @Inject constructor(
         }
     }
 
-    override suspend fun refreshOrdersStatusHub(callback: (OrderResponse) -> Unit) {
-        if(internetManager.isOnline()){
-            val result = authRepository.getActualAuthData()
-            if (result is Result.Success<AuthData>) {
-                orderRemoteDataSource.refreshOrdersStatusHub(
-                    "Bearer ${result.data.accessToken}",
-                    callback
-                )
-            }
-        }
-    }
-
     override fun stopOrdersStatusHub() =
         orderRemoteDataSource.stopOrdersStatusHub()
 

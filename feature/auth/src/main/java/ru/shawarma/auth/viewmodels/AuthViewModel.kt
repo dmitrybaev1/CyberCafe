@@ -23,8 +23,8 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _navCommand = MutableLiveData<NavigationCommand>()
-    val navCommand: LiveData<NavigationCommand> = _navCommand
+    private val _navCommand = MutableLiveData<NavigationCommand?>()
+    val navCommand: LiveData<NavigationCommand?> = _navCommand
 
     private val _authState = MutableStateFlow<AuthUIState?>(null)
     val authState = _authState.asStateFlow()
@@ -40,6 +40,11 @@ class AuthViewModel @Inject constructor(
 
     fun goToRegister(){
         _navCommand.value = NavigationCommand.ToRegisterFragment
+        resetNavCommand()
+    }
+
+    private fun resetNavCommand(){
+        _navCommand.value = null
     }
 
     fun auth(){
@@ -57,13 +62,16 @@ class AuthViewModel @Inject constructor(
         val userLoginRequest = UserLoginRequest(email.value!!,password.value!!)
         viewModelScope.launch {
             when(val result = authRepository.login(userLoginRequest)){
-                is Result.Success<AuthData> -> {
+                is Result.Success -> {
                     _authState.value = AuthUIState.Success
                     _isError.value = false
                 }
                 is Result.Failure -> {
                     _authState.value = AuthUIState.Error(result.message)
-                    _isError.value = result.message != Errors.NO_INTERNET_ERROR
+                    val isNotInternetError = result.message != Errors.NO_INTERNET_ERROR
+                    _isError.value = isNotInternetError
+                    if(!isNotInternetError)
+                        resetState()
                 }
                 is Result.NetworkFailure -> { _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }
@@ -71,7 +79,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun resetState(){
+    private fun resetState(){
         _authState.value = null
     }
 

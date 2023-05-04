@@ -14,8 +14,6 @@ interface OrderRemoteDataSource {
 
     suspend fun startOrdersStatusHub(token: String ,callback: (OrderResponse) -> (Unit))
 
-    suspend fun refreshOrdersStatusHub(token: String, callback: (OrderResponse) -> Unit)
-
     fun stopOrdersStatusHub()
 
 }

@@ -1,5 +1,6 @@
 package ru.shawarma.order.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,7 +22,7 @@ class OrderViewModel @Inject constructor(
     private val orderRepository: OrderRepository
 ) : ViewModel() {
 
-    private val _orderState = MutableStateFlow<OrderUIState>(OrderUIState.Loading)
+    private val _orderState = MutableStateFlow<OrderUIState?>(null)
 
     val orderState = _orderState.asStateFlow()
 
@@ -44,9 +45,17 @@ class OrderViewModel @Inject constructor(
     private val _orderStatus = MutableLiveData<String>()
     val orderStatus: LiveData<String> = _orderStatus
 
-    fun getOrder(orderId: Int, isRefreshRequest: Boolean = false){
+    var id: Int = -1 //avoiding duplicate requests when config changes
+        set(value) {
+            if(field != value) {
+                field = value
+                getOrder(field)
+            }
+        }
+
+    fun getOrder(orderId: Int){
         viewModelScope.launch {
-            _orderState.value = OrderUIState.Loading
+            _orderState.value = null
             when(val result = orderRepository.getOrder(orderId)){
                 is Result.Success<OrderResponse> -> {
                     val order = mapOrderResponseToOrder(result.data)
@@ -54,41 +63,32 @@ class OrderViewModel @Inject constructor(
                     _totalPrice.value = order.totalPrice
                     _createdDate.value = order.createdDate.toString()
                     _closedDate.value = order.closeDate.toString()
-                    _orderState.value = OrderUIState.Success(order,isRefreshRequest)
+                    _orderState.value = OrderUIState.Success(order)
                 }
                 is Result.Failure -> {
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _orderState.value = OrderUIState.TokenInvalidError
                     else {
-                        if(result.message == Errors.NO_INTERNET_ERROR)
+                        if(result.message == Errors.NO_INTERNET_ERROR) {
                             _isDisconnectedToInternet.value = true
-                        if(!isRefreshRequest)
-                            _orderState.value = OrderUIState.Error(result.message)
+                            resetNoInternetState()
+                        }
+                        _orderState.value = OrderUIState.Error(result.message)
                     }
                 }
-                is Result.NetworkFailure -> {
-                    if(!isRefreshRequest)
-                        _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
-                }
+                is Result.NetworkFailure ->
+                    _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
             }
         }
     }
 
-    fun resetNoInternetState(){
+    private fun resetNoInternetState(){
         _isDisconnectedToInternet.value = false
     }
 
     fun startOrderStatusObserving(orderId: Int){
         viewModelScope.launch {
             orderRepository.startOrdersStatusHub{orderResponse ->
-                updateState(orderId,orderResponse)
-            }
-        }
-    }
-
-    fun refreshOrderStatusObserving(orderId: Int){
-        viewModelScope.launch {
-            orderRepository.refreshOrdersStatusHub{orderResponse ->
                 updateState(orderId,orderResponse)
             }
         }
@@ -114,8 +114,7 @@ class OrderViewModel @Inject constructor(
     }
 }
 sealed interface OrderUIState{
-    object Loading: OrderUIState
-    data class Success(val order: Order,val isRefreshRequest: Boolean = false): OrderUIState
+    data class Success(val order: Order): OrderUIState
     data class Error(val message: String): OrderUIState
     object TokenInvalidError: OrderUIState
 }

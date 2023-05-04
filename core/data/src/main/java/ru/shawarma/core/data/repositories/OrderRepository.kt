@@ -14,8 +14,6 @@ interface OrderRepository {
 
     suspend fun startOrdersStatusHub(callback: (OrderResponse) -> (Unit))
 
-    suspend fun refreshOrdersStatusHub(callback: (OrderResponse) -> Unit)
-
     fun stopOrdersStatusHub()
 
 }

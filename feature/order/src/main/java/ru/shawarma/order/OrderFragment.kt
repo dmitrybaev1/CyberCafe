@@ -13,6 +13,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.core.data.utils.Errors
@@ -35,8 +37,6 @@ class OrderFragment : Fragment() {
 
     private var id: Int? = null
 
-    private var isHubStarted = false
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -44,7 +44,9 @@ class OrderFragment : Fragment() {
     ): View? {
         inflateMenu()
         id = arguments?.getInt("orderId")
-        viewModel.getOrder(id!!)
+        id?.let {id ->
+            viewModel.id = id
+        }
         val binding = FragmentOrderBinding.inflate(inflater,container,false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
@@ -55,9 +57,8 @@ class OrderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
-                viewModel.orderState.collect{state ->
+                viewModel.orderState.filterNotNull().stateIn(this).collect{state ->
                     when(state){
-                        is OrderUIState.Loading -> {}
                         is OrderUIState.Success -> {
                             val binding = binding!!
                             binding.orderMenuItemsRecyclerView.apply {
@@ -100,22 +101,18 @@ class OrderFragment : Fragment() {
                                     binding.orderClosedTextView.text = viewModel.closedDate.value
                                 }
                             }
-                            if(status != OrderStatus.CANCELED && status != OrderStatus.CLOSED){
-                                if(!state.isRefreshRequest) {
-                                    if (!isHubStarted) {
-                                        isHubStarted = true
-                                        viewModel.startOrderStatusObserving(id!!)
-                                    }
+                            if(status != OrderStatus.CANCELED && status != OrderStatus.CLOSED)
+                                id?.let {id ->
+                                    viewModel.startOrderStatusObserving(id)
                                 }
-                                else
-                                    viewModel.refreshOrderStatusObserving(id!!)
-                            }
                             else
                                 viewModel.stopOrdersStatusObserving()
                         }
                         is OrderUIState.Error -> {
                             binding!!.orderRetryButton.setOnClickListener {
-                                viewModel.getOrder(id!!)
+                                id?.let {id ->
+                                    viewModel.getOrder(id)
+                                }
                             }
                         }
                         is OrderUIState.TokenInvalidError -> {
@@ -129,7 +126,6 @@ class OrderFragment : Fragment() {
         viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
             if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-                viewModel.resetNoInternetState()
             }
         }
     }
@@ -138,7 +134,9 @@ class OrderFragment : Fragment() {
         (requireActivity() as CommonComponentsController).inflateToolbarMenu(R.menu.order_menu) {
             when(it.itemId){
                 R.id.action_refresh -> {
-                    viewModel.getOrder(id!!,isRefreshRequest = true)
+                    id?.let {id ->
+                        viewModel.getOrder(id)
+                    }
                 }
             }
             true
@@ -149,4 +147,5 @@ class OrderFragment : Fragment() {
         super.onDestroyView()
         binding = null
     }
+
 }

@@ -31,7 +31,6 @@ class AuthFragment : Fragment() {
 
     private var binding: FragmentAuthBinding? = null
 
-
     private val viewModel: AuthViewModel by viewModels()
 
     /*Here we should implement observers like triggers or commands in fragment lifecycle (not view
@@ -40,8 +39,10 @@ class AuthFragment : Fragment() {
     in STARTED state again*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.navCommand.observe(this){
-            findNavController().navigate(R.id.actionAuthToRegister)
+        viewModel.navCommand.observe(this){ command ->
+            command?.let {
+                findNavController().navigate(R.id.actionAuthToRegister)
+            }
         }
     }
 
@@ -88,7 +89,6 @@ class AuthFragment : Fragment() {
                 when(val message = state.message){
                     Errors.NO_INTERNET_ERROR -> {
                         (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-                        viewModel.resetState()
                     }
                     Errors.EMPTY_INPUT_ERROR -> {
                         authErrorTextView.text = resources.getString(R.string.empty_input_error)
@@ -105,6 +105,7 @@ class AuthFragment : Fragment() {
                     }
                     Errors.NETWORK_ERROR -> authErrorTextView.text = resources.getString(R.string.unknown_error)
                     Errors.REFRESH_TOKEN_ERROR -> authErrorTextView.text = resources.getString(R.string.refresh_token_error)
+
                     else -> authErrorTextView.text = message
 
                 }

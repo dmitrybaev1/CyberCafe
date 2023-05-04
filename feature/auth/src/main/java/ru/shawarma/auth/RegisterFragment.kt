@@ -73,7 +73,6 @@ class RegisterFragment : Fragment() {
                 when(val message = state.message){
                     Errors.NO_INTERNET_ERROR -> {
                         (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-                        viewModel.resetState()
                     }
                     Errors.EMPTY_INPUT_ERROR -> {
                         registerErrorTextView.text = resources.getString(R.string.empty_input_error)

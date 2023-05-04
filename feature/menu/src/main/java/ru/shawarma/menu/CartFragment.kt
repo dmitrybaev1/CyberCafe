@@ -74,7 +74,6 @@ class CartFragment : Fragment() {
                         is OrderUIState.Success -> {
                             val paymentType = binding.cartPaymentDropdown.text.toString()
                             if(paymentType != options[2]) {
-                                viewModel.resetOrderState()
                                 startOrderNotifications(state.orderId)
                                 findNavController().popBackStack(R.id.menuFragment, false)
                                 (requireActivity() as AppNavigation).navigateToOrder(state.orderId)
@@ -88,7 +87,6 @@ class CartFragment : Fragment() {
                                 Snackbar.make(
                                     view,getString(R.string.create_order_error),Snackbar.LENGTH_LONG)
                                     .show()
-                            viewModel.resetOrderState()
                         }
                         is OrderUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.menuFragment,true)
@@ -101,7 +99,6 @@ class CartFragment : Fragment() {
         viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
             if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-                viewModel.resetNoInternetState()
             }
         }
     }

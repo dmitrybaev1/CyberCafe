@@ -51,9 +51,9 @@ class MenuViewModel @Inject constructor(
 
     val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
 
-    private val _navCommand = MutableLiveData<NavigationCommand>()
+    private val _navCommand = MutableLiveData<NavigationCommand?>()
 
-    val navCommand: LiveData<NavigationCommand> = _navCommand
+    val navCommand: LiveData<NavigationCommand?> = _navCommand
 
     private val _orderWithDetailsText = MutableLiveData<CharSequence>()
 
@@ -83,6 +83,10 @@ class MenuViewModel @Inject constructor(
 
     val isOrderCreating: LiveData<Boolean> = _isOrderCreating
 
+    init {
+        getMenu()
+    }
+
     fun getMenu(loadNext: Boolean = true){
         viewModelScope.launch {
             if(loadNext)
@@ -111,6 +115,8 @@ class MenuViewModel @Inject constructor(
                         _menuState.value = MenuUIState.TokenInvalidError
                     else {
                         _isDisconnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
+                        if(isDisconnectedToInternet.value == true)
+                            resetNoInternetState()
                         if(menuList.lastOrNull() !is MenuElement.Error)
                             menuList.add(MenuElement.Error)
                         copyAndSetMenuList(false)
@@ -125,7 +131,11 @@ class MenuViewModel @Inject constructor(
         }
     }
 
-    fun resetNoInternetState(){
+    private fun resetNavCommand(){
+        _navCommand.value = null
+    }
+
+    private fun resetNoInternetState(){
         _isDisconnectedToInternet.value = false
     }
 
@@ -180,6 +190,7 @@ class MenuViewModel @Inject constructor(
 
     fun goToCart(){
         _navCommand.value = NavigationCommand.ToCartFragment
+        resetNavCommand()
     }
 
     fun makeOrder(){
@@ -197,24 +208,31 @@ class MenuViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _orderState.value = OrderUIState.TokenInvalidError
                     else {
-                        if(result.message == Errors.NO_INTERNET_ERROR)
+                        if(result.message == Errors.NO_INTERNET_ERROR) {
                             _isDisconnectedToInternet.value = true
+                            resetNoInternetState()
+                        }
                         _orderState.value = OrderUIState.Error(result.message)
+                        resetOrderState()
                     }
                 }
-                is Result.NetworkFailure -> _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
+                is Result.NetworkFailure -> {
+                    _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
+                    resetOrderState()
+                }
             }
             _isOrderCreating.value = false
         }
     }
 
-    fun resetOrderState(){
+    private fun resetOrderState(){
         _orderState.value = null
     }
 
     override fun goToMenuItemFragment(menuItem: MenuElement.MenuItem, count: Int){
         _chosenMenuItem.value = menuItem
         _navCommand.value = NavigationCommand.ToMenuItemFragment
+        resetNavCommand()
     }
 
     private fun getTotalPrice(): Int {

@@ -49,10 +49,12 @@ class MenuFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.navCommand.observe(this){navCommand ->
-            when(navCommand){
-                NavigationCommand.ToCartFragment -> findNavController().navigate(R.id.actionMenuToCart)
-                NavigationCommand.ToMenuItemFragment -> findNavController().navigate(R.id.actionMenuToMenuItem)
+        viewModel.navCommand.observe(this){
+            it?.let { navCommand ->
+                when(navCommand){
+                    NavigationCommand.ToCartFragment -> findNavController().navigate(R.id.actionMenuToCart)
+                    NavigationCommand.ToMenuItemFragment -> findNavController().navigate(R.id.actionMenuToMenuItem)
+                }
             }
         }
         viewModel.getPlaceholderString.observeForever{map ->
@@ -69,7 +71,6 @@ class MenuFragment : Fragment() {
                 viewModel.setFormattedString(PlaceholderStringType.TOTAL_PRICE,text)
             }
         }
-        viewModel.getMenu()
     }
 
     override fun onCreateView(
@@ -87,6 +88,9 @@ class MenuFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        savedInstanceState?.let {
+            isRequestInProgress = it.getBoolean(IS_REQUEST_IN_PROGRESS_KEY)
+        }
         setupMenuRecyclerView()
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
@@ -94,8 +98,7 @@ class MenuFragment : Fragment() {
                     when(state){
                         is MenuUIState.Success -> {
                             menuAdapter?.submitList(state.items)
-                            if(state.isFullyLoaded)
-                                isFullyLoaded = true
+                            isFullyLoaded = state.isFullyLoaded
                         }
                         is MenuUIState.Error -> {
                             val items = state.items
@@ -114,7 +117,6 @@ class MenuFragment : Fragment() {
         viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
             if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-                viewModel.resetNoInternetState()
             }
         }
     }
@@ -164,10 +166,17 @@ class MenuFragment : Fragment() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(IS_REQUEST_IN_PROGRESS_KEY,isRequestInProgress)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
         menuAdapter = null
     }
-
+    companion object{
+        const val IS_REQUEST_IN_PROGRESS_KEY = "IsRequestInProgress"
+    }
 }
