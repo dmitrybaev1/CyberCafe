@@ -7,22 +7,32 @@
             type="ru.shawarma.settings.entities.InfoItem" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/infoItemTextView"
-            android:layout_width="0dp"
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/SubtitleTextView"
+            android:id="@+id/infoNameTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:text='@{infoItem.name + ": " + infoItem.value}'
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="@{infoItem.name}"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/infoValueTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="@{infoItem.value}"/>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:id="@+id/infoDivider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:dividerInsetStart="10dp"
+            app:dividerInsetEnd="10dp" />
+
+    </LinearLayout>
 </layout>

@@ -1,5 +1,6 @@
 package ru.shawarma.settings
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,15 +14,19 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.dpToPx
 import ru.shawarma.settings.adapters.OrdersAdapter
 import ru.shawarma.settings.databinding.FragmentOrdersBinding
 import ru.shawarma.settings.viewmodels.OrdersUIState
 import ru.shawarma.settings.viewmodels.OrdersViewModel
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class OrdersFragment : Fragment() {
@@ -57,6 +62,12 @@ class OrdersFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding!!.ordersSwipeRefreshLayout.apply {
+            setColorSchemeColors(MaterialColors.getColor(requireContext(),
+                com.google.android.material.R.attr.colorPrimary, Color.BLACK))
+            setProgressBackgroundColorSchemeColor(MaterialColors.getColor(requireContext(),
+               android.R.attr.colorBackground, Color.WHITE))
+        }
         setupOrdersRecyclerView()
         viewLifecycleOwner.lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.RESUMED){
@@ -98,6 +109,8 @@ class OrdersFragment : Fragment() {
         binding!!.ordersRecyclerView.apply {
             adapter = ordersAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(AdaptiveSpacingItemDecoration(
+                dpToPx(5f,requireContext()).roundToInt(),true))
             addOnScrollListener(object: OnScrollListener(){
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)

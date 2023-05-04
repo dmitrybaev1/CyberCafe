@@ -10,11 +10,10 @@
         <import type="android.view.View" />
     </data>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/menuItemCardView"
-        android:layout_width="190dp"
+        android:layout_width="match_parent"
         android:layout_height="320dp"
-        android:layout_margin="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -35,8 +34,9 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@tools:sample/avatars" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/menuItemTitleTextView"
+                style="@style/MenuItemTitleTextView"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="10dp"
@@ -44,15 +44,12 @@
                 android:layout_marginBottom="5dp"
                 android:gravity="start"
                 android:text="@{menuItem.name}"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/menuAddToCartButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/menuItemImageView" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/menuAddToCartButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -75,6 +72,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </layout>

@@ -7,16 +7,15 @@
             type="ru.shawarma.settings.entities.OrderElement.OrderItem" />
     </data>
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp">
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/orderItemTitleTextView"
                 android:layout_width="0dp"
                 android:layout_height="35dp"
@@ -29,7 +28,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/orderItemDateTextView"
                 android:layout_width="0dp"
                 android:layout_height="20dp"
@@ -41,7 +40,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/orderItemTitleTextView" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/orderItemStatusTextView"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
@@ -63,5 +62,5 @@
                 app:layout_constraintTop_toBottomOf="@+id/orderItemStatusTextView"
                 app:srcCompat="@drawable/status_indicator_yellow" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 </layout>

@@ -56,8 +56,7 @@ class RegisterViewModel @Inject constructor(
                 is Result.Success<RegisteredUser> -> { _registerState.value = RegisterUIState.Success; _isError.value = false }
                 is Result.Failure -> {
                     _registerState.value = RegisterUIState.Error(result.message)
-                    if(result.message != Errors.NO_INTERNET_ERROR)
-                        _isError.value = true
+                    _isError.value = result.message != Errors.NO_INTERNET_ERROR
                 }
                 is Result.NetworkFailure -> { _registerState.value = RegisterUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }

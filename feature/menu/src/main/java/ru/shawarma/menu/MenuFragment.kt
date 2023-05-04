@@ -18,10 +18,13 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.dpToPx
 import ru.shawarma.menu.adapters.MenuAdapter
 import ru.shawarma.menu.databinding.FragmentMenuBinding
 import ru.shawarma.menu.utlis.MENU_FULL_SPAN_SIZE
@@ -29,6 +32,7 @@ import ru.shawarma.menu.utlis.MENU_ITEM_SPAN_SIZE
 import ru.shawarma.menu.utlis.PlaceholderStringType
 import ru.shawarma.menu.viewmodels.MenuUIState
 import ru.shawarma.menu.viewmodels.MenuViewModel
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class MenuFragment : Fragment() {
@@ -117,7 +121,7 @@ class MenuFragment : Fragment() {
 
     private fun setupMenuRecyclerView(){
         menuAdapter = MenuAdapter(viewModel)
-        val gridLayoutManager = GridLayoutManager(requireActivity(),2)
+        val gridLayoutManager = GridLayoutManager(requireContext(),2)
         gridLayoutManager.spanSizeLookup = object: SpanSizeLookup(){
             override fun getSpanSize(position: Int): Int =
                 if(menuAdapter?.getItemViewType(position) == R.layout.menu_item) MENU_ITEM_SPAN_SIZE
@@ -126,6 +130,8 @@ class MenuFragment : Fragment() {
         binding!!.menuRecyclerView.apply {
             adapter = menuAdapter
             layoutManager = gridLayoutManager
+            addItemDecoration(AdaptiveSpacingItemDecoration(
+                dpToPx(5f,requireContext()).roundToInt(),true))
             addOnScrollListener(object: OnScrollListener(){
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)

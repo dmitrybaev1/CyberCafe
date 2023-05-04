@@ -15,50 +15,62 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TitleTextView"
             android:id="@+id/authLogInTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/log_in"
-            android:textSize="32sp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@id/authTextInputLayoutEmail"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/authEditTextEmail" />
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <EditText
-            android:id="@+id/authEditTextEmail"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="250dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/authTextInputLayoutEmail"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:ems="10"
             android:hint="@string/email_hint"
-            android:text="@={viewModel.email}"
-            android:inputType="textEmailAddress"
-            android:minHeight="48dp"
+            app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/authEditTextPassword" />
+            app:layout_constraintBottom_toTopOf="@id/authTextInputLayoutPassword">
 
-        <EditText
-            android:id="@+id/authEditTextPassword"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="250dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/authEditTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={viewModel.email}"
+                android:inputType="textEmailAddress"
+                android:minHeight="48dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/authTextInputLayoutPassword"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:ems="10"
             android:hint="@string/password_hint"
-            android:inputType="textPassword"
-            android:maxLength="32"
-            android:minHeight="48dp"
-            android:text="@={viewModel.password}"
+            app:endIconMode="password_toggle"
+            app:errorEnabled="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/authEditTextPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:minHeight="48dp"
+                android:text="@={viewModel.password}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/ErrorTextView"
             android:id="@+id/authErrorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -66,11 +78,11 @@
             android:visibility="@{viewModel.isError() ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/authEditTextPassword" />
+            app:layout_constraintTop_toBottomOf="@+id/authTextInputLayoutPassword" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/authSignInButton"
-            android:layout_width="200dp"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:clickable="@{!viewModel.isLoading()}"
@@ -95,9 +107,10 @@
             app:layout_constraintTop_toTopOf="@+id/authSignInButton"
             app:layout_constraintBottom_toBottomOf="@+id/authSignInButton"/>
 
-        <Button
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/authRegisterButton"
-            style="@android:style/Widget.Material.Button.Borderless"
+            style="@style/OutlinedButton"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/register"

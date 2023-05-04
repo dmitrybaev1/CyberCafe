@@ -16,12 +16,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.core.data.utils.Errors
+import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.dpToPx
 import ru.shawarma.order.adapters.OrderMenuItemAdapter
 import ru.shawarma.order.databinding.FragmentOrderBinding
 import ru.shawarma.order.viewmodels.OrderUIState
 import ru.shawarma.order.viewmodels.OrderViewModel
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class OrderFragment : Fragment() {
@@ -60,6 +63,8 @@ class OrderFragment : Fragment() {
                             binding.orderMenuItemsRecyclerView.apply {
                                 val orderMenuItemAdapter = OrderMenuItemAdapter(state.order.menuItems)
                                 layoutManager = LinearLayoutManager(requireContext())
+                                addItemDecoration(AdaptiveSpacingItemDecoration(
+                                    dpToPx(10f,requireContext()).roundToInt(),true))
                                 adapter = orderMenuItemAdapter
                             }
                             val status = state.order.status

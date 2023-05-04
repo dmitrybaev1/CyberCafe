@@ -63,8 +63,7 @@ class AuthViewModel @Inject constructor(
                 }
                 is Result.Failure -> {
                     _authState.value = AuthUIState.Error(result.message)
-                    if(result.message != Errors.NO_INTERNET_ERROR)
-                        _isError.value = true
+                    _isError.value = result.message != Errors.NO_INTERNET_ERROR
                 }
                 is Result.NetworkFailure -> { _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }

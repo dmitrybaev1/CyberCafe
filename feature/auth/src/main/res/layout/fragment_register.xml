@@ -14,76 +14,92 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/TitleTextView"
             android:id="@+id/registerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/join_us"
-            android:textSize="32sp"
+            android:layout_marginBottom="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/registerEditTextEmail" />
+            app:layout_constraintBottom_toTopOf="@id/registerTextInputLayoutEmail" />
 
-        <EditText
-            android:id="@+id/registerEditTextEmail"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="250dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/registerTextInputLayoutEmail"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:ems="10"
             android:hint="@string/email_hint"
-            android:text="@={viewModel.email}"
-            android:inputType="textEmailAddress"
-            android:minHeight="48dp"
+            app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/registerEditTextName" />
+            app:layout_constraintBottom_toTopOf="@id/registerTextInputLayoutName">
 
-        <EditText
-            android:id="@+id/registerEditTextName"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="250dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/registerEditTextEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={viewModel.email}"
+                android:inputType="textEmailAddress"
+                android:minHeight="48dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/registerTextInputLayoutName"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:ems="10"
             android:hint="@string/name_hint"
-            android:text="@={viewModel.name}"
-            android:minHeight="48dp"
+            app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <EditText
-            android:id="@+id/registerEditTextPassword"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="250dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/registerEditTextName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={viewModel.name}"
+                android:minHeight="48dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/registerTextInputLayoutPassword"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:ems="10"
             android:hint="@string/password_hint"
-            android:text="@={viewModel.password}"
-            android:inputType="textPassword"
-            android:minHeight="48dp"
+            app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/registerEditTextName" />
+            app:layout_constraintTop_toBottomOf="@+id/registerTextInputLayoutName">
 
-        <TextView
+            <EditText
+                android:id="@+id/registerEditTextPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@={viewModel.password}"
+                android:inputType="textPassword"
+                android:minHeight="48dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/ErrorTextView"
             android:id="@+id/registerErrorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:text=""
             android:visibility="@{viewModel.isError() ? View.VISIBLE : View.GONE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/registerEditTextPassword" />
+            app:layout_constraintTop_toBottomOf="@+id/registerTextInputLayoutPassword" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/registerRegisterButton"
-            android:layout_width="200dp"
+            android:layout_width="245dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text='@{viewModel.isLoading() ? "" : @string/register_explicit}'

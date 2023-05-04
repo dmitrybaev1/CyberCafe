@@ -20,13 +20,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.workers.OrderWorker
+import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.dpToPx
 import ru.shawarma.menu.adapters.CartAdapter
 import ru.shawarma.menu.databinding.FragmentCartBinding
 import ru.shawarma.menu.viewmodels.MenuViewModel
 import ru.shawarma.menu.viewmodels.OrderUIState
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class CartFragment : Fragment() {
@@ -55,14 +58,12 @@ class CartFragment : Fragment() {
         cartAdapter = CartAdapter(viewModel)
         binding.cartRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireActivity())
+            addItemDecoration(AdaptiveSpacingItemDecoration(
+                dpToPx(10f,requireContext()).roundToInt(),true))
             adapter = cartAdapter
         }
-        ArrayAdapter.createFromResource(
-            requireContext(),R.array.payment_type_array,android.R.layout.simple_spinner_item)
-            .also { adapter ->
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.cartPaymentSpinner.adapter = adapter
-            }
+        val options = resources.getStringArray(R.array.payment_type_array)
+        binding.cartPaymentDropdown.setText(options[0],false)
         viewModel.cartListLiveData.observe(viewLifecycleOwner){ list ->
             cartAdapter?.submitList(list)
         }
@@ -71,8 +72,7 @@ class CartFragment : Fragment() {
                 viewModel.orderState.filterNotNull().stateIn(this).collect{ state ->
                     when(state){
                         is OrderUIState.Success -> {
-                            val paymentType = binding!!.cartPaymentSpinner.selectedItem.toString()
-                            val options = resources.getStringArray(R.array.payment_type_array)
+                            val paymentType = binding.cartPaymentDropdown.text.toString()
                             if(paymentType != options[2]) {
                                 viewModel.resetOrderState()
                                 startOrderNotifications(state.orderId)

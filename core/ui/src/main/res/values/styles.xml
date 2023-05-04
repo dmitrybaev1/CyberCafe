@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTextView" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">@font/raleway_font_family</item>
+        <item name="android:textColor">?attr/colorOnBackground</item>
+    </style>
+
+    <style name="TitleTextView" parent="AppTextView">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="SubtitleTextView" parent="AppTextView">
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="ErrorTextView" parent="AppTextView">
+        <item name="android:textColor">?attr/colorError</item>
+    </style>
+
+    <style name="CartItemTextView" parent="AppTextView">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="MenuItemTitleTextView" parent="AppTextView">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="InvertedPrimaryTextView" parent="AppTextView">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:background">?attr/colorPrimary</item>
+    </style>
+
+    <style name="InvertedPrimaryTitleTextView" parent="InvertedPrimaryTextView">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="Toolbar" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="titleTextAppearance">@style/ToolbarText</item>
+    </style>
+
+    <style name="ToolbarText" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="EditText" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/edit_text</item>
+        <item name="hintTextColor">@color/edit_text</item>
+    </style>
+
+    <style name="OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <style name="SnackbarTextView" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SnackbarActionButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">
+        <item name="android:textColor">?attr/colorSecondary</item>
+    </style>
+    
+    <style name="CircleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+    
+    <style name="AppCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardElevation">8dp</item>
+    </style>
+
+</resources>
