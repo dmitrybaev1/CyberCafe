@@ -25,6 +25,8 @@
             app:destination="@id/registerFragment" />
         <deepLink
             app:uri="android-app://ru.shawarma.app/authFragment/{error}" />
+        <deepLink
+            app:uri="android-app://ru.shawarma.app/authFragment" />
     </fragment>
 
     <fragment

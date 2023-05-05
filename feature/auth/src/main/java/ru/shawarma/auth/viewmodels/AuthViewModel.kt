@@ -89,11 +89,13 @@ class AuthViewModel @Inject constructor(
     }
 
     fun setRefreshTokenErrorAndClearData(message: String){
-        _isError.value = true
-        viewModelScope.launch {
-            authRepository.clearAuthData()
+        if(message.isNotEmpty()) {
+            _isError.value = true
+            viewModelScope.launch {
+                authRepository.clearAuthData()
+            }
+            _authState.value = AuthUIState.Error(message)
         }
-        _authState.value = AuthUIState.Error(message)
     }
 }
 

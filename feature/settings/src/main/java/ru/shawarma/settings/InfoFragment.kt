@@ -76,6 +76,10 @@ class InfoFragment : Fragment() {
                 }
             }
         }
+        binding?.infoExitButton?.setOnClickListener {
+            findNavController().popBackStack(R.id.profileFragment,true)
+            (requireActivity() as AppNavigation).navigateToAuth()
+        }
         viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
             if(isDisconnected){
                 (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)

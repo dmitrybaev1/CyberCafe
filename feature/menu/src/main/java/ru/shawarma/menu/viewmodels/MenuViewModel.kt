@@ -97,7 +97,7 @@ class MenuViewModel @Inject constructor(
                     val items = mapMenuItemResponseToMenuItem(result.data)
                     menuList.add(MenuElement.Header("Шаверма"))
                     menuList.addAll(items)
-                    if(items.isNotEmpty()) {
+                    if(items.size == STANDARD_REQUEST_OFFSET) {
                         menuList.add(MenuElement.Loading)
                         copyAndSetMenuList(true)
                     }

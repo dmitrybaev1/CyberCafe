@@ -61,9 +61,9 @@ class OrdersViewModel @Inject constructor(
             checkAndRemoveOldErrorAndLoading()
             when(val result = orderRepository.getOrders(ordersOffset,ordersCount)){
                 is Result.Success<List<OrderResponse>> -> {
-                    if(result.data.isNotEmpty()) {
-                        val items = mapOrderResponseToOrderItems(result.data)
-                        ordersList.addAll(items)
+                    val items = mapOrderResponseToOrderItems(result.data)
+                    ordersList.addAll(items)
+                    if(result.data.size == STANDARD_REQUEST_OFFSET) {
                         ordersList.add(OrderElement.Loading)
                         copyAndSetOrdersList(true)
                     }

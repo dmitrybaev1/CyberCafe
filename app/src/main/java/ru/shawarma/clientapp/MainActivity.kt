@@ -40,6 +40,12 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         navController.navigate(ru.shawarma.menu.R.id.menu_nav_graph)
     }
 
+    override fun navigateToAuth() {
+        val request = NavDeepLinkRequest.Builder
+            .fromUri("android-app://ru.shawarma.app/authFragment".toUri())
+            .build()
+        navController.navigate(request)
+    }
     override fun navigateToAuth(errorMessage: String) {
         val request = NavDeepLinkRequest.Builder
             .fromUri("android-app://ru.shawarma.app/authFragment/$errorMessage".toUri())

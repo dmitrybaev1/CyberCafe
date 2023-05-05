@@ -33,10 +33,6 @@ class AuthFragment : Fragment() {
 
     private val viewModel: AuthViewModel by viewModels()
 
-    /*Here we should implement observers like triggers or commands in fragment lifecycle (not view
-    because view will be recreated and reset consumers). Only LiveData works with value caching and
-    doesn't invoke duplicate value observing when we move back here from other fragments and switch
-    in STARTED state again*/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.navCommand.observe(this){ command ->
@@ -57,7 +53,7 @@ class AuthFragment : Fragment() {
         binding.viewModel = viewModel
         this.binding = binding
         arguments?.let{bundle ->
-            viewModel.setRefreshTokenErrorAndClearData(bundle.getString("error") ?: Errors.REFRESH_TOKEN_ERROR)
+            viewModel.setRefreshTokenErrorAndClearData(bundle.getString("error") ?: "")
         }
         return binding.root
     }

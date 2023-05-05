@@ -21,6 +21,7 @@
         <item name="colorOnError">?attr/colorError</item>
 
         <item name="android:textViewStyle">@style/AppTextView</item>
+        <item name="materialButtonStyle">@style/AppButton</item>
         <item name="toolbarStyle">@style/Toolbar</item>
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
         <item name="snackbarTextViewStyle">@style/SnackbarTextView</item>
