@@ -14,6 +14,7 @@ import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.settings.entities.InfoItem
 import javax.inject.Inject
 import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.ui.Event
 import ru.shawarma.settings.utils.mapInfoResponseToInfoItems
 
 @HiltViewModel
@@ -29,9 +30,9 @@ class InfoViewModel @Inject constructor(
 
     val userName: LiveData<String> = _userName
 
-    private val _isDisconnectedToInternet = MutableLiveData<Boolean>()
+    private val _isDisconnectedToInternet = MutableLiveData<Event<Boolean>>()
 
-    val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
+    val isDisconnectedToInternet: LiveData<Event<Boolean>> = _isDisconnectedToInternet
 
     init {
         getInfo()
@@ -50,10 +51,8 @@ class InfoViewModel @Inject constructor(
                    if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                        _infoState.value = InfoUIState.TokenInvalidError
                    else {
-                       if(result.message == Errors.NO_INTERNET_ERROR) {
-                           _isDisconnectedToInternet.value = true
-                           resetNoInternetState()
-                       }
+                       if(result.message == Errors.NO_INTERNET_ERROR)
+                           _isDisconnectedToInternet.value = Event(true)
                        _infoState.value = InfoUIState.Error(result.message)
                    }
                }
@@ -62,9 +61,6 @@ class InfoViewModel @Inject constructor(
         }
     }
 
-    fun resetNoInternetState(){
-        _isDisconnectedToInternet.value = false
-    }
 }
 sealed interface InfoUIState{
     data class Success(val items: List<InfoItem>): InfoUIState

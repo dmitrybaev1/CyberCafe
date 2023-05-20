@@ -16,6 +16,7 @@ import ru.shawarma.core.data.entities.UserLoginRequest
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.ui.Event
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,8 +24,8 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _navCommand = MutableLiveData<NavigationCommand?>()
-    val navCommand: LiveData<NavigationCommand?> = _navCommand
+    private val _navCommand = MutableLiveData<Event<NavigationCommand>>()
+    val navCommand: LiveData<Event<NavigationCommand>> = _navCommand
 
     private val _authState = MutableStateFlow<AuthUIState?>(null)
     val authState = _authState.asStateFlow()
@@ -39,12 +40,7 @@ class AuthViewModel @Inject constructor(
     val password = MutableLiveData("")
 
     fun goToRegister(){
-        _navCommand.value = NavigationCommand.ToRegisterFragment
-        resetNavCommand()
-    }
-
-    private fun resetNavCommand(){
-        _navCommand.value = null
+        _navCommand.value = Event(NavigationCommand.ToRegisterFragment)
     }
 
     fun auth(){
@@ -68,10 +64,8 @@ class AuthViewModel @Inject constructor(
                 }
                 is Result.Failure -> {
                     _authState.value = AuthUIState.Error(result.message)
-                    val isNotInternetError = result.message != Errors.NO_INTERNET_ERROR
-                    _isError.value = isNotInternetError
-                    if(!isNotInternetError)
-                        resetState()
+                    _isError.value = result.message != Errors.NO_INTERNET_ERROR
+
                 }
                 is Result.NetworkFailure -> { _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
             }
@@ -79,7 +73,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    private fun resetState(){
+    fun resetState(){
         _authState.value = null
     }
 

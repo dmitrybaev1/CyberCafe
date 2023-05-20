@@ -13,6 +13,7 @@ import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.ui.Event
 import ru.shawarma.order.entities.Order
 import ru.shawarma.order.mapOrderResponseToOrder
 import javax.inject.Inject
@@ -26,9 +27,9 @@ class OrderViewModel @Inject constructor(
 
     val orderState = _orderState.asStateFlow()
 
-    private val _isDisconnectedToInternet = MutableLiveData<Boolean>()
+    private val _isDisconnectedToInternet = MutableLiveData<Event<Boolean>>()
 
-    val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
+    val isDisconnectedToInternet: LiveData<Event<Boolean>> = _isDisconnectedToInternet
 
     private val _orderId = MutableLiveData<Int>()
     val orderId: LiveData<Int> = _orderId
@@ -69,10 +70,8 @@ class OrderViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _orderState.value = OrderUIState.TokenInvalidError
                     else {
-                        if(result.message == Errors.NO_INTERNET_ERROR) {
-                            _isDisconnectedToInternet.value = true
-                            resetNoInternetState()
-                        }
+                        if(result.message == Errors.NO_INTERNET_ERROR)
+                            _isDisconnectedToInternet.value = Event(true)
                         _orderState.value = OrderUIState.Error(result.message)
                     }
                 }
@@ -82,9 +81,6 @@ class OrderViewModel @Inject constructor(
         }
     }
 
-    private fun resetNoInternetState(){
-        _isDisconnectedToInternet.value = false
-    }
 
     fun startOrderStatusObserving(orderId: Int){
         viewModelScope.launch {

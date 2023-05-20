@@ -25,6 +25,7 @@ import ru.shawarma.auth.viewmodels.AuthViewModel
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.EventObserver
 
 @AndroidEntryPoint
 class AuthFragment : Fragment() {
@@ -32,15 +33,6 @@ class AuthFragment : Fragment() {
     private var binding: FragmentAuthBinding? = null
 
     private val viewModel: AuthViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.navCommand.observe(this){ command ->
-            command?.let {
-                findNavController().navigate(R.id.actionAuthToRegister)
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,7 +59,9 @@ class AuthFragment : Fragment() {
                     }
             }
         }
-
+        viewModel.navCommand.observe(viewLifecycleOwner, EventObserver{command ->
+            findNavController().navigate(R.id.actionAuthToRegister)
+        })
     }
 
     private fun handleAuthState(state: AuthUIState, view: View){
@@ -85,6 +79,7 @@ class AuthFragment : Fragment() {
                 when(val message = state.message){
                     Errors.NO_INTERNET_ERROR -> {
                         (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                        viewModel.resetState()
                     }
                     Errors.EMPTY_INPUT_ERROR -> {
                         authErrorTextView.text = resources.getString(R.string.empty_input_error)

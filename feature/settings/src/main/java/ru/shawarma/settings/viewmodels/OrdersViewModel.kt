@@ -12,6 +12,7 @@ import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.ui.Event
 import ru.shawarma.settings.NavigationCommand
 import ru.shawarma.settings.SettingsController
 import ru.shawarma.settings.entities.OrderElement
@@ -34,13 +35,13 @@ class OrdersViewModel @Inject constructor(
 
     val ordersState = _ordersState.asStateFlow()
 
-    private val _isDisconnectedToInternet = MutableLiveData<Boolean>()
+    private val _isDisconnectedToInternet = MutableLiveData<Event<Boolean>>()
 
-    val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
+    val isDisconnectedToInternet: LiveData<Event<Boolean>> = _isDisconnectedToInternet
 
-    private val _navCommand = MutableLiveData<NavigationCommand?>()
+    private val _navCommand = MutableLiveData<Event<NavigationCommand>>()
 
-    val navCommand: LiveData<NavigationCommand?> = _navCommand
+    val navCommand: LiveData<Event<NavigationCommand>> = _navCommand
 
     private val ordersList = arrayListOf<OrderElement>(OrderElement.Loading)
 
@@ -74,9 +75,8 @@ class OrdersViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _ordersState.value = OrdersUIState.TokenInvalidError
                     else {
-                        _isDisconnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
-                        if(isDisconnectedToInternet.value == true)
-                            resetNoInternetState()
+                        if(result.message == Errors.NO_INTERNET_ERROR)
+                            _isDisconnectedToInternet.value = Event(true)
                         if(ordersList.lastOrNull() !is OrderElement.Error)
                             ordersList.add(OrderElement.Error)
                         copyAndSetOrdersList(false)
@@ -97,12 +97,6 @@ class OrdersViewModel @Inject constructor(
         getOrders()
     }
 
-    private fun resetNoInternetState(){
-        _isDisconnectedToInternet.value = false
-    }
-    private fun resetNavCommand(){
-        _navCommand.value = null
-    }
     private fun startOrdersStatusObserving(){
         viewModelScope.launch {
             orderRepository.startOrdersStatusHub{orderResponse ->
@@ -126,8 +120,7 @@ class OrdersViewModel @Inject constructor(
     }
 
     override fun goToOrder(id: Int) {
-        _navCommand.value = NavigationCommand.ToOrderModule(id)
-        resetNavCommand()
+        _navCommand.value = Event(NavigationCommand.ToOrderModule(id))
     }
 
     override fun reloadOrders() {

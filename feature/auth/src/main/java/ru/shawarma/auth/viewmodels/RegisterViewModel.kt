@@ -59,10 +59,7 @@ class RegisterViewModel @Inject constructor(
                 }
                 is Result.Failure -> {
                     _registerState.value = RegisterUIState.Error(result.message)
-                    val isNotInternetError = result.message != Errors.NO_INTERNET_ERROR
-                    _isError.value = isNotInternetError
-                    if(!isNotInternetError)
-                        resetState()
+                    _isError.value = result.message != Errors.NO_INTERNET_ERROR
                 }
                 is Result.NetworkFailure -> {
                     _registerState.value = RegisterUIState.Error(Errors.NETWORK_ERROR)
@@ -72,7 +69,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun resetState(){
+    fun resetState(){
         _registerState.value = null
     }
 

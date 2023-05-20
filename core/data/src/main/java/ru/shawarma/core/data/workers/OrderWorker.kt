@@ -16,16 +16,15 @@ import com.google.gson.GsonBuilder
 import com.microsoft.signalr.GsonHubProtocol
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
-import com.microsoft.signalr.TransportEnum
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.*
+import ru.shawarma.core.data.OrderFragmentPendingIntentCreator
 import ru.shawarma.core.data.R
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.core.data.managers.InternetManager
-import ru.shawarma.core.data.managers.MainInternetManager
 import ru.shawarma.core.data.managers.TokenManager
 import ru.shawarma.core.data.repositories.OrderRepository
 
@@ -35,8 +34,10 @@ class OrderWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val tokenManager: TokenManager,
     private val internetManager: InternetManager,
-    private val orderRepository: OrderRepository
+    private val orderRepository: OrderRepository,
+    private val orderFragmentPendingIntentCreator: OrderFragmentPendingIntentCreator
 ): CoroutineWorker(context,params) {
+
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as
                 NotificationManager
@@ -144,7 +145,7 @@ class OrderWorker @AssistedInject constructor(
             .setContentTitle(applicationContext.getString(R.string.order) + " №$orderId")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setOngoing(true)
-            .setGroup(ORDER_NOTIFICATION_GROUP)
+            .setContentIntent(orderFragmentPendingIntentCreator.createPendingIntentWithOrderId(orderId))
         when(status){
             OrderStatus.IN_QUEUE ->
                 notification.setContentText(applicationContext.getString(R.string.status_in_queue))

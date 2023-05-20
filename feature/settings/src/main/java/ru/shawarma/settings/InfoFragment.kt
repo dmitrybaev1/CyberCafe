@@ -18,10 +18,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
-import ru.shawarma.core.ui.AppNavigation
-import ru.shawarma.core.ui.CommonComponentsController
-import ru.shawarma.core.ui.dpToPx
+import ru.shawarma.core.ui.*
 import ru.shawarma.settings.adapters.InfoAdapter
 import ru.shawarma.settings.databinding.FragmentInfoBinding
 import ru.shawarma.settings.viewmodels.InfoUIState
@@ -80,11 +77,9 @@ class InfoFragment : Fragment() {
             findNavController().popBackStack(R.id.profileFragment,true)
             (requireActivity() as AppNavigation).navigateToAuth()
         }
-        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
-            if(isDisconnected){
-                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-            }
-        }
+        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner, EventObserver{
+            (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+        })
     }
 
     override fun onDestroyView() {

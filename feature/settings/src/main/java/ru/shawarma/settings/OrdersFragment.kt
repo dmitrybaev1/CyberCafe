@@ -18,10 +18,7 @@ import com.google.android.material.color.MaterialColors
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
-import ru.shawarma.core.ui.AppNavigation
-import ru.shawarma.core.ui.CommonComponentsController
-import ru.shawarma.core.ui.dpToPx
+import ru.shawarma.core.ui.*
 import ru.shawarma.settings.adapters.OrdersAdapter
 import ru.shawarma.settings.databinding.FragmentOrdersBinding
 import ru.shawarma.settings.viewmodels.OrdersUIState
@@ -41,15 +38,6 @@ class OrdersFragment : Fragment() {
 
     private var isFullyLoaded = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.navCommand.observe(this){
-            it?.let { command ->
-                if(command is NavigationCommand.ToOrderModule)
-                    (requireActivity() as AppNavigation).navigateToOrder(command.orderId)
-            }
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,6 +60,9 @@ class OrdersFragment : Fragment() {
                 com.google.android.material.R.attr.colorPrimary, Color.BLACK))
             setProgressBackgroundColorSchemeColor(MaterialColors.getColor(requireContext(),
                android.R.attr.colorBackground, Color.WHITE))
+        }
+        binding!!.ordersSwipeRefreshLayout.setOnRefreshListener {
+            viewModel.refreshOrders()
         }
         setupOrdersRecyclerView()
         viewLifecycleOwner.lifecycleScope.launch{
@@ -97,15 +88,14 @@ class OrdersFragment : Fragment() {
                 }
             }
         }
-        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
-            if(isDisconnected){
-                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-                binding!!.ordersSwipeRefreshLayout.isRefreshing = false
-            }
-        }
-        binding!!.ordersSwipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshOrders()
-        }
+        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner, EventObserver{
+            (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+            binding!!.ordersSwipeRefreshLayout.isRefreshing = false
+        })
+        viewModel.navCommand.observe(viewLifecycleOwner,EventObserver{ command ->
+            if(command is NavigationCommand.ToOrderModule)
+                (requireActivity() as AppNavigation).navigateToOrder(command.orderId)
+        })
     }
 
     private fun setupOrdersRecyclerView(){

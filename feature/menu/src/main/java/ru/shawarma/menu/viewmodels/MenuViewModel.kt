@@ -15,6 +15,7 @@ import ru.shawarma.core.data.repositories.MenuRepository
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.ui.Event
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.NavigationCommand
 import ru.shawarma.menu.entities.CartMenuItem
@@ -47,13 +48,13 @@ class MenuViewModel @Inject constructor(
 
     val orderState = _orderState.asStateFlow()
 
-    private val _isDisconnectedToInternet = MutableLiveData<Boolean>()
+    private val _isDisconnectedToInternet = MutableLiveData<Event<Boolean>>()
 
-    val isDisconnectedToInternet: LiveData<Boolean> = _isDisconnectedToInternet
+    val isDisconnectedToInternet: LiveData<Event<Boolean>> = _isDisconnectedToInternet
 
-    private val _navCommand = MutableLiveData<NavigationCommand?>()
+    private val _navCommand = MutableLiveData<Event<NavigationCommand>>()
 
-    val navCommand: LiveData<NavigationCommand?> = _navCommand
+    val navCommand: LiveData<Event<NavigationCommand>> = _navCommand
 
     private val _orderWithDetailsText = MutableLiveData<CharSequence>()
 
@@ -114,9 +115,8 @@ class MenuViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _menuState.value = MenuUIState.TokenInvalidError
                     else {
-                        _isDisconnectedToInternet.value = (result.message == Errors.NO_INTERNET_ERROR)
-                        if(isDisconnectedToInternet.value == true)
-                            resetNoInternetState()
+                        if(result.message == Errors.NO_INTERNET_ERROR)
+                            _isDisconnectedToInternet.value = Event(true)
                         if(menuList.lastOrNull() !is MenuElement.Error)
                             menuList.add(MenuElement.Error)
                         copyAndSetMenuList(false)
@@ -131,13 +131,6 @@ class MenuViewModel @Inject constructor(
         }
     }
 
-    private fun resetNavCommand(){
-        _navCommand.value = null
-    }
-
-    private fun resetNoInternetState(){
-        _isDisconnectedToInternet.value = false
-    }
 
     private fun checkAndRemoveOldErrorAndLoading(){
         if(menuList.lastOrNull() is MenuElement.Error || menuList.lastOrNull() is MenuElement.Loading)
@@ -189,8 +182,7 @@ class MenuViewModel @Inject constructor(
     }
 
     fun goToCart(){
-        _navCommand.value = NavigationCommand.ToCartFragment
-        resetNavCommand()
+        _navCommand.value = Event(NavigationCommand.ToCartFragment)
     }
 
     fun makeOrder(){
@@ -208,31 +200,26 @@ class MenuViewModel @Inject constructor(
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
                         _orderState.value = OrderUIState.TokenInvalidError
                     else {
-                        if(result.message == Errors.NO_INTERNET_ERROR) {
-                            _isDisconnectedToInternet.value = true
-                            resetNoInternetState()
-                        }
+                        if(result.message == Errors.NO_INTERNET_ERROR)
+                            _isDisconnectedToInternet.value = Event(true)
                         _orderState.value = OrderUIState.Error(result.message)
-                        resetOrderState()
                     }
                 }
-                is Result.NetworkFailure -> {
+                is Result.NetworkFailure ->
                     _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
-                    resetOrderState()
-                }
+
             }
             _isOrderCreating.value = false
         }
     }
 
-    private fun resetOrderState(){
+    fun resetOrderState(){
         _orderState.value = null
     }
 
     override fun goToMenuItemFragment(menuItem: MenuElement.MenuItem, count: Int){
         _chosenMenuItem.value = menuItem
-        _navCommand.value = NavigationCommand.ToMenuItemFragment
-        resetNavCommand()
+        _navCommand.value = Event(NavigationCommand.ToMenuItemFragment)
     }
 
     private fun getTotalPrice(): Int {

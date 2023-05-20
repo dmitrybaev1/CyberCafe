@@ -20,10 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.workers.OrderWorker
-import ru.shawarma.core.ui.AdaptiveSpacingItemDecoration
-import ru.shawarma.core.ui.AppNavigation
-import ru.shawarma.core.ui.CommonComponentsController
-import ru.shawarma.core.ui.dpToPx
+import ru.shawarma.core.ui.*
 import ru.shawarma.menu.adapters.CartAdapter
 import ru.shawarma.menu.databinding.FragmentCartBinding
 import ru.shawarma.menu.viewmodels.MenuViewModel
@@ -40,6 +37,8 @@ class CartFragment : Fragment() {
 
     private var cartAdapter: CartAdapter? = null
 
+    private var isNavigationHandled = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,6 +53,9 @@ class CartFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        savedInstanceState?.let {
+            isNavigationHandled = it.getBoolean(IS_NAVIGATION_HANDLED_KEY)
+        }
         val binding = binding!!
         cartAdapter = CartAdapter(viewModel)
         binding.cartRecyclerView.apply {
@@ -93,14 +95,13 @@ class CartFragment : Fragment() {
                             (requireActivity() as AppNavigation).navigateToAuth(Errors.REFRESH_TOKEN_ERROR)
                         }
                     }
+                    viewModel.resetOrderState()
                 }
             }
         }
-        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner){ isDisconnected ->
-            if(isDisconnected){
-                (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
-            }
-        }
+        viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner, EventObserver{
+            (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+        })
     }
     private fun startOrderNotifications(orderId: Int){
         val orderWorkRequest = OneTimeWorkRequestBuilder<OrderWorker>()
@@ -117,8 +118,17 @@ class CartFragment : Fragment() {
         WorkManager.getInstance(requireContext()).enqueueUniqueWork(
             orderWorkRequest.tags.toList()[1],ExistingWorkPolicy.REPLACE,orderWorkRequest)
     }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(IS_NAVIGATION_HANDLED_KEY,isNavigationHandled)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+    }
+    companion object{
+        const val IS_NAVIGATION_HANDLED_KEY = "IsNavigationHandled"
     }
 }
