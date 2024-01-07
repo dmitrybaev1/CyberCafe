@@ -1,6 +1,8 @@
 package ru.shawarma.core.data.datasources
 
 import ru.shawarma.core.data.entities.CreateOrderRequest
+import ru.shawarma.core.data.entities.FirebaseTokenRequest
+import ru.shawarma.core.data.entities.FirebaseTokenResponse
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.utils.Result
 
@@ -15,5 +17,7 @@ interface OrderRemoteDataSource {
     suspend fun startOrdersStatusHub(token: String ,callback: (OrderResponse) -> (Unit))
 
     fun stopOrdersStatusHub()
+
+    suspend fun saveFirebaseToken(token: String, request: FirebaseTokenRequest): Result<FirebaseTokenResponse>
 
 }

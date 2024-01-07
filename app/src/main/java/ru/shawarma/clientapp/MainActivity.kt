@@ -1,21 +1,34 @@
 package ru.shawarma.clientapp
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import ru.shawarma.core.data.entities.FirebaseTokenRequest
+import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), AppNavigation,
@@ -23,6 +36,21 @@ class MainActivity : AppCompatActivity(), AppNavigation,
 
     private lateinit var toolbar: Toolbar
     private lateinit var navController: NavController
+
+    @Inject
+    lateinit var orderRepository: OrderRepository
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (!isGranted) {
+            Snackbar.make(
+                window.decorView.rootView,
+                "Необходимо выдать разрешение на показ уведомлений",
+                Snackbar.LENGTH_LONG
+            ).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +62,26 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         //setSupportActionBar(toolbar)
         val appBarConfig = AppBarConfiguration(navController.graph)
         toolbar.setupWithNavController(navController,appBarConfig)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            if(ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("Firebase", "Fetching FCM registration token failed", task.exception)
+                return@OnCompleteListener
+            }
+            val token = task.result
+            saveFirebaseToken(token)
+        })
+    }
+    private fun saveFirebaseToken(token: String?){
+        lifecycleScope.launch {
+            orderRepository.saveFirebaseToken(FirebaseTokenRequest(token))
+        }
     }
 
     override fun navigateToMenu() {

@@ -2,6 +2,8 @@ package ru.shawarma.core.data.services
 
 import retrofit2.http.*
 import ru.shawarma.core.data.entities.CreateOrderRequest
+import ru.shawarma.core.data.entities.FirebaseTokenRequest
+import ru.shawarma.core.data.entities.FirebaseTokenResponse
 import ru.shawarma.core.data.entities.OrderResponse
 
 interface OrderService {
@@ -25,5 +27,10 @@ interface OrderService {
         @Body request: CreateOrderRequest
     ): OrderResponse
 
+    @POST("firebase-token")
+    suspend fun saveFirebaseToken(
+        @Header("Authorization") token: String,
+        @Body request: FirebaseTokenRequest
+    ): FirebaseTokenResponse
 
 }

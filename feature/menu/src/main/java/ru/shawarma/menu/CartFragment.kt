@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.data.workers.OrderWorker
 import ru.shawarma.core.ui.*
 import ru.shawarma.menu.adapters.CartAdapter
 import ru.shawarma.menu.databinding.FragmentCartBinding
@@ -76,7 +75,7 @@ class CartFragment : Fragment() {
                         is OrderUIState.Success -> {
                             val paymentType = binding.cartPaymentDropdown.text.toString()
                             if(paymentType != options[2]) {
-                                startOrderNotifications(state.orderId)
+                                //startOrderNotifications(state.orderId)
                                 findNavController().popBackStack(R.id.menuFragment, false)
                                 (requireActivity() as AppNavigation).navigateToOrder(state.orderId)
                             }
@@ -102,21 +101,6 @@ class CartFragment : Fragment() {
         viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner, EventObserver{
             (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
         })
-    }
-    private fun startOrderNotifications(orderId: Int){
-        val orderWorkRequest = OneTimeWorkRequestBuilder<OrderWorker>()
-            .addTag("WORK_ORDER_$orderId")
-            .setInputData(Data.Builder()
-                .putInt("orderId",orderId)
-                .build())
-            .setBackoffCriteria(
-                BackoffPolicy.LINEAR,
-                WorkRequest.MIN_BACKOFF_MILLIS,
-                TimeUnit.MILLISECONDS
-            )
-            .build()
-        WorkManager.getInstance(requireContext()).enqueueUniqueWork(
-            orderWorkRequest.tags.toList()[1],ExistingWorkPolicy.REPLACE,orderWorkRequest)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

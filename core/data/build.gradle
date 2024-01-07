@@ -46,7 +46,7 @@ dependencies {
     implementation 'androidx.hilt:hilt-work:1.0.0'
     kapt 'androidx.hilt:hilt-compiler:1.0.0'
     kapt "com.google.dagger:hilt-compiler:2.44"
-    implementation 'com.google.code.gson:gson:2.10.1'
+    api 'com.google.code.gson:gson:2.10.1'
     implementation 'com.microsoft.signalr:signalr:8.0.0-preview.2.23153.2'
     implementation 'org.slf4j:slf4j-jdk14:1.7.25'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'

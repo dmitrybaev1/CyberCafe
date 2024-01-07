@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name" translatable="false">Shawarma</string>
+    <string name="channel_name">Order status channel</string>
+    <string name="channel_description">Channel for order status notifications</string>
+    <string name="order">Order</string>
+    <string name="status_in_queue">Your order is in queue</string>
+    <string name="status_cooking">Your order has just started</string>
+    <string name="status_ready">Your order is ready</string>
+    <string name="status_closed">Your order is closed</string>
+    <string name="status_canceled">Your order is canceled</string>
 </resources>

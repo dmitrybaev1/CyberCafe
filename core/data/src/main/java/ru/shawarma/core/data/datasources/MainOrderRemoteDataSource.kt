@@ -10,6 +10,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import ru.shawarma.core.data.entities.CreateOrderRequest
+import ru.shawarma.core.data.entities.FirebaseTokenRequest
+import ru.shawarma.core.data.entities.FirebaseTokenResponse
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.services.OrderService
 import ru.shawarma.core.data.utils.Result
@@ -49,7 +51,7 @@ class MainOrderRemoteDataSource @Inject constructor(
                 if (!isConnectedToHub()) {
                     val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
                     hubConnection = HubConnectionBuilder
-                        .create("http://10.0.2.2:5029/notifications/client/orders")
+                        .create("http://192.168.0.106:5029/notifications/client/orders")
                         .withHubProtocol(GsonHubProtocol(gson))
                         .withAccessTokenProvider(Single.defer {
                             runBlocking {
@@ -67,6 +69,11 @@ class MainOrderRemoteDataSource @Inject constructor(
             }
         }
     }
+
+    override suspend fun saveFirebaseToken(token: String, request: FirebaseTokenRequest): Result<FirebaseTokenResponse> =
+        safeServiceCall(dispatcher){
+            orderService.saveFirebaseToken(token, request)
+        }
 
     private fun isConnectedToHub(): Boolean =
         hubConnection?.connectionState == HubConnectionState.CONNECTED

@@ -1,11 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="channel_name">Канал статуса заказов</string>
-    <string name="channel_description">Канал для уведомлений об изменении статуса заказов</string>
-    <string name="order">Заказ</string>
-    <string name="status_in_queue">Ваш заказ в очереди</string>
-    <string name="status_cooking">Ваш заказ готовится</string>
-    <string name="status_ready">Ваш заказ готов</string>
-    <string name="status_closed">Ваш заказ закончен</string>
-    <string name="status_canceled">Ваш заказ отменен</string>
+
 </resources>

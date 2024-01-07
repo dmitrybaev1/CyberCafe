@@ -3,6 +3,8 @@ package ru.shawarma.core.data.repositories
 import ru.shawarma.core.data.datasources.OrderRemoteDataSource
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.CreateOrderRequest
+import ru.shawarma.core.data.entities.FirebaseTokenRequest
+import ru.shawarma.core.data.entities.FirebaseTokenResponse
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.managers.InternetManager
 import ru.shawarma.core.data.utils.Errors
@@ -43,6 +45,17 @@ class MainOrderRepository @Inject constructor(
         return when (val result = authRepository.getActualAuthData()) {
             is Result.Success<AuthData> ->
                 orderRemoteDataSource.createOrder("Bearer ${result.data.accessToken}", request)
+            is Result.Failure -> result
+            is Result.NetworkFailure -> result
+        }
+    }
+
+    override suspend fun saveFirebaseToken(request: FirebaseTokenRequest): Result<FirebaseTokenResponse> {
+        if (!internetManager.isOnline())
+            return Result.Failure(Errors.NO_INTERNET_ERROR)
+        return when (val result = authRepository.getActualAuthData()) {
+            is Result.Success<AuthData> ->
+                orderRemoteDataSource.saveFirebaseToken("Bearer ${result.data.accessToken}", request)
             is Result.Failure -> result
             is Result.NetworkFailure -> result
         }

@@ -1,5 +1,6 @@
 package ru.shawarma.core.data.entities
 
+import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class OrderResponse(
