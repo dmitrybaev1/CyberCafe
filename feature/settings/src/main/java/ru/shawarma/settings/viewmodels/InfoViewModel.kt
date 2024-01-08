@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -61,9 +62,20 @@ class InfoViewModel @Inject constructor(
         }
     }
 
+    fun resetAuth(){
+        viewModelScope.launch {
+            val df = async {
+                authRepository.clearAuthData()
+            }
+            df.await()
+            _infoState.value = InfoUIState.LoggedOut
+        }
+    }
+
 }
 sealed interface InfoUIState{
     data class Success(val items: List<InfoItem>): InfoUIState
     class Error(val message: String): InfoUIState
     object TokenInvalidError: InfoUIState
+    object LoggedOut: InfoUIState
 }

@@ -22,6 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.shawarma.core.data.entities.FirebaseTokenRequest
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.entities.OrderStatus
+import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.OrderRepository
 import javax.inject.Inject
 
@@ -29,7 +30,7 @@ import javax.inject.Inject
 class MessagingService : FirebaseMessagingService(), LifecycleOwner {
 
     @Inject
-    lateinit var orderRepository: OrderRepository
+    lateinit var authRepository: AuthRepository
 
     private lateinit var notificationManager: NotificationManager
 
@@ -73,7 +74,10 @@ class MessagingService : FirebaseMessagingService(), LifecycleOwner {
         Log.d("TAG", token)
         super.onNewToken(token)
         lifecycleScope.launchWhenCreated {
-            orderRepository.saveFirebaseToken(FirebaseTokenRequest(token))
+            try {
+                authRepository.saveFirebaseToken(FirebaseTokenRequest(token))
+            }
+            catch (_: Exception){}
         }
     }
 

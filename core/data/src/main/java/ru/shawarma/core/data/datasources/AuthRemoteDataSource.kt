@@ -13,4 +13,6 @@ interface AuthRemoteDataSource {
 
     suspend fun getInfo(token: String): Result<InfoResponse>
 
+    suspend fun saveFirebaseToken(token: String, request: FirebaseTokenRequest): Result<FirebaseTokenResponse>
+
 }

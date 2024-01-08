@@ -14,8 +14,6 @@ interface OrderRepository {
 
     suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse>
 
-    suspend fun saveFirebaseToken(request: FirebaseTokenRequest): Result<FirebaseTokenResponse>
-
     suspend fun startOrdersStatusHub(callback: (OrderResponse) -> (Unit))
 
     fun stopOrdersStatusHub()

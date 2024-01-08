@@ -17,4 +17,6 @@ interface AuthRepository {
     @kotlin.jvm.Throws(NoTokenException::class)
     suspend fun getActualAuthData(): Result<AuthData>
 
+    suspend fun saveFirebaseToken(request: FirebaseTokenRequest): Result<FirebaseTokenResponse>
+
 }

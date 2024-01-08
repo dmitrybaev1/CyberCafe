@@ -3,6 +3,7 @@ package ru.shawarma.auth
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 import ru.shawarma.auth.databinding.FragmentAuthBinding
 import ru.shawarma.auth.viewmodels.AuthUIState
 import ru.shawarma.auth.viewmodels.AuthViewModel
+import ru.shawarma.core.data.entities.FirebaseTokenRequest
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
@@ -69,8 +71,11 @@ class AuthFragment : Fragment() {
         when(state){
             is AuthUIState.Success -> {
                 binding!!.authErrorTextView.text = ""
-                findNavController().popBackStack(R.id.authFragment,true)
-                (requireActivity() as AppNavigation).navigateToMenu()
+                (requireActivity() as CommonComponentsController).sendFirebaseToken(
+                    sendAction = {token ->
+                        viewModel.saveFirebaseToken(FirebaseTokenRequest(token))
+                    }
+                )
             }
             is AuthUIState.Error -> {
                 val authTextInputLayoutEmail = binding!!.authTextInputLayoutEmail
@@ -105,6 +110,10 @@ class AuthFragment : Fragment() {
                     interpolator = LinearInterpolator()
                     start()
                 }
+            }
+            is AuthUIState.FirebaseTokenSent -> {
+                findNavController().popBackStack(R.id.authFragment,true)
+                (requireActivity() as AppNavigation).navigateToMenu()
             }
         }
     }

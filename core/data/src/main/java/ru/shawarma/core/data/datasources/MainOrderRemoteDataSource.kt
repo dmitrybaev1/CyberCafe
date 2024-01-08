@@ -70,11 +70,6 @@ class MainOrderRemoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun saveFirebaseToken(token: String, request: FirebaseTokenRequest): Result<FirebaseTokenResponse> =
-        safeServiceCall(dispatcher){
-            orderService.saveFirebaseToken(token, request)
-        }
-
     private fun isConnectedToHub(): Boolean =
         hubConnection?.connectionState == HubConnectionState.CONNECTED
 

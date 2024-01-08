@@ -18,6 +18,4 @@ interface OrderRemoteDataSource {
 
     fun stopOrdersStatusHub()
 
-    suspend fun saveFirebaseToken(token: String, request: FirebaseTokenRequest): Result<FirebaseTokenResponse>
-
 }

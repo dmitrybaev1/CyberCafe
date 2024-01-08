@@ -15,6 +15,10 @@ interface CommonComponentsController {
 
     fun changeToolbarMenuItemClickListener(onMenuItemClickListener: OnMenuItemClickListener)
 
+    fun sendFirebaseToken(sendAction: (String) -> Unit)
+
+    fun deleteFirebaseToken()
+
     fun setCloseToolbarIcon()
 
     fun showNoInternetSnackbar(view: View)

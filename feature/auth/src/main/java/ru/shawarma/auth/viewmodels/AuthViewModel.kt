@@ -12,6 +12,7 @@ import ru.shawarma.auth.NavigationCommand
 import ru.shawarma.auth.checkEmail
 import ru.shawarma.auth.checkPassword
 import ru.shawarma.core.data.entities.AuthData
+import ru.shawarma.core.data.entities.FirebaseTokenRequest
 import ru.shawarma.core.data.entities.UserLoginRequest
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
@@ -91,9 +92,19 @@ class AuthViewModel @Inject constructor(
             _authState.value = AuthUIState.Error(message)
         }
     }
+
+    fun saveFirebaseToken(request: FirebaseTokenRequest){
+        viewModelScope.launch {
+            when(val result = authRepository.saveFirebaseToken(request)){
+                is Result.Success -> _authState.value = AuthUIState.FirebaseTokenSent(success = true)
+                else -> _authState.value = AuthUIState.FirebaseTokenSent(success = false)
+            }
+        }
+    }
 }
 
 sealed interface AuthUIState{
     object Success: AuthUIState
     class Error(val message: String): AuthUIState
+    data class FirebaseTokenSent(val success: Boolean): AuthUIState
 }

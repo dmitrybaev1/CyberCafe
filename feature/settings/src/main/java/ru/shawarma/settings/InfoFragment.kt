@@ -69,14 +69,20 @@ class InfoFragment : Fragment() {
                             findNavController().popBackStack(R.id.profileFragment,true)
                             (requireActivity() as AppNavigation).navigateToAuth(Errors.REFRESH_TOKEN_ERROR)
                         }
+                        is InfoUIState.LoggedOut -> {
+                            findNavController().popBackStack(R.id.profileFragment,true)
+                            (requireActivity() as AppNavigation).navigateToAuth()
+                        }
                     }
                 }
             }
         }
+
         binding?.infoExitButton?.setOnClickListener {
-            findNavController().popBackStack(R.id.profileFragment,true)
-            (requireActivity() as AppNavigation).navigateToAuth()
+            (requireActivity() as CommonComponentsController).deleteFirebaseToken()
+            viewModel.resetAuth()
         }
+
         viewModel.isDisconnectedToInternet.observe(viewLifecycleOwner, EventObserver{
             (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
         })

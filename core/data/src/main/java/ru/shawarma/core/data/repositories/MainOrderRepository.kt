@@ -50,16 +50,6 @@ class MainOrderRepository @Inject constructor(
         }
     }
 
-    override suspend fun saveFirebaseToken(request: FirebaseTokenRequest): Result<FirebaseTokenResponse> {
-        if (!internetManager.isOnline())
-            return Result.Failure(Errors.NO_INTERNET_ERROR)
-        return when (val result = authRepository.getActualAuthData()) {
-            is Result.Success<AuthData> ->
-                orderRemoteDataSource.saveFirebaseToken("Bearer ${result.data.accessToken}", request)
-            is Result.Failure -> result
-            is Result.NetworkFailure -> result
-        }
-    }
 
     override suspend fun startOrdersStatusHub(callback: (OrderResponse) -> Unit) {
         if(internetManager.isOnline()) {

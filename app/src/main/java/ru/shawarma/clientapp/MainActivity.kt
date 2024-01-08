@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import ru.shawarma.core.data.entities.FirebaseTokenRequest
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.ui.AppNavigation
@@ -36,9 +37,6 @@ class MainActivity : AppCompatActivity(), AppNavigation,
 
     private lateinit var toolbar: Toolbar
     private lateinit var navController: NavController
-
-    @Inject
-    lateinit var orderRepository: OrderRepository
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -69,19 +67,22 @@ class MainActivity : AppCompatActivity(), AppNavigation,
             ) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
+
+    }
+
+    override fun sendFirebaseToken(sendAction: (String) -> Unit) {
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("Firebase", "Fetching FCM registration token failed", task.exception)
                 return@OnCompleteListener
             }
             val token = task.result
-            saveFirebaseToken(token)
+            sendAction.invoke(token)
         })
     }
-    private fun saveFirebaseToken(token: String?){
-        lifecycleScope.launch {
-            orderRepository.saveFirebaseToken(FirebaseTokenRequest(token))
-        }
+
+    override fun deleteFirebaseToken() {
+        FirebaseMessaging.getInstance().deleteToken()
     }
 
     override fun navigateToMenu() {

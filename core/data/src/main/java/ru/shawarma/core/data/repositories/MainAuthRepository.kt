@@ -68,4 +68,15 @@ class MainAuthRepository @Inject constructor(
         } else
             Result.Failure(Errors.REFRESH_TOKEN_ERROR)
     }
+
+    override suspend fun saveFirebaseToken(request: FirebaseTokenRequest): Result<FirebaseTokenResponse> {
+        if (!internetManager.isOnline())
+            return Result.Failure(Errors.NO_INTERNET_ERROR)
+        return when (val result = getActualAuthData()) {
+            is Result.Success<AuthData> ->
+                authRemoteDataSource.saveFirebaseToken("Bearer ${result.data.accessToken}", request)
+            is Result.Failure -> result
+            is Result.NetworkFailure -> result
+        }
+    }
 }
