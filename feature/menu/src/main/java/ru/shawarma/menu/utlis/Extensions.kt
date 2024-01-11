@@ -8,13 +8,15 @@ import ru.shawarma.menu.entities.MenuElement
 fun mapMenuItemResponseToMenuItem(menuItemsResponse: List<MenuItemResponse>): List<MenuElement.MenuItem>{
     val list = arrayListOf<MenuElement.MenuItem>()
     for(item in menuItemsResponse){
-        list.add(
-            MenuElement.MenuItem(
-                item.id,
-                item.name,
-                item.price
+        if(item.visible)
+            list.add(
+                MenuElement.MenuItem(
+                    item.id,
+                    item.name,
+                    item.price,
+                    item.imageUrl
+                )
             )
-        )
     }
     return list
 }

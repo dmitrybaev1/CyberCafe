@@ -15,6 +15,7 @@ fun mapOrderMenuItemResponseToOrderMenuItem(
             itemResponse.id,
             itemResponse.name,
             itemResponse.price,
+            itemResponse.imageUrl,
             itemResponse.amount
         )
         )

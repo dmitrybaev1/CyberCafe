@@ -8,6 +8,7 @@ sealed interface MenuElement{
         val id: Int,
         val name: String,
         val price: Int,
+        val imageUrl: String,
         val isPicked: ObservableBoolean = ObservableBoolean(false)
     ): MenuElement
     object Loading: MenuElement

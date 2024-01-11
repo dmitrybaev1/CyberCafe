@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import ru.shawarma.core.ui.loadImage
 import ru.shawarma.order.R
 import ru.shawarma.order.databinding.OrderMenuItemBinding
 import ru.shawarma.order.entities.OrderMenuItem
@@ -28,6 +29,7 @@ class OrderMenuItemAdapter(
     class OrderMenuItemViewHolder(private val binding: OrderMenuItemBinding): ViewHolder(binding.root){
         fun bind(orderMenuItem: OrderMenuItem){
             binding.orderMenuItem = orderMenuItem
+            binding.orderMenuItemImageView.loadImage(orderMenuItem.imageUrl)
         }
     }
 }

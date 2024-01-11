@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import ru.shawarma.core.ui.loadImage
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.R
 import ru.shawarma.menu.databinding.CartItemBinding
@@ -33,6 +34,7 @@ class CartAdapter(
         fun bind(cartItem: CartMenuItem){
             binding.cartItem = cartItem
             binding.cartCartQuantityControlView.count = cartItem.count
+            binding.cartItemImageView.loadImage(cartItem.menuItem.imageUrl)
             binding.cartCartQuantityControlView.setOnMinusClickListener {
                 menuController.removeFromCart(cartItem.menuItem)
             }

@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import ru.shawarma.core.ui.loadImage
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.R
 import ru.shawarma.menu.databinding.MenuErrorBinding
@@ -79,6 +80,7 @@ class MenuAdapter(
         fun bind(menuItem: MenuElement.MenuItem){
             binding.menuItem = menuItem
             binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
+            binding.menuItemImageView.loadImage(menuItem.imageUrl)
             binding.menuAddToCartButton.setOnClickListener {
                 menuController.addToCart(menuItem)
                 binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
