@@ -14,7 +14,8 @@ fun mapMenuItemResponseToMenuItem(menuItemsResponse: List<MenuItemResponse>): Li
                     item.id,
                     item.name,
                     item.price,
-                    item.imageUrl
+                    item.imageUrl,
+                    item.description
                 )
             )
     }

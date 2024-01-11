@@ -4,5 +4,7 @@ import android.widget.ImageView
 import coil.load
 
 fun ImageView.loadImage(url: String){
-    this.load(url)
+    this.load(url){
+        placeholder(R.drawable.empty_food_placeholder)
+    }
 }

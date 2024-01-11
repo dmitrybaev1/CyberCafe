@@ -80,7 +80,7 @@ class MenuAdapter(
         fun bind(menuItem: MenuElement.MenuItem){
             binding.menuItem = menuItem
             binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
-            binding.menuItemImageView.loadImage(menuItem.imageUrl)
+            menuItem.imageUrl?.let { binding.menuItemImageView.loadImage(it) }
             binding.menuAddToCartButton.setOnClickListener {
                 menuController.addToCart(menuItem)
                 binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)

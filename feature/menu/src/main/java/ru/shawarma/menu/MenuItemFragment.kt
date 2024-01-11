@@ -9,6 +9,7 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.shawarma.core.ui.CommonComponentsController
+import ru.shawarma.core.ui.loadImage
 import ru.shawarma.menu.databinding.FragmentMenuItemBinding
 import ru.shawarma.menu.viewmodels.MenuViewModel
 
@@ -36,6 +37,7 @@ class MenuItemFragment : Fragment() {
         val binding = binding!!
         val menuItem = viewModel.chosenMenuItem.value!!
         binding.menuItemFragmentCartQuantityControlView.count = viewModel.getMenuItemCount(menuItem)
+        menuItem.imageUrl?.let { binding.menuItemFragmentImageView.loadImage(it) }
         binding.menuItemFragmentAddToCartButton.setOnClickListener {
             viewModel.addToCart(menuItem)
             binding.menuItemFragmentCartQuantityControlView.count = viewModel.getMenuItemCount(menuItem)
