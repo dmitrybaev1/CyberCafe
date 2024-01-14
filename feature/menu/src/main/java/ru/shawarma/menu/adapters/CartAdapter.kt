@@ -34,7 +34,7 @@ class CartAdapter(
         fun bind(cartItem: CartMenuItem){
             binding.cartItem = cartItem
             binding.cartCartQuantityControlView.count = cartItem.count
-            cartItem.menuItem.imageUrl?.let { binding.cartItemImageView.loadImage(it) }
+            cartItem.menuItem.imageUrl?.let { binding.cartItemImageView.loadImage(it,binding.root.context) }
             binding.cartCartQuantityControlView.setOnMinusClickListener {
                 menuController.removeFromCart(cartItem.menuItem)
             }

@@ -29,7 +29,7 @@ class OrderMenuItemAdapter(
     class OrderMenuItemViewHolder(private val binding: OrderMenuItemBinding): ViewHolder(binding.root){
         fun bind(orderMenuItem: OrderMenuItem){
             binding.orderMenuItem = orderMenuItem
-            orderMenuItem.imageUrl?.let { binding.orderMenuItemImageView.loadImage(it) }
+            orderMenuItem.imageUrl?.let { binding.orderMenuItemImageView.loadImage(it,binding.root.context) }
         }
     }
 }

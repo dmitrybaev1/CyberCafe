@@ -37,7 +37,7 @@ class MenuItemFragment : Fragment() {
         val binding = binding!!
         val menuItem = viewModel.chosenMenuItem.value!!
         binding.menuItemFragmentCartQuantityControlView.count = viewModel.getMenuItemCount(menuItem)
-        menuItem.imageUrl?.let { binding.menuItemFragmentImageView.loadImage(it) }
+        menuItem.imageUrl?.let { binding.menuItemFragmentImageView.loadImage(it,requireContext()) }
         binding.menuItemFragmentAddToCartButton.setOnClickListener {
             viewModel.addToCart(menuItem)
             binding.menuItemFragmentCartQuantityControlView.count = viewModel.getMenuItemCount(menuItem)

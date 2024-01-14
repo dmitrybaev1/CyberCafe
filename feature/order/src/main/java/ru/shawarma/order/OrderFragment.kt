@@ -57,6 +57,7 @@ class OrderFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.orderState.filterNotNull().stateIn(this).collect{state ->
+                    Log.d("TAG","collector invoked")
                     when(state){
                         is OrderUIState.Success -> {
                             val binding = binding!!

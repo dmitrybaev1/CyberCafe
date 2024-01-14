@@ -28,7 +28,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:srcCompat="@tools:sample/avatars" />
+                app:srcCompat="@drawable/empty_food_placeholder" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/orderMenuItemTitleTextView"

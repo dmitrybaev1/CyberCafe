@@ -12,7 +12,8 @@ interface OrderService {
     suspend fun getOrders(
         @Header("Authorization") token: String,
         @Query("offset") offset: Int,
-        @Query("count") count: Int
+        @Query("count") count: Int,
+        @Query("orderDesc") orderDesc: Boolean = true
     ): List<OrderResponse>
 
     @GET("orders/{id}")

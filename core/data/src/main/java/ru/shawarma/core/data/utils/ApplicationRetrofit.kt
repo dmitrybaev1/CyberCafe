@@ -30,7 +30,7 @@ object ApplicationRetrofit {
                 val original: Request = chain.request()
                 val request: Request = original.newBuilder()
                     .header("Accept-Language", Locale.getDefault().toLanguageTag())
-                    .method(original.method(), original.body())
+                    .method(original.method, original.body)
                     .build()
                 chain.proceed(request)
             }.build()
