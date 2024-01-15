@@ -56,7 +56,6 @@ class MessagingService : FirebaseMessagingService(), LifecycleOwner {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
-        Log.d("TAG", "invoked")
         val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
         when(message.data["event"]){
             "orderStatusUpdate" -> {
@@ -71,7 +70,6 @@ class MessagingService : FirebaseMessagingService(), LifecycleOwner {
     }
 
     override fun onNewToken(token: String) {
-        Log.d("TAG", token)
         super.onNewToken(token)
         lifecycleScope.launchWhenCreated {
             try {

@@ -59,7 +59,6 @@ class OrderViewModel @Inject constructor(
             _orderState.value = null
             when(val result = orderRepository.getOrder(orderId)){
                 is Result.Success<OrderResponse> -> {
-                    Log.d("TAG","REST RESPONSE: "+result.data.toString())
                     val order = mapOrderResponseToOrder(result.data)
                     _orderId.value = order.id
                     _totalPrice.value = order.totalPrice
@@ -92,14 +91,12 @@ class OrderViewModel @Inject constructor(
     }
 
     private fun updateState(orderId: Int, orderResponse: OrderResponse){
-        Log.d("TAG",orderResponse.toString())
         if(orderResponse.id == orderId){
-            //_orderState.value = OrderUIState.Success(mapOrderResponseToOrder(orderResponse))
-            Log.d("TAG","SOCKET RESPONSE: "+orderResponse.toString())
             val order = mapOrderResponseToOrder(orderResponse)
-            viewModelScope.launch {
-                _closedDate.value = order.closeDate.toString()
-            }
+            _orderId.postValue(order.id)
+            _totalPrice.postValue(order.totalPrice)
+            _createdDate.postValue(order.createdDate.toString())
+            _closedDate.postValue(order.closeDate.toString())
             _orderState.value = OrderUIState.Success(order)
         }
     }
