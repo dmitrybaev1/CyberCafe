@@ -13,21 +13,21 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.createGraph
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
+import androidx.paging.LoadState
+import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.ui.*
 import ru.shawarma.menu.adapters.MenuAdapter
+import ru.shawarma.menu.adapters.MenuLoadStateAdapter
 import ru.shawarma.menu.databinding.FragmentMenuBinding
 import ru.shawarma.menu.utlis.MENU_FULL_SPAN_SIZE
 import ru.shawarma.menu.utlis.MENU_ITEM_SPAN_SIZE
 import ru.shawarma.menu.utlis.PlaceholderStringType
-import ru.shawarma.menu.viewmodels.MenuUIState
 import ru.shawarma.menu.viewmodels.MenuViewModel
 import kotlin.math.roundToInt
 
@@ -40,9 +40,6 @@ class MenuFragment : Fragment() {
 
     private var menuAdapter: MenuAdapter? = null
 
-    private var isRequestInProgress = false
-
-    private var isFullyLoaded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,29 +74,27 @@ class MenuFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        savedInstanceState?.let {
-            isRequestInProgress = it.getBoolean(IS_REQUEST_IN_PROGRESS_KEY)
-        }
         setupMenuRecyclerView()
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                viewModel.menuState.collect{state ->
-                    when(state){
-                        is MenuUIState.Success -> {
-                            menuAdapter?.submitList(state.items)
-                            isFullyLoaded = state.isFullyLoaded
-                        }
-                        is MenuUIState.Error -> {
-                            val items = state.items
-                            menuAdapter?.submitList(items)
-                            binding!!.menuRecyclerView.scrollToPosition(items.size-1)
-                        }
-                        is MenuUIState.TokenInvalidError -> {
-                            findNavController().popBackStack(R.id.menuFragment,true)
+            launch {
+                viewModel.menuFlow.collectLatest { pagingData ->
+                    menuAdapter?.submitData(pagingData)
+                }
+            }
+            launch {
+                menuAdapter?.loadStateFlow?.collectLatest { loadStates ->
+                    val state = loadStates.refresh
+                    if(state is LoadState.Error) {
+                        if (state.error.message == Errors.UNAUTHORIZED_ERROR
+                            || state.error.message == Errors.REFRESH_TOKEN_ERROR
+                        ) {
+                            findNavController().popBackStack(R.id.menuFragment, true)
                             (requireActivity() as AppNavigation).navigateToAuth(Errors.REFRESH_TOKEN_ERROR)
                         }
+                        else if(state.error.message == Errors.NO_INTERNET_ERROR){
+                            (requireActivity() as CommonComponentsController).showNoInternetSnackbar(view)
+                        }
                     }
-                    isRequestInProgress = false
                 }
             }
         }
@@ -116,28 +111,15 @@ class MenuFragment : Fragment() {
 
     private fun setupMenuRecyclerView(){
         menuAdapter = MenuAdapter(viewModel)
+        val _adapter = menuAdapter!!
+        _adapter.withLoadStateFooter(MenuLoadStateAdapter(_adapter::retry))
         val gridLayoutManager = GridLayoutManager(requireContext(),2)
-        gridLayoutManager.spanSizeLookup = object: SpanSizeLookup(){
-            override fun getSpanSize(position: Int): Int =
-                if(menuAdapter?.getItemViewType(position) == R.layout.menu_item) MENU_ITEM_SPAN_SIZE
-                else MENU_FULL_SPAN_SIZE
-        }
+
         binding!!.menuRecyclerView.apply {
-            adapter = menuAdapter
             layoutManager = gridLayoutManager
+            adapter = _adapter
             addItemDecoration(AdaptiveSpacingItemDecoration(
                 dpToPx(5f,requireContext()).roundToInt(),true))
-            addOnScrollListener(object: OnScrollListener(){
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    val position = (recyclerView.layoutManager as GridLayoutManager).findLastVisibleItemPosition()
-                    if(!isFullyLoaded)
-                        if(menuAdapter?.getItemViewType(position) == R.layout.menu_loading && !isRequestInProgress) {
-                            isRequestInProgress = true
-                            viewModel.getMenu()
-                        }
-                }
-            })
         }
 
     }
@@ -159,17 +141,10 @@ class MenuFragment : Fragment() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(IS_REQUEST_IN_PROGRESS_KEY,isRequestInProgress)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
         menuAdapter = null
     }
-    companion object{
-        const val IS_REQUEST_IN_PROGRESS_KEY = "IsRequestInProgress"
-    }
+
 }

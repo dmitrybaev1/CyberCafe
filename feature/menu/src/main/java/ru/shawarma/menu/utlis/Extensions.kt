@@ -5,22 +5,14 @@ import ru.shawarma.core.data.entities.OrderMenuItemRequest
 import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.entities.MenuElement
 
-fun mapMenuItemResponseToMenuItem(menuItemsResponse: List<MenuItemResponse>): List<MenuElement.MenuItem>{
-    val list = arrayListOf<MenuElement.MenuItem>()
-    for(item in menuItemsResponse){
-        if(item.visible)
-            list.add(
-                MenuElement.MenuItem(
-                    item.id,
-                    item.name,
-                    item.price,
-                    item.imageUrl,
-                    item.description
-                )
-            )
-    }
-    return list
-}
+fun mapMenuItemResponseToMenuItem(menuItemResponse: MenuItemResponse): MenuElement.MenuItem =
+    MenuElement.MenuItem(
+        menuItemResponse.id,
+        menuItemResponse.name,
+        menuItemResponse.price,
+        menuItemResponse.imageUrl,
+        menuItemResponse.description
+    )
 fun mapCartListToOrderMenuItemRequest(cartList: List<CartMenuItem>): List<OrderMenuItemRequest>{
     val list = arrayListOf<OrderMenuItemRequest>()
     for(cartItem in cartList){

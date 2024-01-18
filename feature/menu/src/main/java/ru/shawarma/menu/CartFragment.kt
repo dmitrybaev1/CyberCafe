@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
@@ -12,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.*
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
@@ -23,8 +21,7 @@ import ru.shawarma.core.ui.*
 import ru.shawarma.menu.adapters.CartAdapter
 import ru.shawarma.menu.databinding.FragmentCartBinding
 import ru.shawarma.menu.viewmodels.MenuViewModel
-import ru.shawarma.menu.viewmodels.OrderUIState
-import java.util.concurrent.TimeUnit
+import ru.shawarma.menu.viewmodels.MakeOrderUIState
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -72,7 +69,7 @@ class CartFragment : Fragment() {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.orderState.filterNotNull().stateIn(this).collect{ state ->
                     when(state){
-                        is OrderUIState.Success -> {
+                        is MakeOrderUIState.Success -> {
                             val paymentType = binding.cartPaymentDropdown.text.toString()
                             if(paymentType != options[2]) {
                                 //startOrderNotifications(state.orderId)
@@ -83,13 +80,13 @@ class CartFragment : Fragment() {
                                 //кинуть на оплату онлайн
                             }
                         }
-                        is OrderUIState.Error -> {
+                        is MakeOrderUIState.Error -> {
                             if(state.message != Errors.NO_INTERNET_ERROR)
                                 Snackbar.make(
                                     view,getString(R.string.create_order_error),Snackbar.LENGTH_LONG)
                                     .show()
                         }
-                        is OrderUIState.TokenInvalidError -> {
+                        is MakeOrderUIState.TokenInvalidError -> {
                             findNavController().popBackStack(R.id.menuFragment,true)
                             (requireActivity() as AppNavigation).navigateToAuth(Errors.REFRESH_TOKEN_ERROR)
                         }

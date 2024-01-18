@@ -3,10 +3,10 @@ package ru.shawarma.menu.adapters
 import androidx.recyclerview.widget.DiffUtil
 import ru.shawarma.menu.entities.MenuElement
 
-class MenuItemDiffCallback: DiffUtil.ItemCallback<MenuElement>() {
-    override fun areItemsTheSame(oldItem: MenuElement, newItem: MenuElement): Boolean =
-        oldItem == newItem
+class MenuItemDiffCallback: DiffUtil.ItemCallback<MenuElement.MenuItem>() {
+    override fun areItemsTheSame(oldItem: MenuElement.MenuItem, newItem: MenuElement.MenuItem): Boolean =
+        oldItem.id == newItem.id
 
-    override fun areContentsTheSame(oldItem: MenuElement, newItem: MenuElement): Boolean =
+    override fun areContentsTheSame(oldItem: MenuElement.MenuItem, newItem: MenuElement.MenuItem): Boolean =
         oldItem == newItem
 }

@@ -4,9 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.CreateOrderRequest
 import ru.shawarma.core.data.entities.MenuItemResponse
@@ -15,6 +21,7 @@ import ru.shawarma.core.data.repositories.MenuRepository
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.ui.CommonPagingSource
 import ru.shawarma.core.ui.Event
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.NavigationCommand
@@ -32,19 +39,7 @@ class MenuViewModel @Inject constructor(
     private val orderRepository: OrderRepository
 ) : ViewModel(), MenuController {
 
-    private var menuOffset = - STANDARD_REQUEST_OFFSET
-
-    private val menuCount = STANDARD_REQUEST_OFFSET
-
-    private val menuList = arrayListOf<MenuElement>(MenuElement.Loading)
-
-    private val _menuState = MutableStateFlow<MenuUIState>(
-        MenuUIState.Success(listOf(MenuElement.Loading))
-    )
-
-    val menuState = _menuState.asStateFlow()
-
-    private val _orderState = MutableStateFlow<OrderUIState?>(null)
+    private val _orderState = MutableStateFlow<MakeOrderUIState?>(null)
 
     val orderState = _orderState.asStateFlow()
 
@@ -84,66 +79,20 @@ class MenuViewModel @Inject constructor(
 
     val isOrderCreating: LiveData<Boolean> = _isOrderCreating
 
-    init {
-        getMenu()
-    }
-
-    fun getMenu(loadNext: Boolean = true){
-        viewModelScope.launch {
-            if(loadNext)
-                menuOffset += STANDARD_REQUEST_OFFSET
-            checkAndRemoveOldErrorAndLoading()
-            when(val result = menuRepository.getMenu(menuOffset,menuCount)){
-                is Result.Success<List<MenuItemResponse>> -> {
-                    val items = mapMenuItemResponseToMenuItem(result.data)
-                    menuList.add(MenuElement.Header("Шаверма"))
-                    menuList.addAll(items)
-                    if(items.size == STANDARD_REQUEST_OFFSET) {
-                        menuList.add(MenuElement.Loading)
-                        copyAndSetMenuList(true)
-                    }
-                    else {
-                        repeat(2){
-                            // empty spacer for overlay button when scroll down
-                            menuList.add(MenuElement.Header(""))
-                        }
-                        copyAndSetMenuList(true, isFullyLoaded = true)
-                    }
-
-                }
-                is Result.Failure -> {
-                    if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
-                        _menuState.value = MenuUIState.TokenInvalidError
-                    else {
-                        if(result.message == Errors.NO_INTERNET_ERROR)
-                            _isDisconnectedToInternet.value = Event(true)
-                        if(menuList.lastOrNull() !is MenuElement.Error)
-                            menuList.add(MenuElement.Error)
-                        copyAndSetMenuList(false)
-                    }
-                }
-                is Result.NetworkFailure -> {
-                    if(menuList.lastOrNull() !is MenuElement.Error)
-                        menuList.add(MenuElement.Error)
-                    copyAndSetMenuList(false)
-                }
-            }
+    val menuFlow = Pager(config = PagingConfig(pageSize = STANDARD_REQUEST_OFFSET), pagingSourceFactory = {
+        CommonPagingSource<MenuItemResponse> { page, pageSize ->
+            menuRepository.getMenu(page, pageSize)
         }
-    }
+    }).flow.map{ pagingData ->
+        pagingData
+            .filter {
+                menuItemResponse -> menuItemResponse.visible
+            }
+            .map {
+                menuItemResponse -> mapMenuItemResponseToMenuItem(menuItemResponse)
+            }
+        }.cachedIn(viewModelScope)
 
-
-    private fun checkAndRemoveOldErrorAndLoading(){
-        if(menuList.lastOrNull() is MenuElement.Error || menuList.lastOrNull() is MenuElement.Loading)
-            menuList.removeLast()
-    }
-
-    override fun reloadMenu() {
-        if(menuList.last() is MenuElement.Error)
-            menuList.removeLast()
-        menuList.add(MenuElement.Loading)
-        copyAndSetMenuList(false)
-        getMenu(loadNext = false)
-    }
 
     override fun addToCart(menuItem: MenuElement.MenuItem) {
         rawCartList.add(menuItem)
@@ -194,19 +143,19 @@ class MenuViewModel @Inject constructor(
                 is Result.Success<OrderResponse> -> {
                     val id = result.data.id
                     clearCartMenuItemList()
-                    _orderState.value = OrderUIState.Success(id)
+                    _orderState.value = MakeOrderUIState.Success(id)
                 }
                 is Result.Failure -> {
                     if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
-                        _orderState.value = OrderUIState.TokenInvalidError
+                        _orderState.value = MakeOrderUIState.TokenInvalidError
                     else {
                         if(result.message == Errors.NO_INTERNET_ERROR)
                             _isDisconnectedToInternet.value = Event(true)
-                        _orderState.value = OrderUIState.Error(result.message)
+                        _orderState.value = MakeOrderUIState.Error(result.message)
                     }
                 }
                 is Result.NetworkFailure ->
-                    _orderState.value = OrderUIState.Error(Errors.NETWORK_ERROR)
+                    _orderState.value = MakeOrderUIState.Error(Errors.NETWORK_ERROR)
 
             }
             _isOrderCreating.value = false
@@ -240,23 +189,10 @@ class MenuViewModel @Inject constructor(
         cartList.sortBy { it.menuItem.id }
         return cartList
     }
+}
 
-    private fun copyAndSetMenuList(isSuccess: Boolean,isFullyLoaded: Boolean = false){
-        val newList = arrayListOf<MenuElement>()
-        newList.addAll(menuList)
-        if(isSuccess)
-            _menuState.value = MenuUIState.Success(newList,isFullyLoaded)
-        else
-            _menuState.value = MenuUIState.Error(newList)
-    }
-}
-sealed interface MenuUIState{
-    data class Success(val items: List<MenuElement>, val isFullyLoaded: Boolean = false): MenuUIState
-    data class Error(val items: List<MenuElement>): MenuUIState
-    object TokenInvalidError: MenuUIState
-}
-sealed interface OrderUIState{
-    class Success(val orderId: Int): OrderUIState
-    class Error(val message: String): OrderUIState
-    object TokenInvalidError: OrderUIState
+sealed interface MakeOrderUIState{
+    class Success(val orderId: Int): MakeOrderUIState
+    class Error(val message: String): MakeOrderUIState
+    object TokenInvalidError: MakeOrderUIState
 }

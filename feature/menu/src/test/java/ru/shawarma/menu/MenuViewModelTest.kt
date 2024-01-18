@@ -8,22 +8,19 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import ru.shawarma.core.data.entities.*
-import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.repositories.MenuRepository
 import ru.shawarma.core.data.utils.Errors
 import ru.shawarma.core.data.utils.Result
-import ru.shawarma.core.data.managers.TokenManager
 import ru.shawarma.core.data.repositories.OrderRepository
 import ru.shawarma.menu.entities.CartMenuItem
 import ru.shawarma.menu.entities.MenuElement
 import ru.shawarma.menu.viewmodels.MenuUIState
 import ru.shawarma.menu.viewmodels.MenuViewModel
-import ru.shawarma.menu.viewmodels.OrderUIState
+import ru.shawarma.menu.viewmodels.MakeOrderUIState
 import java.util.*
 
 class MenuViewModelTest {
@@ -85,21 +82,21 @@ class MenuViewModelTest {
     fun `Make order successfully`() = runTest {
         whenever(orderRepository.createOrder(any())).thenReturn(Result.Success(orderResponse))
         viewModel.makeOrder()
-        assertTrue(viewModel.orderState.value is OrderUIState.Success)
+        assertTrue(viewModel.orderState.value is MakeOrderUIState.Success)
     }
 
     @Test
     fun `Make order api error`() = runTest{
         whenever(orderRepository.createOrder(any())).thenReturn(Result.Failure(""))
         viewModel.makeOrder()
-        assertTrue(viewModel.orderState.value is OrderUIState.Error)
+        assertTrue(viewModel.orderState.value is MakeOrderUIState.Error)
     }
 
     @Test
     fun `Make order token invalid error`() = runTest{
         whenever(orderRepository.createOrder(any())).thenReturn(Result.Failure(Errors.REFRESH_TOKEN_ERROR))
         viewModel.makeOrder()
-        assertTrue(viewModel.orderState.value is OrderUIState.TokenInvalidError)
+        assertTrue(viewModel.orderState.value is MakeOrderUIState.TokenInvalidError)
     }
 
     @Test
