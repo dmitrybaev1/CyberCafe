@@ -4,7 +4,7 @@ import ru.shawarma.core.data.entities.OrderStatus
 import java.util.*
 
 data class Order (
-    val id: Int,
+    val id: Long,
     val menuItems: List<OrderMenuItem>,
     val createdDate: Date,
     val closeDate: Date,

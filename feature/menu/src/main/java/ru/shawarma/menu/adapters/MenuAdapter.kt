@@ -7,22 +7,21 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import ru.shawarma.core.ui.loadImage
 import ru.shawarma.menu.MenuController
+import ru.shawarma.menu.R
 import ru.shawarma.menu.databinding.MenuItemBinding
-import ru.shawarma.menu.entities.MenuElement
+import ru.shawarma.menu.entities.MenuItem
 
 class MenuAdapter(
     private val menuController: MenuController
-) : PagingDataAdapter<MenuElement.MenuItem, MenuAdapter.MenuItemViewHolder>(MenuItemDiffCallback()) {
+) : PagingDataAdapter<MenuItem, MenuAdapter.MenuItemViewHolder>(MenuItemDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuItemViewHolder {
-        val binding = DataBindingUtil.inflate<MenuItemBinding>(
-            LayoutInflater.from(parent.context),viewType,parent,false
-        )
+        val binding = MenuItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return MenuItemViewHolder(binding,menuController)
     }
 
     override fun onBindViewHolder(holder: MenuItemViewHolder, position: Int) {
-        val menuItem = getItem(position) as MenuElement.MenuItem
+        val menuItem = getItem(position) as MenuItem
         holder.bind(menuItem)
     }
 
@@ -30,7 +29,7 @@ class MenuAdapter(
         private val binding: MenuItemBinding,
         private val menuController: MenuController
     ) : ViewHolder(binding.root){
-        fun bind(menuItem: MenuElement.MenuItem){
+        fun bind(menuItem: MenuItem){
             binding.menuItem = menuItem
             binding.menuCartQuantityControlView.count = menuController.getMenuItemCount(menuItem)
             menuItem.imageUrl?.let { binding.menuItemImageView.loadImage(it,binding.root.context) }

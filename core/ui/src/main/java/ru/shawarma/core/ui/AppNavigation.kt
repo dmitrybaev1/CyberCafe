@@ -5,5 +5,5 @@ interface AppNavigation {
     fun navigateToAuth(errorMessage: String)
     fun navigateToAuth()
     fun navigateToSettings()
-    fun navigateToOrder(orderId: Int)
+    fun navigateToOrder(orderId: Long)
 }

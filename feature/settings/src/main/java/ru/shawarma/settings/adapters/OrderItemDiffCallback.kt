@@ -1,12 +1,12 @@
 package ru.shawarma.settings.adapters
 
 import androidx.recyclerview.widget.DiffUtil
-import ru.shawarma.settings.entities.OrderElement
+import ru.shawarma.settings.entities.OrderItem
 
-class OrderItemDiffCallback: DiffUtil.ItemCallback<OrderElement>() {
-    override fun areItemsTheSame(oldItem: OrderElement, newItem: OrderElement): Boolean =
-        oldItem == newItem
+class OrderItemDiffCallback: DiffUtil.ItemCallback<OrderItem>() {
+    override fun areItemsTheSame(oldItem: OrderItem, newItem: OrderItem): Boolean =
+        oldItem.id == newItem.id
 
-    override fun areContentsTheSame(oldItem: OrderElement, newItem: OrderElement): Boolean =
+    override fun areContentsTheSame(oldItem: OrderItem, newItem: OrderItem): Boolean =
         oldItem == newItem
 }

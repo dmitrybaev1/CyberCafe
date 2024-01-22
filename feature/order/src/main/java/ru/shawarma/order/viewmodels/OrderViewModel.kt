@@ -31,8 +31,8 @@ class OrderViewModel @Inject constructor(
 
     val isDisconnectedToInternet: LiveData<Event<Boolean>> = _isDisconnectedToInternet
 
-    private val _orderId = MutableLiveData<Int>()
-    val orderId: LiveData<Int> = _orderId
+    private val _orderId = MutableLiveData<Long>()
+    val orderId: LiveData<Long> = _orderId
 
     private val _totalPrice = MutableLiveData<Int>()
     val totalPrice: LiveData<Int> = _totalPrice
@@ -46,7 +46,7 @@ class OrderViewModel @Inject constructor(
     private val _orderStatus = MutableLiveData<String>()
     val orderStatus: LiveData<String> = _orderStatus
 
-    var id: Int = -1 //avoiding duplicate requests when config changes
+    var id: Long = -1 //avoiding duplicate requests when config changes
         set(value) {
             if(field != value) {
                 field = value
@@ -54,7 +54,7 @@ class OrderViewModel @Inject constructor(
             }
         }
 
-    fun getOrder(orderId: Int){
+    fun getOrder(orderId: Long){
         viewModelScope.launch {
             _orderState.value = null
             when(val result = orderRepository.getOrder(orderId)){
@@ -82,7 +82,7 @@ class OrderViewModel @Inject constructor(
     }
 
 
-    fun startOrderStatusObserving(orderId: Int){
+    fun startOrderStatusObserving(orderId: Long){
         viewModelScope.launch {
             orderRepository.startOrdersStatusHub{orderResponse ->
                 updateState(orderId,orderResponse)
@@ -90,7 +90,7 @@ class OrderViewModel @Inject constructor(
         }
     }
 
-    private fun updateState(orderId: Int, orderResponse: OrderResponse){
+    private fun updateState(orderId: Long, orderResponse: OrderResponse){
         if(orderResponse.id == orderId){
             val order = mapOrderResponseToOrder(orderResponse)
             _orderId.postValue(order.id)

@@ -4,19 +4,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.entities.OrderResponse
 import ru.shawarma.core.data.repositories.OrderRepository
-import ru.shawarma.core.data.utils.Errors
-import ru.shawarma.core.data.utils.Result
+import ru.shawarma.core.ui.CommonPagingSource
 import ru.shawarma.core.ui.Event
 import ru.shawarma.settings.NavigationCommand
 import ru.shawarma.settings.SettingsController
-import ru.shawarma.settings.entities.OrderElement
-import ru.shawarma.settings.utils.STANDARD_REQUEST_OFFSET
+import ru.shawarma.settings.entities.OrderItem
+import ru.shawarma.settings.utils.ORDERS_REQUEST_OFFSET
 import ru.shawarma.settings.utils.mapOrderResponseToOrderItems
 import javax.inject.Inject
 
@@ -24,16 +28,6 @@ import javax.inject.Inject
 class OrdersViewModel @Inject constructor(
     private val orderRepository: OrderRepository
 ) : ViewModel(), SettingsController {
-
-    private var ordersOffset = - STANDARD_REQUEST_OFFSET
-
-    private val ordersCount = STANDARD_REQUEST_OFFSET
-
-    private val _ordersState = MutableStateFlow<OrdersUIState>(
-        OrdersUIState.Success(listOf(OrderElement.Loading))
-    )
-
-    val ordersState = _ordersState.asStateFlow()
 
     private val _isDisconnectedToInternet = MutableLiveData<Event<Boolean>>()
 
@@ -43,58 +37,26 @@ class OrdersViewModel @Inject constructor(
 
     val navCommand: LiveData<Event<NavigationCommand>> = _navCommand
 
-    private val ordersList = arrayListOf<OrderElement>(OrderElement.Loading)
+    val ordersFlow = Pager(
+        config = PagingConfig(
+            pageSize = ORDERS_REQUEST_OFFSET,
+            initialLoadSize = ORDERS_REQUEST_OFFSET
+        ),
+        pagingSourceFactory = {
+            CommonPagingSource { page, pageSize ->
+                orderRepository.getOrders(page*pageSize, pageSize)
+            }
+        }).flow.map<PagingData<OrderResponse>, PagingData<OrderItem>>{ pagingData ->
+            pagingData
+                .map {
+                    orderResponse -> mapOrderResponseToOrderItems(orderResponse)
+                }
+        }.cachedIn(viewModelScope)
 
-    private val _ordersListLiveData = MutableLiveData(
-        listOf<OrderElement>(OrderElement.Loading))
-
-    val ordersListLiveData: LiveData<List<OrderElement>> = _ordersListLiveData
+    val isOrdersListEmpty = MutableLiveData(true)
 
     init {
-        getOrders()
         startOrdersStatusObserving()
-    }
-
-    fun getOrders(loadNext: Boolean = true){
-        viewModelScope.launch {
-            if(loadNext)
-                ordersOffset += STANDARD_REQUEST_OFFSET
-            checkAndRemoveOldErrorAndLoading()
-            when(val result = orderRepository.getOrders(ordersOffset,ordersCount)){
-                is Result.Success<List<OrderResponse>> -> {
-                    val items = mapOrderResponseToOrderItems(result.data)
-                    ordersList.addAll(items)
-                    if(result.data.size == STANDARD_REQUEST_OFFSET) {
-                        ordersList.add(OrderElement.Loading)
-                        copyAndSetOrdersList(true)
-                    }
-                    else
-                        copyAndSetOrdersList(true, isFullyLoaded = true)
-                }
-                is Result.Failure -> {
-                    if(result.message == Errors.UNAUTHORIZED_ERROR || result.message == Errors.REFRESH_TOKEN_ERROR)
-                        _ordersState.value = OrdersUIState.TokenInvalidError
-                    else {
-                        if(result.message == Errors.NO_INTERNET_ERROR)
-                            _isDisconnectedToInternet.value = Event(true)
-                        if(ordersList.lastOrNull() !is OrderElement.Error)
-                            ordersList.add(OrderElement.Error)
-                        copyAndSetOrdersList(false)
-                    }
-                }
-                is Result.NetworkFailure -> {
-                    if(ordersList.lastOrNull() !is OrderElement.Error)
-                        ordersList.add(OrderElement.Error)
-                    copyAndSetOrdersList(false)
-                }
-            }
-        }
-    }
-
-    fun refreshOrders(){
-        ordersList.clear()
-        ordersOffset = - STANDARD_REQUEST_OFFSET
-        getOrders()
     }
 
     private fun startOrdersStatusObserving(){
@@ -106,53 +68,16 @@ class OrdersViewModel @Inject constructor(
     }
 
     private fun updateState(orderResponse: OrderResponse){
-        val newList = ordersList.map {
-            if(it is OrderElement.OrderItem){
-                if(it.id == orderResponse.id)
-                    mapOrderResponseToOrderItems(listOf(orderResponse))[0]
-                else
-                    it
-            }
-            else
-                it
-        }
-        _ordersState.value = OrdersUIState.Success(newList)
+
     }
 
-    override fun goToOrder(id: Int) {
+    override fun goToOrder(id: Long) {
         _navCommand.value = Event(NavigationCommand.ToOrderModule(id))
     }
 
-    override fun reloadOrders() {
-        if(ordersList.last() is OrderElement.Error)
-            ordersList.removeLast()
-        ordersList.add(OrderElement.Loading)
-        copyAndSetOrdersList(false)
-        getOrders(loadNext = false)
-    }
-
-    private fun checkAndRemoveOldErrorAndLoading(){
-        if(ordersList.lastOrNull() is OrderElement.Error || ordersList.lastOrNull() is OrderElement.Loading)
-            ordersList.removeLast()
-    }
-
-    private fun copyAndSetOrdersList(isSuccess: Boolean, isFullyLoaded: Boolean = false){
-        val newList = arrayListOf<OrderElement>()
-        newList.addAll(ordersList)
-        _ordersListLiveData.value = newList
-        if(isSuccess)
-            _ordersState.value = OrdersUIState.Success(newList,isFullyLoaded)
-        else
-            _ordersState.value = OrdersUIState.Error(newList)
-    }
 
     override fun onCleared() {
         super.onCleared()
         orderRepository.stopOrdersStatusHub()
     }
-}
-sealed interface OrdersUIState{
-    class Success(val items: List<OrderElement>, val isFullyLoaded: Boolean = false): OrdersUIState
-    data class Error(val items: List<OrderElement>): OrdersUIState
-    object TokenInvalidError: OrdersUIState
 }

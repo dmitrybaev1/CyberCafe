@@ -8,7 +8,7 @@
         android:paddingTop="20dp">
 
         <ImageView
-            android:id="@+id/menuErrorImageView"
+            android:id="@+id/orderErrorImageView"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:visibility="gone"
@@ -18,7 +18,7 @@
             app:srcCompat="@drawable/error" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/menuErrorTextView"
+            android:id="@+id/orderErrorTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -28,10 +28,10 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/menuErrorImageView" />
+            app:layout_constraintTop_toBottomOf="@+id/orderErrorImageView" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/menuRetryButton"
+            android:id="@+id/orderRetryButton"
             style="@style/OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -39,10 +39,10 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/menuErrorTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/orderErrorTextView" />
 
         <ProgressBar
-            android:id="@+id/menuLoadingProgressBar"
+            android:id="@+id/orderLoadingProgressBar"
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

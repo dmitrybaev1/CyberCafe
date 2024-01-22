@@ -28,7 +28,7 @@ class MainOrderRepository @Inject constructor(
         }
     }
 
-    override suspend fun getOrder(id: Int): Result<OrderResponse> {
+    override suspend fun getOrder(id: Long): Result<OrderResponse> {
         if (!internetManager.isOnline())
             return Result.Failure(Errors.NO_INTERNET_ERROR)
         return when (val result = authRepository.getActualAuthData()) {

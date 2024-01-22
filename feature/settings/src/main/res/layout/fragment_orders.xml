@@ -6,7 +6,6 @@
             name="viewModel"
             type="ru.shawarma.settings.viewmodels.OrdersViewModel" />
         <import type="android.view.View"/>
-        <import type="ru.shawarma.settings.viewmodels.OrdersUIState"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,7 +18,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:text="@string/empty_orders"
-            android:visibility="@{viewModel.ordersListLiveData.empty ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.isOrdersListEmpty ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -29,7 +28,6 @@
             android:id="@+id/ordersSwipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{viewModel.ordersListLiveData.empty ? View.GONE : View.VISIBLE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:swipeRefreshLayoutProgressSpinnerBackgroundColor="?attr/colorPrimary">
@@ -38,6 +36,7 @@
                 android:id="@+id/ordersRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:visibility="@{viewModel.isOrdersListEmpty ? View.GONE : View.VISIBLE}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

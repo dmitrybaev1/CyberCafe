@@ -6,7 +6,7 @@
     <data>
         <variable
             name="menuItem"
-            type="ru.shawarma.menu.entities.MenuElement.MenuItem" />
+            type="ru.shawarma.menu.entities.MenuItem" />
         <import type="android.view.View" />
     </data>
 

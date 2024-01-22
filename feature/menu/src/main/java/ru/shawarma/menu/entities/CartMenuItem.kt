@@ -1,6 +1,6 @@
 package ru.shawarma.menu.entities
 
 data class CartMenuItem (
-    val menuItem: MenuElement.MenuItem,
+    val menuItem: MenuItem,
     val count: Int
 )

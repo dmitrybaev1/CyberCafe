@@ -1,6 +1,7 @@
 package ru.shawarma.menu
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +15,9 @@ import androidx.navigation.createGraph
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
 import androidx.paging.LoadState
-import androidx.paging.LoadStateAdapter
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.shawarma.core.data.utils.Errors
@@ -83,8 +83,10 @@ class MenuFragment : Fragment() {
             }
             launch {
                 menuAdapter?.loadStateFlow?.collectLatest { loadStates ->
-                    val state = loadStates.refresh
-                    if(state is LoadState.Error) {
+                    val states = listOf(loadStates.refresh,loadStates.append,loadStates.prepend)
+                    val errorStates = states.filterIsInstance<LoadState.Error>()
+                    if(errorStates.isNotEmpty()) {
+                        val state = errorStates[0]
                         if (state.error.message == Errors.UNAUTHORIZED_ERROR
                             || state.error.message == Errors.REFRESH_TOKEN_ERROR
                         ) {
@@ -111,10 +113,12 @@ class MenuFragment : Fragment() {
 
     private fun setupMenuRecyclerView(){
         menuAdapter = MenuAdapter(viewModel)
-        val _adapter = menuAdapter!!
-        _adapter.withLoadStateFooter(MenuLoadStateAdapter(_adapter::retry))
+        val _adapter = menuAdapter!!.withLoadStateFooter(MenuLoadStateAdapter(menuAdapter!!::retry))
         val gridLayoutManager = GridLayoutManager(requireContext(),2)
-
+        gridLayoutManager.spanSizeLookup = object: GridLayoutManager.SpanSizeLookup(){
+            override fun getSpanSize(position: Int): Int =
+                if(_adapter.getItemViewType(position) == 0) MENU_ITEM_SPAN_SIZE else MENU_FULL_SPAN_SIZE
+        }
         binding!!.menuRecyclerView.apply {
             layoutManager = gridLayoutManager
             adapter = _adapter

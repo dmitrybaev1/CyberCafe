@@ -1,14 +1,14 @@
 package ru.shawarma.menu
 
-import ru.shawarma.menu.entities.MenuElement
+import ru.shawarma.menu.entities.MenuItem
 
 interface MenuController {
 
-    fun addToCart(menuItem: MenuElement.MenuItem)
+    fun addToCart(menuItem: MenuItem)
 
-    fun removeFromCart(menuItem: MenuElement.MenuItem)
+    fun removeFromCart(menuItem: MenuItem)
 
-    fun goToMenuItemFragment(menuItem: MenuElement.MenuItem, count: Int)
+    fun goToMenuItemFragment(menuItem: MenuItem, count: Int)
 
-    fun getMenuItemCount(menuItem: MenuElement.MenuItem): Int
+    fun getMenuItemCount(menuItem: MenuItem): Int
 }

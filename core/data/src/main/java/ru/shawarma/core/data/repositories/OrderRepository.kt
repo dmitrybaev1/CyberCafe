@@ -10,7 +10,7 @@ interface OrderRepository {
 
     suspend fun getOrders(offset: Int, count: Int): Result<List<OrderResponse>>
 
-    suspend fun getOrder(id: Int): Result<OrderResponse>
+    suspend fun getOrder(id: Long): Result<OrderResponse>
 
     suspend fun createOrder(request: CreateOrderRequest): Result<OrderResponse>
 

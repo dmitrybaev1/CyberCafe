@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import java.util.*
 
 data class OrderResponse(
-    val id: Int,
+    val id: Long,
     val menuItems: List<OrderMenuItemResponse>,
     val clientId: String,
     val createdDate: Date,

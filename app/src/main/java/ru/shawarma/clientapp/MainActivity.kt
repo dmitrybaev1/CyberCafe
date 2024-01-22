@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         navController.navigate(ru.shawarma.settings.R.id.settings_nav_graph)
     }
 
-    override fun navigateToOrder(orderId: Int) {
+    override fun navigateToOrder(orderId: Long) {
         val bundle = bundleOf("orderId" to orderId)
         navController.navigate(ru.shawarma.order.R.id.order_nav_graph,bundle)
     }

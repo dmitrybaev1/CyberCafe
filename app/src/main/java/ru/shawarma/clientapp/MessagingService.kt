@@ -81,7 +81,7 @@ class MessagingService : FirebaseMessagingService(), LifecycleOwner {
 
     private fun showOrderStatusNotification(
         status: OrderStatus,
-        orderId: Int,
+        orderId: Long,
     ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel()
@@ -118,7 +118,7 @@ class MessagingService : FirebaseMessagingService(), LifecycleOwner {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun createPendingIntentWithOrderId(id: Int): PendingIntent {
+    private fun createPendingIntentWithOrderId(id: Long): PendingIntent {
         val navDeepLinkBuilder = NavDeepLinkBuilder(this).setGraph(R.navigation.main_nav_graph)
         return navDeepLinkBuilder.setDestination(
             ru.shawarma.order.R.id.order_nav_graph, bundleOf("orderId" to id)

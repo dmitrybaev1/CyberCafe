@@ -3,75 +3,36 @@ package ru.shawarma.settings.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import ru.shawarma.core.data.entities.OrderStatus
 import ru.shawarma.settings.R
 import ru.shawarma.settings.SettingsController
-import ru.shawarma.settings.databinding.OrderErrorBinding
 import ru.shawarma.settings.databinding.OrderItemBinding
-import ru.shawarma.settings.databinding.OrderLoadingBinding
-import ru.shawarma.settings.entities.OrderElement
+import ru.shawarma.settings.entities.OrderItem
 
 class OrdersAdapter(
     private val settingsController: SettingsController
-) : ListAdapter<OrderElement, ViewHolder>(OrderItemDiffCallback()) {
+) : PagingDataAdapter<OrderItem, OrdersAdapter.OrderItemViewHolder>(OrderItemDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return when(viewType){
-            R.layout.order_item -> {
-                val binding = DataBindingUtil.inflate<OrderItemBinding>(
-                    LayoutInflater.from(parent.context), viewType, parent,false)
-                return OrderItemViewHolder(binding,settingsController)
-            }
-            R.layout.order_error -> {
-                val binding = DataBindingUtil.inflate<OrderErrorBinding>(
-                    LayoutInflater.from(parent.context), viewType, parent,false)
-                return OrderErrorViewHolder(binding,settingsController)
-            }
-            R.layout.order_loading -> {
-                val binding = DataBindingUtil.inflate<OrderLoadingBinding>(
-                    LayoutInflater.from(parent.context), viewType, parent,false)
-                return OrderLoadingViewHolder(binding)
-            }
-            else -> throw ClassCastException("Unknown viewType $viewType")
-        }
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderItemViewHolder {
+        val binding = OrderItemBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        return OrderItemViewHolder(binding,settingsController)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if(holder is OrderItemViewHolder){
-            val orderItem = getItem(position) as OrderElement.OrderItem
+    override fun onBindViewHolder(holder: OrderItemViewHolder, position: Int) {
+        val orderItem = getItem(position)
+        if (orderItem != null) {
             holder.bind(orderItem)
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return when(getItem(position)){
-            is OrderElement.OrderItem -> R.layout.order_item
-            is OrderElement.Error -> R.layout.order_error
-            is OrderElement.Loading -> R.layout.order_loading
-            else -> throw IllegalStateException()
-        }
-    }
-
-    class OrderErrorViewHolder(binding: OrderErrorBinding, settingsController: SettingsController
-    ): ViewHolder(binding.root){
-        init{
-            binding.ordersRetryButton.setOnClickListener {
-                settingsController.reloadOrders()
-            }
-        }
-    }
-
-    class OrderLoadingViewHolder(binding: OrderLoadingBinding): ViewHolder(binding.root)
 
     class OrderItemViewHolder(
         private val binding: OrderItemBinding,
         private val settingsController: SettingsController
     ) : ViewHolder(binding.root){
-        fun bind(orderItem: OrderElement.OrderItem){
+        fun bind(orderItem: OrderItem){
             binding.orderItem = orderItem
             val context = binding.root.context
             when(orderItem.status){

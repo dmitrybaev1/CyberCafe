@@ -32,7 +32,7 @@ class OrderFragment : Fragment() {
 
     private var binding: FragmentOrderBinding? = null
 
-    private var id: Int? = null
+    private var id: Long? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,7 +40,7 @@ class OrderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         inflateMenu()
-        id = arguments?.getInt("orderId")
+        id = arguments?.getLong("orderId")
         id?.let {id ->
             viewModel.id = id
         }

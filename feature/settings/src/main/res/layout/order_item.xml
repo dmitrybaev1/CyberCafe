@@ -4,7 +4,7 @@
     <data>
         <variable
             name="orderItem"
-            type="ru.shawarma.settings.entities.OrderElement.OrderItem" />
+            type="ru.shawarma.settings.entities.OrderItem" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

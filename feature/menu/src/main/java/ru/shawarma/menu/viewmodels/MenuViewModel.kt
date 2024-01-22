@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.filter
 import androidx.paging.map
@@ -26,9 +27,9 @@ import ru.shawarma.core.ui.Event
 import ru.shawarma.menu.MenuController
 import ru.shawarma.menu.NavigationCommand
 import ru.shawarma.menu.entities.CartMenuItem
-import ru.shawarma.menu.entities.MenuElement
+import ru.shawarma.menu.entities.MenuItem
 import ru.shawarma.menu.utlis.PlaceholderStringType
-import ru.shawarma.menu.utlis.STANDARD_REQUEST_OFFSET
+import ru.shawarma.menu.utlis.MENU_REQUEST_OFFSET
 import ru.shawarma.menu.utlis.mapCartListToOrderMenuItemRequest
 import ru.shawarma.menu.utlis.mapMenuItemResponseToMenuItem
 import javax.inject.Inject
@@ -67,11 +68,11 @@ class MenuViewModel @Inject constructor(
 
     val cartListLiveData: LiveData<List<CartMenuItem>> = _cartListLiveData
 
-    private val rawCartList = arrayListOf<MenuElement.MenuItem>()
+    private val rawCartList = arrayListOf<MenuItem>()
 
-    private val _chosenMenuItem = MutableLiveData<MenuElement.MenuItem>()
+    private val _chosenMenuItem = MutableLiveData<MenuItem>()
 
-    val chosenMenuItem: LiveData<MenuElement.MenuItem> = _chosenMenuItem
+    val chosenMenuItem: LiveData<MenuItem> = _chosenMenuItem
 
     var totalCurrentCartPrice = 0
 
@@ -79,22 +80,27 @@ class MenuViewModel @Inject constructor(
 
     val isOrderCreating: LiveData<Boolean> = _isOrderCreating
 
-    val menuFlow = Pager(config = PagingConfig(pageSize = STANDARD_REQUEST_OFFSET), pagingSourceFactory = {
-        CommonPagingSource<MenuItemResponse> { page, pageSize ->
-            menuRepository.getMenu(page, pageSize)
-        }
-    }).flow.map{ pagingData ->
-        pagingData
-            .filter {
-                menuItemResponse -> menuItemResponse.visible
+    val menuFlow = Pager(
+        config = PagingConfig(
+            pageSize = MENU_REQUEST_OFFSET,
+            initialLoadSize = MENU_REQUEST_OFFSET
+        ),
+        pagingSourceFactory = {
+            CommonPagingSource<MenuItemResponse> { page, pageSize ->
+                menuRepository.getMenu(page*pageSize, pageSize)
             }
-            .map {
-                menuItemResponse -> mapMenuItemResponseToMenuItem(menuItemResponse)
-            }
-        }.cachedIn(viewModelScope)
+        }).flow.map<PagingData<MenuItemResponse>,PagingData<MenuItem>>{ pagingData ->
+            pagingData
+                .filter {
+                    menuItemResponse -> menuItemResponse.visible
+                }
+                .map {
+                    menuItemResponse -> mapMenuItemResponseToMenuItem(menuItemResponse)
+                }
+            }.cachedIn(viewModelScope)
 
 
-    override fun addToCart(menuItem: MenuElement.MenuItem) {
+    override fun addToCart(menuItem: MenuItem) {
         rawCartList.add(menuItem)
         if(!menuItem.isPicked.get())
             menuItem.isPicked.set(true)
@@ -107,7 +113,7 @@ class MenuViewModel @Inject constructor(
         )
     }
 
-    override fun removeFromCart(menuItem: MenuElement.MenuItem) {
+    override fun removeFromCart(menuItem: MenuItem) {
         rawCartList.remove(menuItem)
         if(getMenuItemCount(menuItem) == 0)
             menuItem.isPicked.set(false)
@@ -120,7 +126,7 @@ class MenuViewModel @Inject constructor(
         )
     }
 
-    override fun getMenuItemCount(menuItem: MenuElement.MenuItem): Int =
+    override fun getMenuItemCount(menuItem: MenuItem): Int =
         rawCartList.filter { item -> item == menuItem }.size
 
     fun setFormattedString(type: PlaceholderStringType, formattedString: CharSequence){
@@ -166,7 +172,7 @@ class MenuViewModel @Inject constructor(
         _orderState.value = null
     }
 
-    override fun goToMenuItemFragment(menuItem: MenuElement.MenuItem, count: Int){
+    override fun goToMenuItemFragment(menuItem: MenuItem, count: Int){
         _chosenMenuItem.value = menuItem
         _navCommand.value = Event(NavigationCommand.ToMenuItemFragment)
     }
@@ -192,7 +198,7 @@ class MenuViewModel @Inject constructor(
 }
 
 sealed interface MakeOrderUIState{
-    class Success(val orderId: Int): MakeOrderUIState
+    class Success(val orderId: Long): MakeOrderUIState
     class Error(val message: String): MakeOrderUIState
     object TokenInvalidError: MakeOrderUIState
 }
