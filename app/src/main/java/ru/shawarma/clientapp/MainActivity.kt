@@ -93,12 +93,16 @@ class MainActivity : AppCompatActivity(), AppNavigation,
         val request = NavDeepLinkRequest.Builder
             .fromUri("android-app://ru.shawarma.app/authFragment".toUri())
             .build()
+        navController.popBackStack(ru.shawarma.menu.R.id.menu_nav_graph,true)
+        navController.popBackStack(ru.shawarma.auth.R.id.auth_nav_graph,true)
         navController.navigate(request)
     }
     override fun navigateToAuth(errorMessage: String) {
         val request = NavDeepLinkRequest.Builder
             .fromUri("android-app://ru.shawarma.app/authFragment/$errorMessage".toUri())
             .build()
+        navController.popBackStack(ru.shawarma.menu.R.id.menu_nav_graph,true)
+        navController.popBackStack(ru.shawarma.auth.R.id.auth_nav_graph,true)
         navController.navigate(request)
     }
 

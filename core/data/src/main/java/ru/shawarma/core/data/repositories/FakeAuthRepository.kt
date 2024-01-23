@@ -3,6 +3,7 @@ package ru.shawarma.core.data.repositories
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.FirebaseTokenRequest
 import ru.shawarma.core.data.entities.FirebaseTokenResponse
+import ru.shawarma.core.data.entities.GoogleTokenRequest
 import ru.shawarma.core.data.entities.InfoResponse
 import ru.shawarma.core.data.entities.RegisteredUser
 import ru.shawarma.core.data.entities.TokensRequest
@@ -33,6 +34,19 @@ class FakeAuthRepository @Inject constructor(
 
     override suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser> {
         return Result.Success(RegisteredUser("","",""))
+    }
+
+    override suspend fun verifyGoogle(googleTokenRequest: GoogleTokenRequest): Result<AuthData> {
+        val result = Result.Success(
+            AuthData(
+                accessToken = "accessToken",
+                refreshToken = "refreshToken",
+                expiresIn = 1805769969084L,
+                tokenType = "jwt"
+            )
+        )
+        tokenManager.update(result.data)
+        return result
     }
 
     override suspend fun getInfo(): Result<InfoResponse> {
