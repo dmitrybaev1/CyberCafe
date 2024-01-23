@@ -17,6 +17,9 @@ interface AuthService {
     @POST("auth/login")
     suspend fun login(@Body userLoginRequest: UserLoginRequest): AuthData
 
+    @POST("auth/verify-google")
+    suspend fun verifyGoogle(@Body googleTokenRequest: GoogleTokenRequest): AuthData
+
     @GET("users/_me")
     suspend fun getInfo(@Header("Authorization") token: String): InfoResponse
 }

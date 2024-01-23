@@ -33,6 +33,15 @@ class MainAuthRepository @Inject constructor(
         return authRemoteDataSource.register(userRegisterRequest)
     }
 
+    override suspend fun verifyGoogle(googleTokenRequest: GoogleTokenRequest): Result<AuthData> {
+        if(!internetManager.isOnline())
+            return Result.Failure(Errors.NO_INTERNET_ERROR)
+        val result = authRemoteDataSource.verifyGoogle(googleTokenRequest)
+        if(result is Result.Success<AuthData>)
+            tokenManager.update(result.data)
+        return result
+    }
+
     override suspend fun getInfo(): Result<InfoResponse> {
         if (!internetManager.isOnline())
             return Result.Failure(Errors.NO_INTERNET_ERROR)

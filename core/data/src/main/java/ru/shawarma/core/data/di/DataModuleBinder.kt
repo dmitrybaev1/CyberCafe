@@ -25,13 +25,13 @@ abstract class DataModuleBinder {
     abstract fun bindOrderRemoteDataSource(dataSource: MainOrderRemoteDataSource): OrderRemoteDataSource
 
     @Binds
-    abstract fun bindAuthRepository(repository: FakeAuthRepository): AuthRepository
+    abstract fun bindAuthRepository(repository: MainAuthRepository): AuthRepository
 
     @Binds
-    abstract fun bindMenuRepository(repository: FakeMenuRepository): MenuRepository
+    abstract fun bindMenuRepository(repository: MainMenuRepository): MenuRepository
 
     @Binds
-    abstract fun bindOrderRepository(repository: FakeOrderRepository): OrderRepository
+    abstract fun bindOrderRepository(repository: MainOrderRepository): OrderRepository
 
     @Binds
     abstract fun bindTokenManager(tokenManager: MainTokenManager): TokenManager

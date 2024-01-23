@@ -51,7 +51,7 @@ class MainOrderRemoteDataSource @Inject constructor(
                 if (!isConnectedToHub()) {
                     val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
                     hubConnection = HubConnectionBuilder
-                        .create("http://192.168.0.106:5029/notifications/client/orders")
+                        .create("http://192.168.86.104:5029/notifications/client/orders")
                         .withHubProtocol(GsonHubProtocol(gson))
                         .withAccessTokenProvider(Single.defer {
                             runBlocking {

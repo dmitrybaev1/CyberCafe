@@ -33,6 +33,12 @@ class MainAuthRemoteDataSource @Inject constructor(
             authService.register(userRegisterRequest)
         }
 
+    override suspend fun verifyGoogle(googleTokenRequest: GoogleTokenRequest): Result<AuthData> =
+        safeServiceCall(dispatcher){
+            authService.verifyGoogle(googleTokenRequest)
+        }
+
+
     override suspend fun getInfo(token: String): Result<InfoResponse> =
         safeServiceCall(dispatcher){
             authService.getInfo(token)

@@ -1,5 +1,6 @@
 package ru.shawarma.core.data.repositories
 
+import android.util.Log
 import ru.shawarma.core.data.datasources.MenuRemoteDataSource
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.MenuItemResponse

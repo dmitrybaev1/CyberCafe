@@ -107,6 +107,21 @@
             app:layout_constraintTop_toTopOf="@+id/authSignInButton"
             app:layout_constraintBottom_toBottomOf="@+id/authSignInButton"/>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/authGoogleSignInButton"
+            android:layout_width="245dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:clickable="@{!viewModel.isLoading()}"
+            android:onClick="@{() ->  viewModel.googleSignIn()}"
+            android:text='@{viewModel.isLoading() ? "" : @string/sign_in_with_google}'
+            tools:text="Войти через Google"
+            android:drawableLeft="@drawable/google_icon"
+            android:textAllCaps="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/authSignInButton"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/authRegisterButton"
@@ -119,5 +134,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/authSignInButton" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

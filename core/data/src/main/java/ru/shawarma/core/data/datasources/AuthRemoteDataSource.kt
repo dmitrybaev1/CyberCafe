@@ -11,6 +11,8 @@ interface AuthRemoteDataSource {
 
     suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser>
 
+    suspend fun verifyGoogle(googleTokenRequest: GoogleTokenRequest): Result<AuthData>
+
     suspend fun getInfo(token: String): Result<InfoResponse>
 
     suspend fun saveFirebaseToken(token: String, request: FirebaseTokenRequest): Result<FirebaseTokenResponse>

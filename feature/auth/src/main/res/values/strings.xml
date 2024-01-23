@@ -5,6 +5,7 @@
     <string name="name_hint">Name (optional)</string>
     <string name="password_hint">Password</string>
     <string name="sign_in">Sign In</string>
+    <string name="sign_in_with_google">Sing in with Google</string>
     <string name="log_in">Login</string>
     <string name="register">No account yet?</string>
     <string name="register_explicit">Register</string>
@@ -17,4 +18,5 @@
     <string name="refresh_token_error">Session is invalid, try login again</string>
     <string name="email_error">Incorrect email</string>
     <string name="password_error">Password must be at least 8 characters</string>
+    <string name="server_client_id" translatable="false">620553566742-uj469o7nqh2dg586iv39ud3ivlpcji1l.apps.googleusercontent.com</string>
 </resources>

@@ -13,6 +13,7 @@ import ru.shawarma.auth.checkEmail
 import ru.shawarma.auth.checkPassword
 import ru.shawarma.core.data.entities.AuthData
 import ru.shawarma.core.data.entities.FirebaseTokenRequest
+import ru.shawarma.core.data.entities.GoogleTokenRequest
 import ru.shawarma.core.data.entities.UserLoginRequest
 import ru.shawarma.core.data.repositories.AuthRepository
 import ru.shawarma.core.data.utils.Errors
@@ -68,7 +69,37 @@ class AuthViewModel @Inject constructor(
                     _isError.value = result.message != Errors.NO_INTERNET_ERROR
 
                 }
-                is Result.NetworkFailure -> { _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR); _isError.value = true }
+                is Result.NetworkFailure -> {
+                    _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR)
+                    _isError.value = true
+                }
+            }
+            _isLoading.value = false
+        }
+    }
+
+    fun googleSignIn(){
+        _authState.value = AuthUIState.NeedGoogleSignIn
+    }
+
+    fun verifyGoogle(token: String){
+        _isLoading.value = true
+        val googleTokenRequest = GoogleTokenRequest(token)
+        viewModelScope.launch {
+            when(val result = authRepository.verifyGoogle(googleTokenRequest)){
+                is Result.Success -> {
+                    _authState.value = AuthUIState.Success
+                    _isError.value = false
+                }
+                is Result.Failure -> {
+                    _authState.value = AuthUIState.Error(result.message)
+                    _isError.value = result.message != Errors.NO_INTERNET_ERROR
+
+                }
+                is Result.NetworkFailure -> {
+                    _authState.value = AuthUIState.Error(Errors.NETWORK_ERROR)
+                    _isError.value = true
+                }
             }
             _isLoading.value = false
         }
@@ -95,7 +126,7 @@ class AuthViewModel @Inject constructor(
 
     fun saveFirebaseToken(request: FirebaseTokenRequest){
         viewModelScope.launch {
-            when(val result = authRepository.saveFirebaseToken(request)){
+            when(authRepository.saveFirebaseToken(request)){
                 is Result.Success -> _authState.value = AuthUIState.FirebaseTokenSent(success = true)
                 else -> _authState.value = AuthUIState.FirebaseTokenSent(success = false)
             }
@@ -106,5 +137,6 @@ class AuthViewModel @Inject constructor(
 sealed interface AuthUIState{
     object Success: AuthUIState
     class Error(val message: String): AuthUIState
+    object NeedGoogleSignIn: AuthUIState
     data class FirebaseTokenSent(val success: Boolean): AuthUIState
 }

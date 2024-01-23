@@ -39,7 +39,7 @@ object ApplicationRetrofit {
                 return authInstance ?: run {
                     val builder = Retrofit.Builder()
                         .addConverterFactory(GsonConverterFactory.create())
-                        .baseUrl("http://192.168.0.106:5236/api/v1/")
+                        .baseUrl("http://192.168.86.104:5236/api/v1/")
                         .client(client)
                     val retrofit = builder.build()
                     authInstance = retrofit
@@ -50,7 +50,7 @@ object ApplicationRetrofit {
                 return menuInstance ?: run {
                     val builder = Retrofit.Builder()
                         .addConverterFactory(GsonConverterFactory.create())
-                        .baseUrl("http://192.168.0.106:5291/api/v1/")
+                        .baseUrl("http://192.168.86.104:5291/api/v1/")
                         .client(client)
                     val retrofit = builder.build()
                     menuInstance = retrofit
@@ -62,7 +62,7 @@ object ApplicationRetrofit {
                     val gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create()
                     val builder = Retrofit.Builder()
                         .addConverterFactory(GsonConverterFactory.create(gson))
-                        .baseUrl("http://192.168.0.106:5029/api/v1/")
+                        .baseUrl("http://192.168.86.104:5029/api/v1/")
                         .client(client)
                     val retrofit = builder.build()
                     orderInstance = retrofit

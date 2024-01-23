@@ -10,6 +10,8 @@ interface AuthRepository {
 
     suspend fun register(userRegisterRequest: UserRegisterRequest): Result<RegisteredUser>
 
+    suspend fun verifyGoogle(googleTokenRequest: GoogleTokenRequest): Result<AuthData>
+
     suspend fun getInfo(): Result<InfoResponse>
 
     suspend fun clearAuthData()

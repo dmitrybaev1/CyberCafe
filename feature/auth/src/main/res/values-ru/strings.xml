@@ -5,6 +5,7 @@
     <string name="name_hint">Имя (необязательно)</string>
     <string name="password_hint">Пароль</string>
     <string name="sign_in">Войти</string>
+    <string name="sign_in_with_google">Войти через Google</string>
     <string name="log_in">Вход</string>
     <string name="register">Нет аккаунта?</string>
     <string name="register_explicit">Зарегистрироваться</string>

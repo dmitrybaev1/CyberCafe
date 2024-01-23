@@ -2,6 +2,7 @@ package ru.shawarma.auth
 
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,6 +17,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.createGraph
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.fragment
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
@@ -29,12 +33,15 @@ import ru.shawarma.core.ui.AppNavigation
 import ru.shawarma.core.ui.CommonComponentsController
 import ru.shawarma.core.ui.EventObserver
 
+
 @AndroidEntryPoint
 class AuthFragment : Fragment() {
 
     private var binding: FragmentAuthBinding? = null
 
     private val viewModel: AuthViewModel by viewModels()
+
+    private lateinit var googleSignInClient: GoogleSignInClient
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +60,7 @@ class AuthFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setupGoogleAuth()
         viewLifecycleOwner.lifecycleScope.launch{
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 viewModel.authState.filterNotNull().stateIn(this)
@@ -72,7 +80,7 @@ class AuthFragment : Fragment() {
             is AuthUIState.Success -> {
                 binding!!.authErrorTextView.text = ""
                 (requireActivity() as CommonComponentsController).sendFirebaseToken(
-                    sendAction = {token ->
+                    sendAction = { token ->
                         viewModel.saveFirebaseToken(FirebaseTokenRequest(token))
                     }
                 )
@@ -111,9 +119,43 @@ class AuthFragment : Fragment() {
                     start()
                 }
             }
+            is AuthUIState.NeedGoogleSignIn -> {
+                googleSignIn()
+                viewModel.resetState()
+            }
+
             is AuthUIState.FirebaseTokenSent -> {
                 findNavController().popBackStack(R.id.authFragment,true)
                 (requireActivity() as AppNavigation).navigateToMenu()
+            }
+        }
+    }
+
+    private fun setupGoogleAuth(){
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.server_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), gso)
+    }
+
+    private fun googleSignIn(){
+        val signInIntent = googleSignInClient.signInIntent
+        startActivityForResult(signInIntent, RC_GOOGLE_SIGN_IN)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == RC_GOOGLE_SIGN_IN){
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try{
+                val token = task.result.idToken
+                token?.let {
+                    viewModel.verifyGoogle(it)
+                }
+            }
+            catch (e: Exception){
+                e.printStackTrace()
             }
         }
     }
@@ -137,5 +179,8 @@ class AuthFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+    }
+    companion object{
+        const val RC_GOOGLE_SIGN_IN = 1488
     }
 }
